@@ -4,7 +4,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFModule.cpp,v 1.14 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: CAAFModule.cpp,v 1.15 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -956,6 +956,50 @@ STDAPI
           internalppNewFile->ReleaseReference(); // We are through with this pointer.
         }
     }
+  return hr;
+}
+
+
+STDAPI
+    AAFSetProgressCallback (IAAFProgress*  pProgress)
+{
+  HRESULT hr;
+
+
+  try
+    {
+      hr = ImplAAFSetProgressCallback
+       (pProgress);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
   return hr;
 }
 

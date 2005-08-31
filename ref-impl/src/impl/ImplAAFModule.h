@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.16 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.17 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -413,6 +413,10 @@ ImplAAFCreateAAFFileOnRawStorage
    aafUInt32  modeFlags,
    aafProductIdentification_constptr  pIdent,
    ImplAAFFile ** ppNewFile);
+
+STDAPI
+ImplAAFSetProgressCallback
+  (IAAFProgress * pProgress);
 
 //***********************************************************
 //

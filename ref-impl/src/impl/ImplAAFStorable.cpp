@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStorable.cpp,v 1.4 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFStorable.cpp,v 1.5 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -37,6 +37,8 @@
 
 #include "ImplAAFStorable.h"
 #include "ImplAAFClassDef.h"
+#include "ImplAAFContext.h"
+#include "ImplAAFModule.h"
 #include "assert.h"
 
 ImplAAFStorable::ImplAAFStorable ()
@@ -77,4 +79,23 @@ AAFRESULT ImplAAFStorable::GetDefinition(ImplAAFClassDef ** ppClassDef)
   *ppClassDef = pClassDef;
   pClassDef->AcquireReference();
   return AAFRESULT_SUCCESS;
+}
+
+// Call during long operations in order to give time to the calling application
+void ImplAAFStorable::Progress(void) const
+{
+  ImplAAFContext* context = ImplAAFContext::GetInstance();
+  assert(context);
+  IAAFProgress* progress = NULL;
+  context->GetProgressCallback(&progress);
+  if(progress != NULL)
+  {
+	  try
+	  {
+		(*progress).ProgressCallback();
+	  }
+	  catch(...)
+	  {
+	  }
+  }
 }

@@ -1,11 +1,9 @@
-//@doc
-//@class    MetaDefinition | Implementation class for MetaDefinition
 #ifndef __ImplAAFStorable_h__
 #define __ImplAAFStorable_h__
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStorable.h,v 1.5 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFStorable.h,v 1.6 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +16,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -69,6 +67,10 @@ protected:
   // the given class definition. NOTE: This call is recursive, it calls itself again
   // for the parent class of the given class until current class is a "root" class.
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef) = 0;
+
+  // Call during long operations in order to give time to the calling application
+  void Progress(void) const;
+
 };
 
 //

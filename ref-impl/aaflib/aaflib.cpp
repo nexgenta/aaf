@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.37 2005/08/23 00:08:15 montrowe Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.38 2005/08/31 19:13:53 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -594,6 +594,38 @@ STDAPI AAFGetPluginManager (
 
 //***********************************************************
 //
+// AAFSetProgressCallback()
+//
+STDAPI AAFSetProgressCallback (
+  IAAFProgress * pProgress)
+{
+  HRESULT hr = S_OK;
+  AAFDLL *pAAFDLL = NULL;
+
+
+  // Get the dll wrapper
+  hr = LoadIfNecessary(&pAAFDLL);
+  if (FAILED(hr))
+    return hr;
+  
+  try
+  {
+    // Attempt to call the dll's exported function...
+    hr = pAAFDLL->SetProgressCallback(pProgress);
+  }
+  catch (...)
+  {
+    // Return a reasonable exception code.
+    //
+    hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+  }
+
+  return hr;
+}
+
+
+//***********************************************************
+//
 // AAFGetFileEncodings()
 //
 STDAPI AAFGetFileEncodings (
@@ -840,6 +872,10 @@ HRESULT AAFDLL::Load(const char *dllname)
   }
 
   rc = ::AAFFindSymbol(_libHandle,
+  					   "AAFSetProgressCallback",
+  					   (AAFSymbolAddr *)&_pfnSetProgressCallback);
+
+  rc = ::AAFFindSymbol(_libHandle,
   					   "AAFCreateRawStorageCachedDisk",
   					   (AAFSymbolAddr *)&_pfnCreateRawStorageCachedDisk);
   // Ignore failure
@@ -906,6 +942,7 @@ void AAFDLL::ClearEntrypoints()
   _pfnCreateRawStorageDisk = 0;
   _pfnCreateRawStorageCachedDisk = 0;
   _pfnCreateAAFFileOnRawStorage = 0;
+  _pfnSetProgressCallback = 0;
   _pfnGetFileEncodings = 0;
   _pfnGetLibraryVersion = 0;
   _pfnGetLibraryPathNameBufLen = 0;
@@ -1081,6 +1118,17 @@ HRESULT AAFDLL::CreateAAFFileOnRawStorage (
 	 modeFlags,
 	 pIdent,
 	 ppNewFile);
+}
+
+HRESULT AAFDLL::SetProgressCallback (
+  IAAFProgress * pProgress)
+{
+//  ASSERT("Valid dll callback function", _pfnCreateAAFFileOnRawStorage);
+  // This callback did not exist in DR4 or earlier toolkits.
+  if (NULL == _pfnSetProgressCallback)
+    return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
+    
+  return _pfnSetProgressCallback(pProgress);
 }
 
 HRESULT AAFDLL::GetFileEncodings (

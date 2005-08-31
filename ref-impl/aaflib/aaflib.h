@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.h,v 1.18 2005/08/23 00:08:15 montrowe Exp $ $Name:  $
+// $Id: aaflib.h,v 1.19 2005/08/31 19:13:53 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -110,6 +110,9 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
 	aafProductIdentification_constptr  pIdent,
 	IAAFFile ** ppNewFile);
 
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFSETPROGRESSCALLBACK)(
+    IAAFProgress * pProgress);
+
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETFILEENCODINGS)(
     IEnumAAFFileEncodings ** ppFileEncodings);
 
@@ -195,6 +198,9 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFCREATEAAFFILEONRAWSTORAGE)(
 	aafUInt32  modeFlags,
 	aafProductIdentification_constptr  pIdent,
 	IAAFFile ** ppNewFile);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFSETPROGRESSCALLBACK)(
+    IAAFProgress * pProgress);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETFILEENCODINGS)(
     IEnumAAFFileEncodings ** ppFileEncodings);
@@ -323,6 +329,9 @@ public:
 	aafProductIdentification_constptr  pIdent,
 	IAAFFile ** ppNewFile);
 
+  HRESULT SetProgressCallback (
+    IAAFProgress * pProgress);
+
   HRESULT GetFileEncodings (
     IEnumAAFFileEncodings ** ppFileEncodings);
 
@@ -363,6 +372,7 @@ protected:
   LPFNAAFCREATERAWSTORAGEDISK      _pfnCreateRawStorageDisk;
   LPFNAAFCREATERAWSTORAGECACHEDDISK _pfnCreateRawStorageCachedDisk;
   LPFNAAFCREATEAAFFILEONRAWSTORAGE _pfnCreateAAFFileOnRawStorage;
+  LPFNAAFSETPROGRESSCALLBACK       _pfnSetProgressCallback;
   LPFNAAFGETFILEENCODINGS          _pfnGetFileEncodings;
   LPFNAAFGETLIBRARYVERSION         _pfnGetLibraryVersion;
   LPFNAAFGETLIBRARYPATHNAMEBUFLEN  _pfnGetLibraryPathNameBufLen;

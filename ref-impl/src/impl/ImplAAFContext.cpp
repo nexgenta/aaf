@@ -1,7 +1,6 @@
-
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFContext.cpp,v 1.34 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFContext.cpp,v 1.35 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -14,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -41,7 +40,6 @@
 #include "ImplAAFPluginManager.h"
 
 #include "OMObjectManager.h"
-
 
 extern "C" const aafClassID_t CLSID_AAFPluginManager;
 
@@ -78,6 +76,7 @@ ImplAAFContext::ImplAAFContext ()
   assert(NULL == _singleton);
 
   _plugins = NULL;
+  _progressCallback = 0;
   OMObjectManager::initialize();
   ImplAAFFile::registerFactories();
 }
@@ -89,7 +88,12 @@ ImplAAFContext::~ImplAAFContext ()
     _plugins->ReleaseReference();
     _plugins = 0;
   }
-  
+  if (_progressCallback)
+  {
+    _progressCallback->Release();
+    _progressCallback = 0;
+  }
+
   ImplAAFFile::removeFactories();
   OMObjectManager::finalize();
 }
@@ -110,6 +114,29 @@ class ImplAAFPluginManager *ImplAAFContext::GetPluginManager (void)
   if (_plugins)
     _plugins->AcquireReference();
   return(_plugins);
+}
+
+HRESULT ImplAAFContext::SetProgressCallback(IAAFProgress * pProgress)
+{
+  if (_progressCallback != 0)
+    _progressCallback->Release();
+
+  _progressCallback = pProgress;
+
+  if (_progressCallback != 0)
+    _progressCallback->AddRef();
+
+  return AAFRESULT_SUCCESS;
+}
+
+HRESULT ImplAAFContext::GetProgressCallback(IAAFProgress ** ppProgress)
+{
+  if (ppProgress == 0)
+    return AAFRESULT_NULL_PARAM;
+
+  *ppProgress = _progressCallback;
+
+  return AAFRESULT_SUCCESS;
 }
 
 // extern "C" const aafClassID_t CLSID_AAFContext;

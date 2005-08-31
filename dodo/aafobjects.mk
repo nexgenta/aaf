@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.155 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.156 2005/08/31 19:13:53 montrowe Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -44,6 +44,7 @@ AAFCOMINTERFACESONLY="\
 	AAFMasterMob2 \
 	AAFMasterMobEx \
 	AAFMob2 \
+	AAFProgress \
 	AAFRGBADescriptor2 \
 	AAFSearchSource \
 	AAFSourceReference2 \

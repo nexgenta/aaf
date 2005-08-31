@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.16 2004/11/23 17:29:55 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.17 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -468,6 +468,7 @@ void ImplAAFMetaDefinition::onRestore(void* /*clientContext*/) const
 
   // Cast away constness (maintaining logical constness)
   ((ImplAAFMetaDefinition*) this)->setInitialized ();
+  Progress();
 }
 
 

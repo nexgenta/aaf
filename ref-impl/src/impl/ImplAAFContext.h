@@ -1,11 +1,9 @@
-//@doc
-//@class    AAFContext | Implementation class for AAFContext
 #ifndef __ImplAAFContext_h__
 #define __ImplAAFContext_h__
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFContext.h,v 1.26 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFContext.h,v 1.27 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +16,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -30,13 +28,12 @@
 #include "AAFTypes.h"
 #include "ImplAAFRoot.h"
 
-
 //
 // Forward declaration
 //
 class ImplAAFFile;
 class ImplAAFPluginManager;
-
+struct IAAFProgress;
 
 class ImplAAFContext : public ImplAAFRoot
 {
@@ -56,6 +53,11 @@ public:
   void InitPluginManager (void);
   ImplAAFPluginManager *GetPluginManager (void);
 
+  // Pass in NULL to revert to no-callback
+  HRESULT SetProgressCallback(IAAFProgress * pProgress);
+
+  // Succeeds, returning NULL if no calback
+  HRESULT GetProgressCallback(IAAFProgress ** ppProgress);
 private:
 
   //
@@ -69,6 +71,7 @@ private:
   static ImplAAFContext * _singleton;
 
   ImplAAFPluginManager	*_plugins;
+  IAAFProgress			*_progressCallback;
 
 };
 
