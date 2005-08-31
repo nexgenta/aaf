@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.66 2005/08/31 19:14:14 montrowe Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.67 2005/08/31 19:20:47 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@
 
 #ifndef MAKE_HRESULT
 #define MAKE_HRESULT(sev,fac,code) \
-    ((HRESULT) (((AAFUInt32)(sev)<<31) | ((AAFUInt32)(fac)<<16) | ((AAFUInt32)(code))) )
+    ((HRESULT) (((aafUInt32)(sev)<<31) | ((aafUInt32)(fac)<<16) | ((aafUInt32)(code))) )
 #endif
 
 // #define _FACILITY_AAF    FACILITY_ITF
