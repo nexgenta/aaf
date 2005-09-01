@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Test.cpp$,v 1.2 2005/07/11 13:29:14 dks Exp $
+// $Id: AAFAnalyzerTest.cpp,v 1.8 2005/09/01 16:05:07 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

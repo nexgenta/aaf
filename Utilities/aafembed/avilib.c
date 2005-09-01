@@ -1,4 +1,6 @@
 /*
+ *  $Id: avilib.c,v 1.2 2005/09/01 16:05:07 stuart_hc Exp $ $Name:  $
+ *
  *  avilib.c
  *
  *  Copyright (C) Thomas Östreich - June 2001
