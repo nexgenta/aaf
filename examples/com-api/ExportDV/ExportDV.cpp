@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.12 2005/09/01 16:55:33 tbingham Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.13 2005/09/01 17:06:28 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -191,11 +191,18 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;		// Set by SDK when saving
 
-	// Large sectors for new files, small sectors for legacy files
-	const aafUID_t *fileKind = useLegacyDV ? &kAAFFileKind_Aaf512Binary : &kAAFFileKind_Aaf4KBinary;
 
-	if (formatMXF)
+	const aafUID_t *fileKind = 0;
+	if (!formatMXF) {
+	  // Large sectors for new files, small sectors for legacy files
+          if (useLegacyDV) {
+	    fileKind = &kAAFFileKind_Aaf512Binary;
+          } else {
+            fileKind = &kAAFFileKind_Aaf4KBinary;
+	  }
+	} else {
 	  fileKind = &aafFileKindMxfKlvBinary;
+	}
 
 	// Create a new AAF file
 	check(AAFFileOpenNewModifyEx(pFileName, fileKind, 0, &ProductInfo, &pFile));
