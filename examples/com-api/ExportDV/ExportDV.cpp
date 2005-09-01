@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.13 2005/09/01 17:06:28 tbingham Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.14 2005/09/01 20:24:23 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -219,7 +219,11 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 	check(pDictionary->LookupClassDef(AUID_AAFMasterMob, &pCDMasterMob));
 
 	/* Lookup any necessary data definitions. */
-	check(pDictionary->LookupDataDef(kAAFDataDef_Picture, &pPictureDef));
+	if (useLegacyDV) {
+	  check(pDictionary->LookupDataDef(kAAFDataDef_LegacyPicture, &pPictureDef));
+        } else {
+	  check(pDictionary->LookupDataDef(kAAFDataDef_Picture, &pPictureDef));
+	}
 
 	/* Create a Mastermob */
 
