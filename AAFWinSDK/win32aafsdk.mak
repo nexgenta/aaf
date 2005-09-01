@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.34 2005/03/18 18:18:43 phil_tudor Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.35 2005/09/01 03:49:36 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -256,6 +256,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)\AAFPropertyIDs.h \
 	$(AAFSDK_INCLUDE)\AAFResult.h \
 	$(AAFSDK_INCLUDE)\AAFSmartPointer.h \
+	$(AAFSDK_INCLUDE)\AAFSmartPointer2.h \
 	$(AAFSDK_INCLUDE)\AAFSmartPointerBase.h \
 	$(AAFSDK_INCLUDE)\AAFStoredObjectIDs.h \
 	$(AAFSDK_INCLUDE)\AAFTypeDefUIDs.h \
@@ -550,6 +551,9 @@ $(AAFSDK_INCLUDE)\AAFSmartPointerBase.h : $(TOOLKIT_INCLUDE)\AAFSmartPointerBase
 
 $(AAFSDK_INCLUDE)\AAFSmartPointer.h : $(TOOLKIT_INCLUDE)\AAFSmartPointer.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFSmartPointer.h $@
+	
+$(AAFSDK_INCLUDE)\AAFSmartPointer2.h : $(TOOLKIT_INCLUDE)\AAFSmartPointer2.h
+	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFSmartPointer2.h $@
 
 $(AAFSDK_INCLUDE)\AAFStoredObjectIDs.h : $(TOOLKIT_INCLUDE)\AAFStoredObjectIDs.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFStoredObjectIDs.h $@
