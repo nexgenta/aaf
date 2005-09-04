@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.h,v 1.15 2005/08/25 00:28:58 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.h,v 1.16 2005/09/04 04:11:26 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -150,6 +150,8 @@ AxString AxNameToString( IAAFSmartPointer< Type >& sp )
 
 	return name;
 }
+
+AxString AxTaggedValueToString( IAAFTaggedValueSP& sp );
 
 // Function template that will return a description given a smart
 // pointer of type "Type".  Type must have a "GetDescriptionBufLen",

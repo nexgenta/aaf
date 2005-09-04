@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.18 2005/08/25 00:28:58 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.19 2005/09/04 04:11:26 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -322,4 +322,26 @@ AxString AxStringUtil::mobid2Str(const aafMobID_t & mobID)
 		throw AxEx( L"Error in mobid2Str" );
 	}    
 	return mbtowc( buf );
+}
+
+
+AxString AxTaggedValueToString( IAAFTaggedValueSP& sp )
+{
+	aafUInt32 sizeInBytes = 0;
+
+	CHECK_HRESULT( sp->GetValueBufLen( &sizeInBytes ) );
+
+	// size is in bytes!  Divide by sizeof(aafCharacter) to allocate correctly
+	// sized aafCharacter array.  Add one to account for possible rounding.
+
+	int sizeInChars = (sizeInBytes /sizeof(aafCharacter)) + 1;
+	std::vector< aafCharacter > buf( sizeInChars );
+
+	aafUInt32 bytesRead; // unused
+	CHECK_HRESULT( sp->GetValue( sizeInChars*sizeof(aafCharacter),
+				     reinterpret_cast<aafDataBuffer_t>(&buf[0]), &bytesRead ) );
+
+	AxString name( &buf[0] );
+
+	return name;
 }
