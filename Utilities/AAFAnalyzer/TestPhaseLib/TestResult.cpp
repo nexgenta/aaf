@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.cpp,v 1.4 2005/08/30 18:42:15 ajakowpa Exp $
+// $Id: TestResult.cpp,v 1.5 2005/09/05 06:00:30 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -146,6 +146,16 @@ enum TestResult::Result TestResult::GetAggregateResult() const {
 
 bool TestResult::ContainsSubtests() const {
     return !_spSubtestResults->empty();
+}
+
+void TestResult::AddDetail( AxString detail )
+{
+  _details.push_back( detail );
+}
+
+const vector<AxString>& TestResult::GetDetails() const
+{
+  return _details;
 }
 
 } // end of namespace diskstream

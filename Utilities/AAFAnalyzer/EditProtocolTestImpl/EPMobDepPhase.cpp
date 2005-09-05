@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.1 2005/09/05 04:59:37 jptrainor Exp $
+// $Id: EPMobDepPhase.cpp,v 1.2 2005/09/05 06:00:30 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,8 @@
 
 #include <CompMobDependency.h>
 #include <TestResult.h>
+
+#include <sstream>
 
 namespace {
 
@@ -70,7 +72,21 @@ boost::shared_ptr<TestResult> EPMobDepPhase::Execute()
   shared_ptr<TestResult> depTestResult = depTest.Execute();
   spTestResult->AppendSubtestResult( depTest.Execute() );
 
-  //  spTestResult->SetResult( spTestResult->GetAggregateResult() );
+  spTestResult->SetResult( spTestResult->GetAggregateResult() );
+
+  CompMobDependency::CompMobNodeVectorSP spRootNodes = depTest.GetRootCompMobNodes();
+  wstringstream ss;
+  ss << spRootNodes->size() << L" unreferenced composition ";
+  if ( spRootNodes->size() == 1 )
+  {
+    ss << L"mob ";
+  }
+  else
+  {
+    ss << L"mobs ";
+  }
+  ss << "found.";
+  spTestResult->AddDetail( ss.str() );
 
   return spTestResult;
 }
