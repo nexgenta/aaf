@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DepthFirstTraversal.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: DepthFirstTraversal.h,v 1.2 2005/09/05 16:34:51 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,8 +37,12 @@ class DepthFirstTraversal
   DepthFirstTraversal(boost::shared_ptr<EdgeMap> spEdgeMap, boost::shared_ptr<Node> spStartNode);
   ~DepthFirstTraversal();
 
+  // Depricated (there is no need to pass a start node here).
   void TraverseDown(boost::shared_ptr<Visitor> spVisitor, boost::shared_ptr<Node> spNode);
   void TraverseUp(boost::shared_ptr<Visitor> spVisitor, boost::shared_ptr<Node> spNode);
+
+  void TraverseDown(boost::shared_ptr<Visitor> spVisitor );
+  void TraverseUp(boost::shared_ptr<Visitor> spVisitor );
 
  private:
   boost::shared_ptr<EdgeMap> _spEdgeMap;

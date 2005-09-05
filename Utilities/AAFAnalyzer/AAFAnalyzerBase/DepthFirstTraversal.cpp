@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DepthFirstTraversal.cpp,v 1.3 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: DepthFirstTraversal.cpp,v 1.4 2005/09/05 16:34:51 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,6 +68,11 @@ void DepthFirstTraversal::TraverseDown(boost::shared_ptr<Visitor> spVisitor, boo
   spNode->PostOrderVisit(spVisitor);
 }
 
+void DepthFirstTraversal::TraverseDown(boost::shared_ptr<Visitor> spVisitor )
+{
+  TraverseDown( spVisitor, _spStartNode );
+}
+
 void DepthFirstTraversal::TraverseUp(boost::shared_ptr<Visitor> spVisitor, boost::shared_ptr<Node> spNode)
 {
   EdgeMap::EdgeVectorSP theParents = _spEdgeMap->GetParents(spNode);  
@@ -85,6 +90,11 @@ void DepthFirstTraversal::TraverseUp(boost::shared_ptr<Visitor> spVisitor, boost
   }
 
   spNode->PostOrderVisit(spVisitor);
+}
+
+void DepthFirstTraversal::TraverseUp(boost::shared_ptr<Visitor> spVisitor )
+{
+  TraverseUp( spVisitor, _spStartNode );
 }
 
 
