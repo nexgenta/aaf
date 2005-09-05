@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.7 2005/09/05 05:00:21 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.8 2005/09/05 05:04:19 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -134,7 +134,7 @@ int main( int argc, char** argv )
     boost::shared_ptr<TestResult> spSubResult;
     boost::shared_ptr<TestResult> spResult( new TestResult() );
     spResult->SetName( L"AAF Analyzer" );
-    spResult->SetDescription( L"Run a suite of tests on an AAF file." );
+    spResult->SetDescription( L"AAF Edit Protocol compliance test." );
     
     // First phase: load the aaf file, and build the object graph.
     LoadPhase load( wcout, fileName );
