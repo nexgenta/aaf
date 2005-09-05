@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
+// $Id: CompMobDependency.h,v 1.5 2005/09/05 16:37:04 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,11 +43,11 @@ class CompMobDependency : public Test
   typedef shared_ptr<CompMobNodeVector> CompMobNodeVectorSP;
 
   CompMobDependency(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
-  ~CompMobDependency();
+  virtual ~CompMobDependency();
 
-  boost::shared_ptr<TestResult> Execute();
-  AxString GetName() const;
-  AxString GetDescription() const;
+  virtual boost::shared_ptr<TestResult> Execute();
+  virtual AxString GetName() const;
+  virtual AxString GetDescription() const;
 
   CompMobNodeVectorSP GetRootCompMobNodes();
 
