@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.cpp,v 1.6 2005/09/05 04:34:20 jptrainor Exp $
+// $Id: CompMobDependency.cpp,v 1.7 2005/09/05 05:00:21 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,9 +50,8 @@ CompMobDependency::~CompMobDependency()
 boost::shared_ptr<TestResult> CompMobDependency::Execute()
 {
 
-  boost::shared_ptr<TestResult> spVisitorResult(new TestResult());
   boost::shared_ptr<NodeRefCountVisitor<IAAFCompositionMob> > spVisitor(
-       new NodeRefCountVisitor<IAAFCompositionMob>( GetOutStream(), *spVisitorResult) );
+       new NodeRefCountVisitor<IAAFCompositionMob>( GetOutStream() ) );
 
   DepthFirstTraversal dfs(GetTestGraph()->GetEdgeMap(), GetTestGraph()->GetRootNode());
 
@@ -66,10 +65,10 @@ boost::shared_ptr<TestResult> CompMobDependency::Execute()
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode()); 
   
-  spResult->AppendSubtestResult(spVisitorResult);
-  spResult->SetResult(spResult->GetAggregateResult());
-
   _spRootCompMobs = spVisitor->GetNodesWithCount(0);
+
+  spResult->AppendSubtestResult( spVisitor->GetTestResult() );
+  spResult->SetResult(spResult->GetAggregateResult());
 
   return spResult;
 }
