@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.19 2005/09/04 04:11:26 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.20 2005/09/05 00:28:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,6 +38,19 @@ AxString catUnknownStr( L"unknown" );
 };
 
 //=---------------------------------------------------------------------=
+
+// AxContants go here
+
+const aafMobID_t AxConstants::NULL_MOBID  =  { {0,0,0,0,0,0,0,0,0,0,0,0}, // SMPTELable
+					       0, // length
+					       0, // instanceHigh
+					       0, // instanceMid
+					       0, // instanceLow
+					       { 0, 0, 0, {0,0,0,0,0,0,0,0} } // material (uuid) 
+                                             };
+
+//=---------------------------------------------------------------------=
+
 
 AxTypeCatMap::AxTypeCatMap()
 {

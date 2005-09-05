@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.h,v 1.16 2005/09/04 04:11:26 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.h,v 1.17 2005/09/05 00:28:44 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,13 @@
 #include <utility>
 
 #include <map>
+
+// Useful constants that appear over and over again.
+class AxConstants
+{
+ public:
+  static const aafMobID_t NULL_MOBID;
+};
 
 // Map eAAFTypeCategory_t to string
 
