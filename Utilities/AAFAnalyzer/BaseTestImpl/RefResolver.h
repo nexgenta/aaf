@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.h,v 1.4 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: RefResolver.h,v 1.5 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@ namespace aafanalyzer {
 class RefResolver : public Test
 {
  public:
-  RefResolver(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
+  RefResolver(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~RefResolver();
 
   boost::shared_ptr<TestResult> Execute();

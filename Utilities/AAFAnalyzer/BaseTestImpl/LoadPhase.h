@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LoadPhase.h,v 1.4 2005/09/05 01:07:46 jptrainor Exp $ $Name:  $
+// $Id: LoadPhase.h,v 1.5 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@ class TestGraph;
 class LoadPhase : public TestPhase
 {
  public:
-  LoadPhase(std::ostream& os, const std::basic_string<wchar_t> AAFFile);
+  LoadPhase(std::wostream& os, const std::basic_string<wchar_t> AAFFile);
   virtual ~LoadPhase();
 
   virtual boost::shared_ptr<TestResult> Execute();  

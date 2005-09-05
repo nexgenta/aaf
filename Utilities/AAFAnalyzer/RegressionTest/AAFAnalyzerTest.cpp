@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerTest.cpp,v 1.8 2005/09/01 16:05:07 stuart_hc Exp $ $Name:  $
+// $Id: AAFAnalyzerTest.cpp,v 1.9 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,13 +89,13 @@ int main()
 
   //test the Acyclic Visitor
   std::cout << "***CYCLE TESTER (no cycles)***" << std::endl;
-  boost::shared_ptr<AcyclicVisitor> spAcyclicVisitorA(new AcyclicVisitor(std::cout));
+  boost::shared_ptr<AcyclicVisitor> spAcyclicVisitorA(new AcyclicVisitor(std::wcout));
   dfs.TraverseDown(spAcyclicVisitorA, parentOne);
   TestResult resultA = *spAcyclicVisitorA->GetTestResult();
   assert( resultA.GetResult() == TestResult::PASS );
   
   std::cout << "***CYCLE TESTER (w/ cycle present)***" << std::endl;
-  boost::shared_ptr<AcyclicVisitor> spAcyclicVisitorB(new AcyclicVisitor(std::cout));
+  boost::shared_ptr<AcyclicVisitor> spAcyclicVisitorB(new AcyclicVisitor(std::wcout));
   spEdgeMap->AddEdge(boost::shared_ptr<Edge>(new Edge(fooTwo, parentTwo)));//adds a cycle
   dfs.TraverseDown(spAcyclicVisitorB, parentOne);
   TestResult resultB = *spAcyclicVisitorB->GetTestResult();

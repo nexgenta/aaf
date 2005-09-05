@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.6 2005/09/05 00:50:45 jptrainor Exp $
+// $Id: AcyclicVisitor.cpp,v 1.7 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,7 @@ using namespace aafanalyzer;
 
 namespace aafanalyzer {
 
-AcyclicVisitor::  AcyclicVisitor(std::ostream& os)
+AcyclicVisitor::  AcyclicVisitor(std::wostream& os)
   : _os(os),
     _spResult( new TestResult( L"AcyclicVisitor",
                                L"Detects cycles in an AAF object graph.",

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: NodeRefCountVisitor.h,v 1.2 2005/08/25 22:11:55 jptrainor Exp $
+// $Id: NodeRefCountVisitor.h,v 1.3 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ class NodeRefCountVisitor : public TypedVisitor
   typedef vector<ReferencedNodeSP> ReferencedNodeVector;
   typedef shared_ptr<ReferencedNodeVector> ReferencedNodeVectorSP;
 
-  NodeRefCountVisitor(std::ostream& os, TestResult& result)
+  NodeRefCountVisitor(std::wostream& os, TestResult& result)
     : _os(os),
      _result(result)
   {}
@@ -147,7 +147,7 @@ class NodeRefCountVisitor : public TypedVisitor
     return iter != _nodeMap.end();
   }
 
-  std::ostream& _os;
+  std::wostream& _os;
   TestResult& _result;
   NodeMap _nodeMap;   //<LID, ref count>
 };

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LoadPhase.cpp,v 1.3 2005/09/05 00:50:45 jptrainor Exp $
+// $Id: LoadPhase.cpp,v 1.4 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,15 +36,13 @@ using namespace aafanalyzer;
 namespace aafanalyzer 	
 {
 
-LoadPhase::LoadPhase(std::ostream& os, const std::basic_string<wchar_t> AAFFile) 
-: TestPhase(os),
-  _FileName(AAFFile)
-{
-}
+LoadPhase::LoadPhase(std::wostream& os, const std::basic_string<wchar_t> AAFFile) 
+  : TestPhase(os),
+    _FileName(AAFFile)
+{}
 
 LoadPhase::~LoadPhase()
-{
-}
+{}
 
 boost::shared_ptr<TestGraph> LoadPhase::GetTestGraph()
 {

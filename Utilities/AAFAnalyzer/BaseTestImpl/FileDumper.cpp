@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileDumper.cpp,v 1.2 2005/08/30 18:42:15 ajakowpa Exp $
+// $Id: FileDumper.cpp,v 1.3 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@ using namespace aafanalyzer;
 namespace aafanalyzer 
 {
 
-FileDumper::FileDumper(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph)
+FileDumper::FileDumper(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph)
 : Test(os)
 {
   SetTestGraph(spTestGraph);
@@ -66,15 +66,15 @@ boost::shared_ptr<TestResult> FileDumper::Execute()
   return spResult;
 }
 
-AxString FileDumper::GetName()
+AxString FileDumper::GetName() const
 {
-  AxString name = L"--- File Dump ---";
+  AxString name = L"File Dump";
   return name;
 }
 
-AxString FileDumper::GetDescription()
+AxString FileDumper::GetDescription() const
 {
-  AxString description = L"Test Description: Dump the AAF graph to screen.";
+  AxString description = L"Dump an dobject graph..";
   return description;
 }
 

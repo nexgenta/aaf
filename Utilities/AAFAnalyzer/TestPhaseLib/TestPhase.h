@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhase.h,v 1.2 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: TestPhase.h,v 1.3 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,16 +37,16 @@ namespace aafanalyzer {
 class TestPhase
 {
  public:
-  TestPhase(std::ostream& os);
+  TestPhase(std::wostream& os);
   virtual ~TestPhase();
 
-  virtual std::string GetDescription();
-  virtual std::string GetName();
+  virtual AxString GetDescription() const;
+  virtual AxString GetName() const;
   virtual boost::shared_ptr<TestResult> Execute() = 0; 
-  std::ostream& GetOutStream(); 
+  std::wostream& GetOutStream() const;
 
  private:
-  std::ostream& _os;
+  std::wostream& _os;
 
   // prohibited
   TestPhase();

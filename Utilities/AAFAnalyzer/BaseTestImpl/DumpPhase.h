@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DumpPhase.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: DumpPhase.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@ class TestGraph;
 class DumpPhase : public TestPhase
 {
  public:
-  DumpPhase(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
+  DumpPhase(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~DumpPhase();
 
   boost::shared_ptr<TestGraph> GetTestGraph();

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DumpPhase.cpp,v 1.2 2005/08/30 18:42:15 ajakowpa Exp $
+// $Id: DumpPhase.cpp,v 1.3 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,15 +36,13 @@ using namespace aafanalyzer;
 namespace aafanalyzer 	
 {
 
-DumpPhase::DumpPhase(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph) 
+DumpPhase::DumpPhase(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph) 
 : TestPhase(os),
   _spTestGraph(spTestGraph)
-{
-}
+{}
 
 DumpPhase::~DumpPhase()
-{
-}
+{}
 
 boost::shared_ptr<TestGraph> DumpPhase::GetTestGraph()
 {

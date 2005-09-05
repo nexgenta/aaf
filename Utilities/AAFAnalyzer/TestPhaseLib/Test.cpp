@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.cpp,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $
+// $Id: Test.cpp,v 1.4 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@ using namespace aafanalyzer;
 namespace aafanalyzer 
 {
 
-Test::Test(std::ostream& os)
+Test::Test(std::wostream& os)
 : _os(os)
 {
 }
@@ -55,7 +55,7 @@ AxString Test::GetDescription() const
   return null;
 }
 
-std::ostream& Test::GetOutStream() const
+std::wostream& Test::GetOutStream() const
 {
   return _os;
 }

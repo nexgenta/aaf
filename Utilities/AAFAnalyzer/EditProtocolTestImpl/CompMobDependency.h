@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: CompMobDependency.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,8 +18,8 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef __COMPMOBDEPENDENCY_h__
-#define __COMPMOBDEPENDENCY_h__
+#ifndef __CompMobDependency_h__
+#define __CompMobDependency_h__
 
 #include <AAFTypedObjNode.h>
 
@@ -42,12 +42,12 @@ class CompMobDependency : public Test
   typedef vector<CompMobNodeSP> CompMobNodeVector;
   typedef shared_ptr<CompMobNodeVector> CompMobNodeVectorSP;
 
-  CompMobDependency(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
+  CompMobDependency(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~CompMobDependency();
 
   boost::shared_ptr<TestResult> Execute();
-  AxString GetName();
-  AxString GetDescription();
+  AxString GetName() const;
+  AxString GetDescription() const;
 
   CompMobNodeVectorSP GetRootCompMobNodes();
 

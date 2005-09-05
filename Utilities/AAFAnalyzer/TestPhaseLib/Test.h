@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: Test.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,20 +40,20 @@ namespace aafanalyzer {
 class Test
 {
  public:
-  Test(std::ostream& os);
+  Test(std::wostream& os);
   virtual ~Test();
 
   virtual boost::shared_ptr<TestResult> Execute() = 0;
   virtual AxString GetName() const;
   virtual AxString GetDescription() const;
-  std::ostream& GetOutStream() const;
+  std::wostream& GetOutStream() const;
   boost::shared_ptr<TestGraph> GetTestGraph();
 
 protected:
   void SetTestGraph(boost::shared_ptr<TestGraph> spTestGraph);
 
  private:
-  std::ostream& _os;
+  std::wostream& _os;
   boost::shared_ptr<TestGraph> _spTestGraph;
 
   // prohibited

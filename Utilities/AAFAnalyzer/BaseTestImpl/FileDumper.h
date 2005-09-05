@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileDumper.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: FileDumper.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,12 +29,12 @@ namespace aafanalyzer {
 class FileDumper : public Test
 {
  public:
-  FileDumper(std::ostream& os, boost::shared_ptr<TestGraph> spTestGraph);
+  FileDumper(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
   ~FileDumper();
 
-  boost::shared_ptr<TestResult> Execute();
-  AxString GetName();
-  AxString GetDescription();
+  virtual boost::shared_ptr<TestResult> Execute();
+  virtual AxString GetName() const;
+  virtual AxString GetDescription() const;
 
  private:
 

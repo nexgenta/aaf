@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhase.cpp,v 1.1 2005/08/18 14:07:23 greek_fire Exp $
+// $Id: TestPhase.cpp,v 1.2 2005/09/05 04:34:20 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@ using namespace aafanalyzer;
 namespace aafanalyzer 
 {
 
-TestPhase::TestPhase(std::ostream& os)
+TestPhase::TestPhase(std::wostream& os)
 : _os(os)
 {
 }
@@ -43,19 +43,17 @@ TestPhase::~TestPhase()
 {
 }
 
-std::string TestPhase::GetDescription()
+AxString TestPhase::GetDescription() const
 {
-  std::string null;
-  return null;
+  return L"";
 }
 
-std::string TestPhase::GetName()
+AxString TestPhase::GetName() const
 {
-  std::string null;
-  return null;
+  return L"";
 }
 
-std::ostream& TestPhase::GetOutStream()
+std::wostream& TestPhase::GetOutStream() const
 {
   return _os;
 }
