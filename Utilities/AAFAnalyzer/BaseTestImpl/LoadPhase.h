@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LoadPhase.h,v 1.3 2005/08/30 18:42:15 ajakowpa Exp $ $Name:  $
+// $Id: LoadPhase.h,v 1.4 2005/09/05 01:07:46 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,19 +38,21 @@ class LoadPhase : public TestPhase
 {
  public:
   LoadPhase(std::ostream& os, const std::basic_string<wchar_t> AAFFile);
-  ~LoadPhase();
+  virtual ~LoadPhase();
+
+  virtual boost::shared_ptr<TestResult> Execute();  
 
   boost::shared_ptr<TestGraph> GetTestGraph();
-  boost::shared_ptr<TestResult> Execute();  
 
  private:
-  boost::shared_ptr<TestGraph> _spTestGraph;
-  const std::basic_string<wchar_t> _FileName;
 
   // prohibited
   LoadPhase();
   LoadPhase( const LoadPhase& );
   LoadPhase& operator=( const LoadPhase& );
+
+  boost::shared_ptr<TestGraph> _spTestGraph;
+  const std::basic_string<wchar_t> _FileName;
 };
 
 } // end of namespace diskstream
