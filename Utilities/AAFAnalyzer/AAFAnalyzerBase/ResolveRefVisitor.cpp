@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.7 2005/09/05 04:34:20 jptrainor Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.8 2005/09/06 00:22:17 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -135,11 +135,6 @@ bool ResolveRefVisitor::PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node)
     _spResult->AppendSubtestResult( spWarning );
   }
 
-  return true;
-}
-
-bool ResolveRefVisitor::EdgeVisit(Edge& edge)
-{
   return true;
 }
 
