@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.148 2005/08/30 19:04:48 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.149 2005/09/06 21:24:25 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1585,7 +1585,7 @@ OMRawStorage * ImplAAFFile::RawStorage ()
 
 // these are only prototype
 #define AAFXMLEncoding ENCODING(kAAFFileKind_AafXmlText)
-#define AAFKLVEncoding ENCODING(kAAFFileKind_MxfKlvBinary)
+#define AAFKLVEncoding ENCODING(kAAFFileKind_AafKlvBinary)
 
 // signatures from the point of view of the OM
 #define Signature_SSBin_512 ENCODING(kAAFSignature_Aaf512Binary)
