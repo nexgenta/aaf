@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.227 2005/08/26 20:23:33 tbingham Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.228 2005/09/06 19:44:07 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -396,6 +396,7 @@ void OMMXFStorage::writePartition(const OMKLVKey& key,
   OMUInt64 currentPosition = position();
   OMUInt32 i;
   bool found = findPartition(currentPosition, i);
+  (void)found;
   ASSERT("Partition not found", !found);
   i = _partitions.count();
 
@@ -2272,6 +2273,7 @@ void OMMXFStorage::restoreStreams(void)
     while (needBody || needIndex) {
       keyPosition = position();
       bool b = readOuterKLVKey(k);
+      (void)b;
       ASSERT("Read key", b);
       ASSERT("Key is not a partition key", !isPartition(k));
       length = readKLVLength();
