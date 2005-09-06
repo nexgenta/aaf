@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.h,v 1.1 2005/09/05 16:38:34 jptrainor Exp $
+// $Id: EPDerivationTest.h,v 1.2 2005/09/06 02:37:10 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@ namespace aafanalyzer {
 using namespace boost;
 using namespace std;
 
- class EPDerivationTest : public Test
+class EPDerivationTest : public Test
 {
  public:
 
@@ -49,7 +49,6 @@ using namespace std;
   EPDerivationTest();
   EPDerivationTest( const EPDerivationTest& );
   EPDerivationTest& operator=( const EPDerivationTest& );
-
 
   shared_ptr<TestGraph> _spGraph;
   CompMobDependency::CompMobNodeVectorSP _spTopLevelCompMobs;
