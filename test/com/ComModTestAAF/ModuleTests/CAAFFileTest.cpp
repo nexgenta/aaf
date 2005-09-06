@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.47 2005/08/31 20:31:15 montrowe Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.48 2005/09/06 13:40:01 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -316,7 +316,8 @@ class TestProgress : public IAAFProgress
     // Defeat gcc warning about private ctor/dtor and no friends
     // Note that this dummy function cannot itself be called because
     // it requires a constructed TestProgress object.
-    friend void DummyveFriend(TestProgress);
+    friend void dummyFriend(TestProgress);
+
     public:
         virtual HRESULT STDMETHODCALLTYPE ProgressCallback( void);
         virtual ULONG STDMETHODCALLTYPE AddRef( void);
