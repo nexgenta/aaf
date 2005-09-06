@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.17 2005/09/06 21:26:03 tbingham Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.18 2005/09/06 22:30:57 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -202,7 +202,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
             fileKind = &kAAFFileKind_Aaf4KBinary;
 	  }
 	} else {
-	  fileKind = &aafFileKindAafKlvBinary;
+	  fileKind = &kAAFFileKind_AafKlvBinary;
 	}
 
 	// Create a new AAF file
