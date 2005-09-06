@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.h,v 1.6 2005/06/09 12:11:20 montrowe Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.h,v 1.7 2005/09/06 12:43:24 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@
 
 class CAAFTypeDefStream
   : public IAAFTypeDefStream,
+    public IAAFTypeDefStreamEx,
     public CAAFTypeDef
 {
 protected:
@@ -59,7 +60,6 @@ protected:
   virtual ~CAAFTypeDefStream ();
 
 public:
-
 
 
   //***********************************************************
@@ -596,6 +596,43 @@ public:
     // buffer into which elements from the stream should be written
     /*[in, ref, size_is(dataSize)]*/ aafMemPtr_t  pData);
 
+  //***********************************************************
+  // METHOD NAME: SetCallback()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFTypeDefStreamEx | SetCallback |
+  // Sets a callback interface to be called when a stream is written to or
+  /// read from the file.  This allows the stream property to be built bottom up.
+  ///
+  /// Succeeds if:
+  /// - Initialize() has already been called on this object.
+  /// - pPropertyValue pointer is valid.
+  /// - pCallbackIF pointer is valid.
+  /// - pUserData pointer is valid.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - either pPropertyValue or pCallbackIF or pUserData arg is NULL.
+  // @end
+  // 
+  STDMETHOD (SetCallback)
+   (
+    // @parm [in] AAFPropertyValue | pPropertyValue | Issue the callback for this property
+    IAAFPropertyValue * pPropertyValue,
+
+    // @parm [in] IAAFStreamAccess* | pCallbackIF | Interface of the callback object
+    IAAFStreamAccess*  pCallbackIF,
+
+    // @parm [in] aafMemPtr_t | pUserData | Client-specific data passed through to the callback
+    aafMemPtr_t  pUserData
+  );
+
 
 protected:
   // 
@@ -617,5 +654,4 @@ public:
 };
 
 #endif // ! __CAAFTypeDefStream_h__
-
 

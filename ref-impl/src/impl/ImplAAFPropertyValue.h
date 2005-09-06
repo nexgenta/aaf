@@ -1,12 +1,8 @@
-//@doc
-//@class    AAFPropertyValue | Implementation class for AAFPropertyValue
 #ifndef __ImplAAFPropertyValue_h__
 #define __ImplAAFPropertyValue_h__
-
-
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyValue.h,v 1.17 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPropertyValue.h,v 1.18 2005/09/06 12:43:24 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -37,7 +33,7 @@ class ImplAAFTypeDef;
 #endif
 
 class OMProperty;
-
+class OMDataStreamAccess;
 
 class ImplAAFPropertyValue : public ImplAAFRoot
 {
@@ -67,6 +63,7 @@ public:
 
 
   virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
+
 
 protected:
   //
@@ -109,7 +106,7 @@ private:
   
   OMProperty *_property; // The property associated with this property value.
   ImplAAFRoot *_propertyContainer; // The object that owns the property.
-};
+ };
 
 //
 // smart pointer
