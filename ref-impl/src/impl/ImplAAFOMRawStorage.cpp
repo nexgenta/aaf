@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOMRawStorage.cpp,v 1.6 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: ImplAAFOMRawStorage.cpp,v 1.7 2005/09/07 18:23:20 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -372,7 +372,7 @@ void ImplAAFOMCachedRawStorage::rawWriteAt(OMUInt64 position,
   aafUInt64 rawStorageSize = 0;
 
   IAAFRandomRawStorage* pRandomRawStorage = 0;
-  AAFRESULT hr = pRawStorage->QueryInterface(IID_IAAFRandomRawStorage,
+  pRawStorage->QueryInterface(IID_IAAFRandomRawStorage,
                                              (void **)&pRandomRawStorage);
 
   if (pRandomRawStorage)
