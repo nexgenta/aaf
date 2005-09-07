@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.5 2005/07/25 20:23:28 montrowe Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.6 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,39 +57,14 @@ void RemoveTestFile(const wchar_t* pFileName)
 
 //======================================================================
 
-
-void CreateSimpleAAFFile(aafWChar* pFileName
-	, aafWChar* pTestName
-	, SimpleFilePointers* pFilePointers)
-{
-  aafProductIdentification_t productIdentification;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  productIdentification.companyName = L"AAF Developers Desk";
-  productIdentification.productName = pTestName;
-  productIdentification.productVersion = &v;
-  productIdentification.productVersionString = NULL;
-  productIdentification.productID = UnitTestProductID;
-  productIdentification.platform = NULL;
-
-  CreateSimpleAAFFile(pFileName
-	, testFileKindDefault
-	, kAAFNamedFile
-	, productIdentification
-	, pFilePointers);
-}
-
 void CreateSimpleAAFFile(aafWChar * pFileName,
 			 aafUID_constref fileKind,
 			 const testRawStorageType_t rawStorageType,
 			 aafProductIdentification_constref productIdentification,
 			 SimpleFilePointers* pFilePointers )
 {
+  HRESULT hr = AAFRESULT_SUCCESS;
+
   // Remove the previous test file if any.
   RemoveTestFile(pFileName);
 

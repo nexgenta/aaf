@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.h,v 1.4 2005/07/25 20:23:28 montrowe Exp $ $Name:  $
+// $Id: ModuleTestsCommon.h,v 1.5 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -85,7 +85,9 @@ struct SimpleFilePointers {
 
 // Deprecated
 void CreateSimpleAAFFile( aafCharacter* pFileName,
-			  aafCharacter* pCompMobName,
+			  aafUID_constref fileKind,
+			  const testRawStorageType_t rawStorageType,
+			  aafProductIdentification_constref productIdentification,
 			  SimpleFilePointers* pFilePointers );
 
 void CreateSimpleAAFFile( aafCharacter* pFileName,
