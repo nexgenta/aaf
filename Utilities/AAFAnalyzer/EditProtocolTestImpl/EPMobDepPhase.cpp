@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.3 2005/09/05 16:37:57 jptrainor Exp $
+// $Id: EPMobDepPhase.cpp,v 1.4 2005/09/07 03:39:42 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -94,6 +94,8 @@ boost::shared_ptr<TestResult> EPMobDepPhase::Execute()
   // with the identified root compositions.
   EPDerivationTest derivationTest( _log, _spGraph, spRootNodes );
   spPhaseResult->AppendSubtestResult( derivationTest.Execute() );
+
+  spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
   return spPhaseResult;
 }
