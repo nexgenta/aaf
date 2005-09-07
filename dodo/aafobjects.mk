@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.157 2005/09/06 12:43:22 montrowe Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.158 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -62,6 +62,7 @@ HUMAN_TYPED_IMPL="\
 	AAFAIFCDescriptor \
 	AAFAuxiliaryDescriptor \
 	AAFCDCIDescriptor \
+	AAFCachePageAllocator \
 	AAFClassDef \
 	AAFCodecDef \
 	AAFCommentMarker \

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.7 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.8 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,7 @@ extern "C" const aafClassID_t CLSID_AAFAES3PCMDescriptor;
 extern "C" const aafClassID_t CLSID_AAFAIFCDescriptor;
 extern "C" const aafClassID_t CLSID_AAFAuxiliaryDescriptor;
 extern "C" const aafClassID_t CLSID_AAFCDCIDescriptor;
+extern "C" const aafClassID_t CLSID_AAFCachePageAllocator;
 extern "C" const aafClassID_t CLSID_AAFClassDef;
 extern "C" const aafClassID_t CLSID_AAFCodecDef;
 extern "C" const aafClassID_t CLSID_AAFCommentMarker;

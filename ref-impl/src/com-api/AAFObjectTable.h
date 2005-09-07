@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.8 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.9 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -72,6 +72,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFAIFCDescriptor)
 	AAF_OBJECT_ENTRY(AAFAuxiliaryDescriptor)
 	AAF_OBJECT_ENTRY(AAFCDCIDescriptor)
+	AAF_OBJECT_ENTRY(AAFCachePageAllocator)
 	AAF_OBJECT_ENTRY(AAFClassDef)
 	AAF_OBJECT_ENTRY(AAFCodecDef)
 	AAF_OBJECT_ENTRY(AAFCommentMarker)

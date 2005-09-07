@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.8 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.9 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,7 @@
 #include "CAAFAIFCDescriptor.h"
 #include "CAAFAuxiliaryDescriptor.h"
 #include "CAAFCDCIDescriptor.h"
+#include "CAAFCachePageAllocator.h"
 #include "CAAFClassDef.h"
 #include "CAAFCodecDef.h"
 #include "CAAFCommentMarker.h"

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.8 2005/08/22 23:25:03 montrowe Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.9 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,6 +53,7 @@ EXTERN_C const CLSID CLSID_AAFAES3PCMDescriptor;
 EXTERN_C const CLSID CLSID_AAFAIFCDescriptor;
 EXTERN_C const CLSID CLSID_AAFAuxiliaryDescriptor;
 EXTERN_C const CLSID CLSID_AAFCDCIDescriptor;
+EXTERN_C const CLSID CLSID_AAFCachePageAllocator;
 EXTERN_C const CLSID CLSID_AAFClassDef;
 EXTERN_C const CLSID CLSID_AAFCodecDef;
 EXTERN_C const CLSID CLSID_AAFCommentMarker;

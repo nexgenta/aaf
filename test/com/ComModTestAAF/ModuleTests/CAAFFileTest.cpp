@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFileTest.cpp,v 1.48 2005/09/06 13:40:01 montrowe Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.49 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -574,8 +574,8 @@ static HRESULT NegativeTestPublicGlobalFunctions(
   aafWChar* pFileName = L"NoSuchF.ile";
 
   /* **************************************************************************
-     HACK ALERT -- temporaily remove non-existing file and already exitisting
-	 file tests until OMStream divergence fixed
+     HACK ALERT -- temporaily remove non-existing file and already existing
+     file tests until OMStream divergence fixed
 
   RemoveTestFile(pFileName);
 
@@ -583,7 +583,15 @@ static HRESULT NegativeTestPublicGlobalFunctions(
   f += ExpectFail(AAFFileOpenExistingModify(pFileName, 0, id, &pFile));
   //              AAFFileOpenNewModify - NA
   //              AAFFileOpenNewModifyEx - NA
+  ************************************************************************** */
+
   f += ExpectFail(AAFFileIsAAFFile(pFileName, &k, &b));
+  f += ExpectFail(AAFFileIsAAFFileKind(pFileName, &kind, &b));
+
+  /* **************************************************************************
+     HACK ALERT -- temporaily remove non-existing file and already existing
+     file tests until OMStream divergence fixed
+
   f += ExpectFail(AAFCreateRawStorageDisk(pFileName,
                                          kAAFFileExistence_existing,
                                          kAAFFileAccess_read,
@@ -634,6 +642,8 @@ static HRESULT NegativeTestPublicGlobalFunctions(
   // AAFFileOpenNewModify - NA
   // AAFFileOpenNewModifyEx - NA
   h = AAFFileIsAAFFile(pFileName, &k, &b);
+  f += ExpectFalse(h, b);
+  h = AAFFileIsAAFFileKind(pFileName, &kind, &b);
   f += ExpectFalse(h, b);
   // AAFCreateRawStorageDisk - NA
   // AAFCreateRawStorageCachedDisk - NA

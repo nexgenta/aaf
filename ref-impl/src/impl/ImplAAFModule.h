@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.17 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.18 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -365,6 +365,25 @@ STDAPI ImplAAFRawStorageIsAAFFile (
 
 //***********************************************************
 //
+// ImplAAFFileIsAAFFileKind()
+//
+STDAPI ImplAAFFileIsAAFFileKind (
+  aafCharacter_constptr  pFileName,
+  aafUID_constptr pAAFFileKind,
+  aafBool *  pFileIsAAFFile);
+
+//***********************************************************
+//
+// ImplAAFRawStorageIsAAFFileKind()
+//
+//
+STDAPI ImplAAFRawStorageIsAAFFileKind (
+  IAAFRawStorage *  /*pRawStorage*/,
+  aafUID_constptr /*pAAFFileKind*/,
+  aafBool *  /*pRawStorageIsAAFFile*/);
+
+//***********************************************************
+//
 // AAFLoadPluginManager()
 //
 // Returns a instance of the singleton plugin manager.
@@ -402,6 +421,21 @@ ImplAAFCreateRawStorageCachedDisk
    aafFileAccess_t access,
    aafUInt32  pageCount,
    aafUInt32  pageSize,
+   ImplAAFRawStorage ** ppNewRawStorage);
+
+STDAPI
+ImplAAFCreateRawStorageCached
+  (IAAFRawStorage * pRawStorage,
+   aafUInt32  pageCount,
+   aafUInt32  pageSize,
+   ImplAAFRawStorage ** ppNewRawStorage);
+
+STDAPI
+ImplAAFCreateRawStorageCached2
+  (IAAFRawStorage * pRawStorage,
+   aafUInt32  pageCount,
+   aafUInt32  pageSize,
+   IAAFCachePageAllocator * pCachePageAllocator,
    ImplAAFRawStorage ** ppNewRawStorage);
 
 STDAPI
