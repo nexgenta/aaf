@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.6 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.7 2005/09/07 20:15:32 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,8 +63,6 @@ void CreateSimpleAAFFile(aafWChar * pFileName,
 			 aafProductIdentification_constref productIdentification,
 			 SimpleFilePointers* pFilePointers )
 {
-  HRESULT hr = AAFRESULT_SUCCESS;
-
   // Remove the previous test file if any.
   RemoveTestFile(pFileName);
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCachePageAllocatorTest.cpp,v 1.1 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: CAAFCachePageAllocatorTest.cpp,v 1.2 2005/09/07 20:15:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,10 @@
 
 class TestCachePageAllocator : public IAAFCachePageAllocator {
 public:
+  // Defeat gcc warning about private ctor/dtor and no friends
+  // Note that this dummy function cannot itself be called because
+  // it requires a constructed TestCachePageAllocator object.
+  friend void dummyFriend(TestCachePageAllocator);
 
   HRESULT STDMETHODCALLTYPE QueryInterface(REFIID iid, void ** ppIfc);
 

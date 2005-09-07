@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFModuleTest.cpp,v 1.31 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
+// $Id: CAAFModuleTest.cpp,v 1.32 2005/09/07 20:15:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -319,7 +319,7 @@ HRESULT CAAFModuleTest::Test
 			}
 			std::wcout << std::endl;
 			index = findObjectTestInfo(pClassName[i]);
-			if (index!=-1) {
+			if (index!=static_cast<aafUInt32>(-1)) {
 				testResults[index] = AAFObjectMap[index].CallTestProc(mode, fileKind, rawStorageType);
 				if (testResults[index]!=AAFRESULT_SUCCESS) {
 					printNotSuccess(testResults[index]);
@@ -354,7 +354,7 @@ HRESULT CAAFModuleTest::Test
 			{
 				printName(pClassName[i], true);
 				index = findObjectTestInfo(pClassName[i]);
-				if (index!=-1)
+				if (index!=static_cast<aafUInt32>(-1))
 				{
 					++testCount;
 					testResults[index] = AAFObjectMap[index].CallTestProc(mode, fileKind, rawStorageType);

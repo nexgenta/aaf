@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComModTestAAF.cpp,v 1.28 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
+// $Id: ComModTestAAF.cpp,v 1.29 2005/09/07 20:15:31 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -203,7 +203,7 @@ main(int argc, char* argv[])
 	for (int i=0; i<argc; ++i) {
 		size_t argSize=strlen(argv[i])+1;
 		wargv[i]=new wchar_t[argSize];
-		if (mbstowcs(wargv[i], argv[i], argSize)==-1) {
+		if (mbstowcs(wargv[i], argv[i], argSize)==static_cast<size_t>(-1)) {
 			std::wcerr << L"ERROR: Cannot convert arguments to wide characters." << std::endl;
 			return EXIT_FAILURE;
 		}

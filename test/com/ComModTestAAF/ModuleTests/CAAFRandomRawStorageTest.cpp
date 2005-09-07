@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.25 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.26 2005/09/07 20:15:32 montrowe Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1139,7 +1139,7 @@ HRESULT CAAFRandomRawStorage_test(
 
 		  if (mode == kAAFUnitTestReadWrite)
 			{
-			  cout << "  Writing "
+			  cout << "\tWriting "
 				   << sFileDescriptions[wType].description
 				   << endl;
 			  subtest_result = CreateAAFFile (sFileDescriptions[wType], fileName, fileKind, productID);
@@ -1152,7 +1152,7 @@ HRESULT CAAFRandomRawStorage_test(
 				   rType < kNumDescriptions;
 				   rType++)
 				{
-				  cout << "    Reading "
+				  cout << "\t\tReading "
 					   << sFileDescriptions[rType].description
 					   << endl;
 				  subtest_result = ReadAAFFile (sFileDescriptions[rType],
