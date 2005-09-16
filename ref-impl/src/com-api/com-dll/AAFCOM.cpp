@@ -13,7 +13,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOM.cpp,v 1.26 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
+// $Id: AAFCOM.cpp,v 1.27 2005/09/16 18:23:43 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -104,7 +104,8 @@ BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID /*lpReserved*/)
     if (NULL == ImplAAFContext::GetInstance ())
     {
       // Return the most liked error code.
-      return E_OUTOFMEMORY;
+	  SetLastError(E_OUTOFMEMORY);
+	  return FALSE;
     }
 
     // We don't need to be notified everytime a thread is created
