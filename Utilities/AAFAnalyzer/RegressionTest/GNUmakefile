@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2005/08/19 19:15:44 greek_fire Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2005/09/20 17:48:53 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 
 PROGNAME = RegressionTest
 
-PROGLIBS = -lAAFAnalyzerBase -lTestPhase
+PROGLIBS = -lAAFAnalyzerBase -lTestPhase -lRequirement
 
 include ../aafanalyzer.mk
 
