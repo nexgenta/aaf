@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhase.h,v 1.4 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
+// $Id: TopLevelTestResult.h,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,42 +18,34 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef __TESTPHASE_h__
-#define __TESTPHASE_h__
+#ifndef __TOPLEVELTESTRESULT_h__
+#define __TOPLEVELTESTRESULT_h__
 
-//test files
+//Project files
+#include "HighLevelTestResult.h"
 #include "TestPhaseLevelTestResult.h"
-
-//stl files
-#include <iostream>
-#include <vector>
-#include <string>
-
-//boost files
-#include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
 
-class TestPhase
+using namespace std;
+
+class TopLevelTestResult : public HighLevelTestResult
 {
  public:
-  TestPhase(std::wostream& os);
-  virtual ~TestPhase();
 
-  virtual AxString GetDescription() const;
-  virtual AxString GetName() const;
-  virtual boost::shared_ptr<TestPhaseLevelTestResult> Execute() = 0; 
-  std::wostream& GetOutStream() const; 
+  TopLevelTestResult();
+  TopLevelTestResult( const AxString& name, const AxString& desc,
+                      const AxString& explain, const AxString& docRef,
+                      Result defaultResult );
+  ~TopLevelTestResult();
 
- private:
-  std::wostream& _os;
+  void AppendSubtestResult( const boost::shared_ptr<const TestPhaseLevelTestResult>& subtestResult );
+  const enum ResultLevel GetResultType() const;
 
   // prohibited
-  TestPhase();
-  TestPhase( const TestPhase& );
-  TestPhase& operator=( const TestPhase& );
+  
 };
 
 } // end of namespace diskstream
 
-#endif/*__TEMPLATE_h__*/
+#endif/*__TOPLEVELTESTRESULT_h__*/
