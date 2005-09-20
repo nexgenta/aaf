@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.cpp,v 1.7 2005/09/05 05:00:21 jptrainor Exp $
+// $Id: CompMobDependency.cpp,v 1.8 2005/09/20 17:48:22 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,7 @@
 
 #include <NodeRefCountVisitor.h>
 #include <DepthFirstTraversal.h>
+#include <DetailLevelTestResult.h>
 
 namespace {
 
@@ -38,7 +39,7 @@ namespace aafanalyzer
 {
 
 CompMobDependency::CompMobDependency(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph)
-: Test(os)
+: Test(os, GetTestInfo() )
 {
   SetTestGraph(spTestGraph);
 }
@@ -47,7 +48,7 @@ CompMobDependency::~CompMobDependency()
 {
 }
 
-boost::shared_ptr<TestResult> CompMobDependency::Execute()
+boost::shared_ptr<TestLevelTestResult> CompMobDependency::Execute()
 {
 
   boost::shared_ptr<NodeRefCountVisitor<IAAFCompositionMob> > spVisitor(
@@ -59,7 +60,9 @@ boost::shared_ptr<TestResult> CompMobDependency::Execute()
   //GetOutStream() << GetName() << std::endl << GetDescription() << std::endl << std::endl;
 
   //set result properties
-  boost::shared_ptr<TestResult> spResult(new TestResult());
+  const boost::shared_ptr<const Test> me = this->shared_from_this();
+  Requirement::RequirementMapSP spMyReqs(new Requirement::RequirementMap(this->GetCoveredRequirements()));
+  boost::shared_ptr<TestLevelTestResult> spResult(new TestLevelTestResult( me, spMyReqs ) );
   spResult->SetName(GetName());
   spResult->SetDescription(GetDescription());
 
@@ -88,6 +91,13 @@ AxString CompMobDependency::GetDescription() const
 CompMobDependency::CompMobNodeVectorSP CompMobDependency::GetRootCompMobNodes()
 {
   return _spRootCompMobs;
+}
+
+const TestInfo CompMobDependency::GetTestInfo()
+{
+    boost::shared_ptr<std::vector<AxString> > spReqIds(new std::vector<AxString>);
+//    spReqIds->push_back(L"Requirement Id");
+    return TestInfo(L"CompMobDependency", spReqIds);
 }
 
 } // end of namespace diskstream

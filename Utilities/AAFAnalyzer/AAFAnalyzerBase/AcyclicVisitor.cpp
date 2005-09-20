@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.7 2005/09/05 04:34:20 jptrainor Exp $
+// $Id: AcyclicVisitor.cpp,v 1.8 2005/09/20 17:47:54 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,6 +21,8 @@
 #include "AcyclicVisitor.h"
 
 #include "Node.h"
+
+#include <Requirement.h>
 
 #include <iostream>
 
@@ -46,12 +48,14 @@ namespace aafanalyzer {
 
 AcyclicVisitor::  AcyclicVisitor(std::wostream& os)
   : _os(os),
-    _spResult( new TestResult( L"AcyclicVisitor",
-                               L"Detects cycles in an AAF object graph.",
-                               L"No cycles found.",
-                               L"", // DOCREF REQUIRED
-                               TestResult::PASS ) )
+    _spResult( new DetailLevelTestResult(L"AcyclicVisitor",
+                                         L"Detects cycles in an AAF object graph.",
+                                         L"No cycles found.",
+                                         L"", // DOCREF REQUIRED
+                                         TestResult::PASS,
+                                         *(new Requirement::RequirementMapSP(new Requirement::RequirementMap())) ) )
 {}
+//TODO: Pass a real RequirementVectorSP
 
 AcyclicVisitor::~AcyclicVisitor()
 {
@@ -126,7 +130,7 @@ void AcyclicVisitor::Erase(unsigned int lid)
   }  
 }
 
-boost::shared_ptr<const TestResult> AcyclicVisitor::GetTestResult() const
+boost::shared_ptr<const DetailLevelTestResult> AcyclicVisitor::GetTestResult() const
 {
   return _spResult; 
 }

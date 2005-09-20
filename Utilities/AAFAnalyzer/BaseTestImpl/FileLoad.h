@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileLoad.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
+// $Id: FileLoad.h,v 1.5 2005/09/20 17:48:10 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,7 @@
 
 //project files
 #include <Test.h>
+#include <TestLevelTestResult.h>
 
 namespace aafanalyzer {
 
@@ -32,9 +33,10 @@ class FileLoad : public Test
   FileLoad(std::wostream& os, const std::basic_string<wchar_t> AAFFile);
   ~FileLoad();
 
-  boost::shared_ptr<TestResult> Execute();
+  boost::shared_ptr<TestLevelTestResult> Execute();
   AxString GetName() const;
   AxString GetDescription() const;
+  static const TestInfo GetTestInfo();
 
  private:
   const std::basic_string<wchar_t> _File;

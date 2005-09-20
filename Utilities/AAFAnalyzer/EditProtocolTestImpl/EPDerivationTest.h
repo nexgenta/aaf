@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.h,v 1.2 2005/09/06 02:37:10 jptrainor Exp $
+// $Id: EPDerivationTest.h,v 1.3 2005/09/20 17:48:22 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,9 +39,10 @@ class EPDerivationTest : public Test
 		    CompMobDependency::CompMobNodeVectorSP spTopLevelCompMobs );
   virtual ~EPDerivationTest();
 
-  virtual shared_ptr<TestResult> Execute();
+  virtual shared_ptr<TestLevelTestResult> Execute();
   virtual AxString GetName() const;
   virtual AxString GetDescription() const;
+  static const TestInfo GetTestInfo();
 
  private:
 

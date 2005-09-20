@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.h,v 1.1 2005/09/05 04:59:37 jptrainor Exp $ $Name:  $
+// $Id: EPMobDepPhase.h,v 1.2 2005/09/20 17:48:22 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,9 @@
 
 #include <TestPhase.h>
 
+#include <CompMobDependency.h>
+#include <EPDerivationTest.h>
+
 #include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
@@ -40,7 +43,7 @@ class EPMobDepPhase : public TestPhase
 
   virtual AxString GetDescription() const;
   virtual AxString GetName() const;
-  virtual boost::shared_ptr<TestResult> Execute();
+  virtual boost::shared_ptr<TestPhaseLevelTestResult> Execute();
 
  private:
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DumpPhase.h,v 1.4 2005/09/05 04:34:20 jptrainor Exp $ $Name:  $
+// $Id: DumpPhase.h,v 1.5 2005/09/20 17:48:10 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,7 @@
 
 //test files
 #include <TestPhase.h>
+#include "FileDumper.h"
 
 namespace aafanalyzer {
 
@@ -35,7 +36,7 @@ class DumpPhase : public TestPhase
   ~DumpPhase();
 
   boost::shared_ptr<TestGraph> GetTestGraph();
-  boost::shared_ptr<TestResult> Execute();
+  boost::shared_ptr<TestPhaseLevelTestResult> Execute();
 
  private:
   boost::shared_ptr<TestGraph> _spTestGraph;

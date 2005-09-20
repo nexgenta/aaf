@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.cpp,v 1.4 2005/09/05 04:34:20 jptrainor Exp $
+// $Id: RefResolver.cpp,v 1.5 2005/09/20 17:48:10 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,7 @@
 
 #include <DepthFirstTraversal.h>
 #include <ResolveRefVisitor.h>
+#include <DetailLevelTestResult.h>
 
 //boost files
 #include <boost/shared_ptr.hpp>
@@ -41,7 +42,7 @@ namespace aafanalyzer
 {
 
 RefResolver::RefResolver(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph)
-: Test(os)
+: Test(os, GetTestInfo())
 {
   SetTestGraph(spTestGraph);
 }
@@ -50,7 +51,7 @@ RefResolver::~RefResolver()
 {
 }
 
-boost::shared_ptr<TestResult> RefResolver::Execute()
+boost::shared_ptr<TestLevelTestResult> RefResolver::Execute()
 {
   //TestResult visitorResult;
   boost::shared_ptr<ResolveRefVisitor> spVisitor(new ResolveRefVisitor(GetOutStream(), GetTestGraph()->GetEdgeMap()));
@@ -58,14 +59,17 @@ boost::shared_ptr<TestResult> RefResolver::Execute()
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode());
 
-  boost::shared_ptr<TestResult> spResult(
-                new TestResult( L"ReferenceResolver",
-                                L"Resolves source references in an AAF file.",
-                                spVisitor->GetTestResult()->GetExplanation(),
-                                L"-", //DOCREF
-                                spVisitor->GetTestResult()->GetResult()
-                              ) );
-  boost::shared_ptr<const TestResult> spVisitorResult(spVisitor->GetTestResult());
+  const boost::shared_ptr<const Test> me = this->shared_from_this();
+  Requirement::RequirementMapSP spMyReqs(new Requirement::RequirementMap(this->GetCoveredRequirements()));
+  boost::shared_ptr<TestLevelTestResult> spResult(
+            new TestLevelTestResult( L"ReferenceResolver",
+                                     L"Resolves source references in an AAF file.",
+                                     spVisitor->GetTestResult()->GetExplanation(),
+                                     L"-", //DOCREF
+                                     spVisitor->GetTestResult()->GetResult(),
+                                     me, 
+                                     spMyReqs ) ); 
+  boost::shared_ptr<const DetailLevelTestResult> spVisitorResult( spVisitor->GetTestResult() );
   spResult->AppendSubtestResult(spVisitorResult);
 
   return spResult;
@@ -81,6 +85,13 @@ AxString RefResolver::GetDescription() const
 {
   AxString description = L"Test Description: Resolve all source clip references.";
   return description;
+}
+
+const TestInfo RefResolver::GetTestInfo()
+{
+    boost::shared_ptr<std::vector<AxString> > spReqIds(new std::vector<AxString>);
+//    spReqIds->push_back(L"Requirement Id");
+    return TestInfo(L"RefResolver", spReqIds);
 }
 
 } // end of namespace diskstream

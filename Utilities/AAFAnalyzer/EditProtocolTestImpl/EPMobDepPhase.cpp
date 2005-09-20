@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.4 2005/09/07 03:39:42 jptrainor Exp $
+// $Id: EPMobDepPhase.cpp,v 1.5 2005/09/20 17:48:22 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,9 +19,6 @@
 //=---------------------------------------------------------------------=
 
 #include <EPMobDepPhase.h>
-
-#include <CompMobDependency.h>
-#include <EPDerivationTest.h>
 
 #include <TestResult.h>
 
@@ -60,9 +57,9 @@ AxString EPMobDepPhase::GetName() const
   return PHASE_NAME;
 }
 
-boost::shared_ptr<TestResult> EPMobDepPhase::Execute()
+boost::shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
 {
-  shared_ptr<TestResult> spPhaseResult( new TestResult( PHASE_NAME,        // name
+  shared_ptr<TestPhaseLevelTestResult> spPhaseResult( new TestPhaseLevelTestResult( PHASE_NAME,        // name
 						       PHASE_DESC,        // desc
 						       L"",               // explain
 						       L"",               // DOCREF REQUIRED
@@ -70,13 +67,13 @@ boost::shared_ptr<TestResult> EPMobDepPhase::Execute()
 
   // First, compute the composition mob dependencies.
 
-  CompMobDependency depTest( _log, _spGraph );
-  shared_ptr<TestResult> depTestResult = depTest.Execute();
-  spPhaseResult->AppendSubtestResult( depTest.Execute() );
+  boost::shared_ptr<CompMobDependency> depTest( new CompMobDependency(_log, _spGraph) );
+  //shared_ptr<TestResult> depTestResult = depTest->Execute();
+  spPhaseResult->AppendSubtestResult( depTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
-  CompMobDependency::CompMobNodeVectorSP spRootNodes = depTest.GetRootCompMobNodes();
+  CompMobDependency::CompMobNodeVectorSP spRootNodes = depTest->GetRootCompMobNodes();
   wstringstream ss;
   ss << spRootNodes->size() << L" unreferenced composition ";
   if ( spRootNodes->size() == 1 )
@@ -92,8 +89,8 @@ boost::shared_ptr<TestResult> EPMobDepPhase::Execute()
 
   // Second, run the dependency test to verify the chains starting
   // with the identified root compositions.
-  EPDerivationTest derivationTest( _log, _spGraph, spRootNodes );
-  spPhaseResult->AppendSubtestResult( derivationTest.Execute() );
+  boost::shared_ptr<EPDerivationTest> derivationTest( new EPDerivationTest(_log, _spGraph, spRootNodes) );
+  spPhaseResult->AppendSubtestResult( derivationTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
