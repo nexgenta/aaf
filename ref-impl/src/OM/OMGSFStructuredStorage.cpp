@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.cpp,v 1.6 2005/05/11 14:36:44 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.cpp,v 1.7 2005/09/21 04:44:19 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,7 +114,7 @@ ULONG STDMETHODCALLTYPE
 OMGSFIStorage::Release(void)
 {
 	TRACE("OMGSFIStorage::Release");
-	--_referenceCount;
+	ULONG result = --_referenceCount;
 	if (_referenceCount == 0)
 	{
 		if (_storage != 0)
@@ -128,7 +128,7 @@ OMGSFIStorage::Release(void)
 		}
 		delete this;
 	}
-	return _referenceCount;
+	return result;
 }
 
 
