@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/08/18 22:10:42 tbingham Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2005/09/21 16:48:05 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,10 +26,12 @@ PACKAGE = DevUtils
 
 AAFBASE ?= ../..
 
-
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
+ifeq ($(AAFPLATFORM),PPCDarwin)
+PLATFORMLIBS += -framework CoreServices
+endif
 
 # Include directories
 INCLUDES = -I$(AAFSDKINCLUDEDIR)
@@ -38,7 +40,7 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 all : $(OBJDIR) $(AAFSDKBINDIR)/MXFDump$(EXE)
 
 $(AAFSDKBINDIR)/MXFDump$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) $(LIBCIO) -o $@
+	$(LD) $(PLATFORMLIBS) $(CXXOBJS) $(RPATH_OPT) $(LIBCIO) -o $@
 
 .PHONY : clean
 clean :
