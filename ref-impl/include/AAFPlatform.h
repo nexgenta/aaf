@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPlatform.h,v 1.17 2005/06/14 20:27:52 montrowe Exp $ $Name:  $
+// $Id: AAFPlatform.h,v 1.18 2005/09/21 17:53:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -142,7 +142,7 @@
 /*
  *  Compiler:   GNU C++
  *  Processor:  Intel x86
- *  OS:         FreeBSD
+ *  OS:         OpenBSD
  */
 #elif defined(__GNUC__) && defined(__i386__) && defined(__OpenBSD__)
 #define CPU_INTEL
