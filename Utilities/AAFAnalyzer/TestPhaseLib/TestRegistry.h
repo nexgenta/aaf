@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.h,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $
+// $Id: TestRegistry.h,v 1.2 2005/09/22 13:55:12 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@
 #include "TopLevelTestResult.h"
 #include "TestInfo.h"
 #include <Requirement.h>
-#include <AxTypes.h>
 
 //STL files
 #include <map>
