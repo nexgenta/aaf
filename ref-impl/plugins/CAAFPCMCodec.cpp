@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.10 2005/06/16 13:38:20 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.11 2005/09/27 09:36:00 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1316,6 +1316,7 @@ HRESULT STDMETHODCALLTYPE
 				memcpy(&valueUInt32, buf, bytesRead);
 				XASSERT(valueUInt32 > 0, AAFRESULT_ZERO_SAMPLESIZE);
 				_bitsPerSample = (aafUInt16)valueUInt32;
+                _bytesPerFrame = (_bitsPerSample + 7) / 8;
 			}
 			else if(EqualAUID(&kAAFNumChannels, &opcode))
 			{
