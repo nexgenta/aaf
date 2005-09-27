@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.4 2005/09/20 17:49:39 ajakowpa Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.5 2005/09/27 19:12:31 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,7 @@ AXLIBPACKAGE = axExamples
 AXLIBDIR = $(AAFBUILDDIR)/$(AXLIBPACKAGE)/$(AAFTARGETDIR)
 
 .PHONY : all
-all : $(OBJDIR) $(BINTARGET)
+all : $(OBJDIR) $(BINTARGET) $(LIBDIR)
 
 ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
