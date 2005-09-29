@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.cpp,v 1.24 2004/04/10 23:21:56 jptrainor Exp $ $Name:  $
+// $Id: AxEssence.cpp,v 1.25 2005/09/29 15:57:20 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -662,6 +662,154 @@ aafUInt32 AxTapeDescriptor::GetTapeLength()
 	aafUInt32 length;
 	CHECK_HRESULT( _spIaafTapeDescriptor->GetTapeLength( &length ) );
 	return length;
+}
+
+//=---------------------------------------------------------------------=
+
+AxFilmDescriptor::AxFilmDescriptor( IAAFFilmDescriptorSP spIaafFilmDescriptor )
+:   AxEssenceDescriptor( AxQueryInterface<IAAFFilmDescriptor, IAAFEssenceDescriptor>(spIaafFilmDescriptor) ),
+    _spIaafFilmDescriptor( spIaafFilmDescriptor )
+{}
+
+AxFilmDescriptor::~AxFilmDescriptor()
+{}
+
+void AxFilmDescriptor::SetFilmManufacturer( const AxString& manufacturer )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetFilmManufacturer( manufacturer.c_str() )
+    );
+}
+
+AxString AxFilmDescriptor::GetFilmManufacturer()
+{
+    AxString manufacturer;
+
+    AX_ANY_TO_STRING( manufacturer,
+                      _spIaafFilmDescriptor,
+                      GetFilmManufacturerBufLen,
+                      GetFilmManufacturer );
+
+    return manufacturer;
+}
+
+void AxFilmDescriptor::SetFilmModel( const AxString& model )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetFilmModel( model.c_str() )
+    );
+}
+
+AxString AxFilmDescriptor::GetFilmModel()
+{
+    AxString filmModel;
+
+    AX_ANY_TO_STRING( filmModel,
+                      _spIaafFilmDescriptor,
+                      GetFilmModelBufLen,
+                      GetFilmModel );
+
+    return filmModel;
+}
+
+void AxFilmDescriptor::SetFilmFormat( aafFilmType_t filmFormat )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetFilmFormat( filmFormat )
+    );
+}
+
+aafFilmType_t AxFilmDescriptor::GetFilmFormat()
+{
+    aafFilmType_t filmFormat;
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->GetFilmFormat( &filmFormat ) );
+    return filmFormat;
+}
+
+void AxFilmDescriptor::SetFrameRate( aafUInt32 rate )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetFrameRate( rate )
+    );
+}
+
+aafUInt32 AxFilmDescriptor::GetFrameRate()
+{
+    aafUInt32 frameRate;
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->GetFrameRate( &frameRate ) );
+    return frameRate;
+}
+
+void AxFilmDescriptor::SetPerfPerFrame( aafUInt8 perfPerFrame )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetPerfPerFrame( perfPerFrame )
+    );
+}
+
+aafUInt8 AxFilmDescriptor::GetPerfPerFrame()
+{
+    aafUInt8 perfPerFrame;
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->GetPerfPerFrame( &perfPerFrame ) );
+    return perfPerFrame;
+}
+
+void AxFilmDescriptor::SetFilmAspectRatio( aafRational_t aspectRatio )
+{
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->SetFilmAspectRatio( aspectRatio )
+    );
+}
+
+aafRational_t AxFilmDescriptor::GetFilmAspectRatio()
+{
+    aafRational_t aspectRatio;
+    CHECK_HRESULT(
+        _spIaafFilmDescriptor->GetFilmAspectRatio( &aspectRatio ) );
+    return aspectRatio;
+}
+
+//=---------------------------------------------------------------------=
+
+AxPhysicalDescriptor::AxPhysicalDescriptor( IAAFPhysicalDescriptorSP spIaafPhysicalDescriptor )
+:   AxEssenceDescriptor( AxQueryInterface<IAAFPhysicalDescriptor, IAAFEssenceDescriptor>(spIaafPhysicalDescriptor) ),
+    _spIaafPhysicalDescriptor( spIaafPhysicalDescriptor )
+{}
+
+AxPhysicalDescriptor::~AxPhysicalDescriptor()
+{}
+
+//=---------------------------------------------------------------------=
+
+AxImportDescriptor::AxImportDescriptor( IAAFImportDescriptorSP spIaafImportDescriptor )
+:   AxPhysicalDescriptor( AxQueryInterface<IAAFImportDescriptor, IAAFPhysicalDescriptor>(spIaafImportDescriptor) ),
+    _spIaafImportDescriptor( spIaafImportDescriptor )
+{}
+
+AxImportDescriptor::~AxImportDescriptor()
+{}
+
+void AxImportDescriptor::Initialize()
+{
+    // noop
+}
+
+//=---------------------------------------------------------------------=
+
+AxRecordingDescriptor::AxRecordingDescriptor( IAAFRecordingDescriptorSP spIaafRecordingDescriptor )
+:   AxPhysicalDescriptor( AxQueryInterface<IAAFRecordingDescriptor, IAAFPhysicalDescriptor>(spIaafRecordingDescriptor) ),
+    _spIaafRecordingDescriptor( spIaafRecordingDescriptor )
+{}
+
+AxRecordingDescriptor::~AxRecordingDescriptor()
+{}
+
+void AxRecordingDescriptor::Initialize()
+{
+    // noop
 }
 
 //=---------------------------------------------------------------------=
