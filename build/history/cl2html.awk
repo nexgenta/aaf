@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cl2html.awk,v 1.70 2005/04/05 20:58:28 tbingham Exp $ $Name:  $
+# $Id: cl2html.awk,v 1.71 2005/10/04 16:09:16 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -259,6 +259,7 @@ function rowcolor(files) {
 function filter(comments) {
   gsub("<", "\\&lt;", comments);
   gsub(">", "\\&gt;", comments);
+  gsub("&", "\\&amp;", comments);
   return comments;
 }
 
