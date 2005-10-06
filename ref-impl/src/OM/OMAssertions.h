@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMAssertions.h,v 1.37 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMAssertions.h,v 1.38 2005/10/06 21:37:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -268,6 +268,25 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define OLD(name) \
   oldValueOf##name
 
+  // @func Assert (when enabled with OM_DEBUG) that the
+  //       condition <p expression> is true.
+  //       Please don't use this macro in new code. It is intended
+  //       only as a quick replacement, in existing code, for the ISO
+  //       assert() macro from <assert.h>. In new code, please use
+  //       <f ASSERT>, or one of the other macros defined here.
+  //   @parm The condition expression. The expression should be
+  //         free of side effects.
+#define ASSERTU(expression) \
+  (expression) \
+    ? (void)0  \
+    : assertionViolation( \
+        "Assertion", \
+        "Unknown (assertion name not supplied by developer)", \
+        #expression, \
+        "Unknown (routine name not supplied by developer)", \
+        __FILE__, \
+        __LINE__)
+
 #else
 
 #define TRACE(name)
@@ -295,6 +314,8 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define SAVE_EXPRESSION(name, expression, type)
 
 #define OLD(name)
+
+#define ASSERTU(expression)
 
 #endif
 
