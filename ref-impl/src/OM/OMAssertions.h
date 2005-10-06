@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMAssertions.h,v 1.38 2005/10/06 21:37:40 tbingham Exp $ $Name:  $
+// $Id: OMAssertions.h,v 1.39 2005/10/06 22:05:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -240,6 +240,12 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define FORALL(index, elementCount, expression) \
         FOREACH(index, 0, elementCount, expression)
 
+  // @func Declare a return result only when assertions are enabled. Use to
+  //       avoid compiler warnings. Note trailing "=" - invoke without ";".
+  //   @parm The return result to (conditionally) define.
+#define ARESULT(result) \
+  result =
+
   // @func Define a name only when assertions are enabled. Use to
   //       avoid compiler warnings.
   //   @parm The name to (conditionally) define.
@@ -306,6 +312,8 @@ void obsolete(const char* routineName, const char* newRoutineName);
 #define FOREACH(index, start, elementCount, expression)
 
 #define FORALL(index, elementCount, expression)
+
+#define ARESULT(result)
 
 #define ANAME(name)
 
