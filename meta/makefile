@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: makefile,v 1.6 2005/06/29 14:43:32 montrowe Exp $ $Name:  $
+# $Id: makefile,v 1.7 2005/10/10 13:21:34 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@ AAFMetaDict.csv : AAFMetaDict.xls
 	$(EXCEL) /e /r AAFMetaDict.xls /p .
 
 AAFMetaDictionary.h : AAFMetaDict.csv $(AWKFILE)
-	$(AWK) -f $(AWKFILE) AAFMetaDict.csv > AAFMetaDictionary.h
+	$(AWK) -f $(AWKFILE) -v SYM=r_name AAFMetaDict.csv > AAFMetaDictionary.h
 
 $(INSTALL_DIR)/AAFMetaDictionary.h: AAFMetaDictionary.h
 	@$(ECHO) "Installing new Meta Dictionary"
