@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.26 2005/09/07 20:15:32 montrowe Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.27 2005/10/13 03:11:26 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1122,10 +1122,9 @@ HRESULT CAAFRandomRawStorage_test(
     aafProductIdentification_t productID)
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-#ifdef __MACH__		// Need to thunk back from the SS library to make this work!!!
   if (memcmp(&fileKind, &aafFileKindAafSSBinary, sizeof(aafUID_t)) == 0)
   	return AAFRESULT_NOT_IMPLEMENTED;
-#endif
+
   try
 	{
 	  for (int wType = 0;
