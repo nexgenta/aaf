@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: AcyclicVisitor.h,v 1.3 2005/10/13 20:55:36 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 
 //STL files
 #include <vector>
+#include <set>
 
 namespace aafanalyzer {
 
@@ -50,12 +51,16 @@ class AcyclicVisitor : public Visitor
   shared_ptr<const DetailLevelTestResult> GetTestResult() const;
 
  private:
+ 
+typedef set<Node::LID> Set;
+ 
   bool IsPresent(Node::LID lid);
   void Erase(Node::LID lid);
 
   wostream& _os;
   shared_ptr< DetailLevelTestResult > _spResult;
   Vector _Vector;
+Set _Set;
 
   // prohibited
   AcyclicVisitor( const AcyclicVisitor& );
