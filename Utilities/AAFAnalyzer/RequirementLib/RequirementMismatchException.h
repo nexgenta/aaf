@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementMismatchException.h,v 1.1 2005/09/20 17:35:39 ajakowpa Exp $ $Name:  $
+// $Id: RequirementMismatchException.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,15 +21,21 @@
 #ifndef __REQUIREMENTMISMATCHEXCEPTION_H_
 #define __REQUIREMENTMISMATCHEXCEPTION_H_
 
-//Ax files
-#include <AxEx.h>
+//Analyzer Base files
+#include <AnalyzerException.h>
 
-class RequirementMismatchException : public AxEx {
+namespace aafanalyzer {
+
+using namespace std;
+
+class RequirementMismatchException : public AnalyzerException {
 
 public:
 
     RequirementMismatchException( const wchar_t* what );
     virtual ~RequirementMismatchException() throw();
 };
+
+} // end of namespace diskstream
 
 #endif /*__REQUIREMENTMISMATCHEXCEPTION_H_*/

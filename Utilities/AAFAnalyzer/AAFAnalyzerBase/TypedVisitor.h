@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.h,v 1.4 2005/07/26 16:30:16 greek_fire Exp $ $Name:  $
+// $Id: TypedVisitor.h,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,15 +21,14 @@
 #ifndef __TYPEDVISITOR_h__
 #define __TYPEDVISITOR_h__
 
-//project files
-#include "Visitor.h"
+//Analyzer Base files
+#include <Visitor.h>
+
+//AAF Analyzer Base files
 #include "AAFTypedObjNode.h"
 
 //AAF files
 #include <AAF.h>
-
-//boost files
-#include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
 
@@ -37,7 +36,6 @@ class AAFContainment;
 class AAFComponentReference;
 class AAFMobReference;
 class AAFSlotReference;
-
 
 class TypedVisitor : public Visitor
 {
@@ -51,6 +49,7 @@ class TypedVisitor : public Visitor
     virtual bool EdgeVisit(AAFSlotReference& edge) { return true; }
 
 #include "TypedVisitor.h.gen"
+
 };
 
 } // end of namespace diskstream

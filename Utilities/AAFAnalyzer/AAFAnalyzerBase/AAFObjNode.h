@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjNode.h,v 1.1 2005/08/05 20:20:51 greek_fire Exp $ $Name:  $
+// $Id: AAFObjNode.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,25 +21,27 @@
 #ifndef __AAFOBJNODE_h__
 #define __AAFOBJNODE_h__
 
-//project files
-#include "Node.h"
+//Analyzer Base files
+#include <Node.h>
 
 //Ax files
 #include <AxSmartPointer.h>
 
-//boost files
-#include <boost/shared_ptr.hpp>
-
 namespace aafanalyzer {
+
+using namespace std;
 
 class AAFObjNode : public Node
 {
  public:
   AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj);
-  AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const std::basic_string<wchar_t>& name);
+  AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const basic_string<wchar_t>& name);
   virtual ~AAFObjNode();
 
   IAAFSmartPointer<IAAFObject> GetAAFObject() const;
+
+ protected:
+  AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const basic_string<wchar_t>& name, Node::LID lid);
 
  private:
   IAAFSmartPointer<IAAFObject> _spIAAFObj;  

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhaseLevelTestResult.cpp,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $
+// $Id: TestPhaseLevelTestResult.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,9 @@
 //
 //=---------------------------------------------------------------------=
 
+//Test/Result files
 #include "TestPhaseLevelTestResult.h"
+#include "TestLevelTestResult.h"
 
 namespace {
 
@@ -35,15 +37,16 @@ namespace aafanalyzer
 {
 
 using namespace std;
+using namespace boost;
 
 TestPhaseLevelTestResult::TestPhaseLevelTestResult()
   : HighLevelTestResult()
 {}
 
-TestPhaseLevelTestResult:: TestPhaseLevelTestResult( const AxString& name, 
-                                                     const AxString& desc,
-                                                     const AxString& explain,
-                                                     const AxString& docRef,
+TestPhaseLevelTestResult:: TestPhaseLevelTestResult( const wstring& name, 
+                                                     const wstring& desc,
+                                                     const wstring& explain,
+                                                     const wstring& docRef,
                                                      Result defaultResult )
   : HighLevelTestResult( name, desc, explain, docRef, defaultResult )
 {}
@@ -51,7 +54,7 @@ TestPhaseLevelTestResult:: TestPhaseLevelTestResult( const AxString& name,
 TestPhaseLevelTestResult::~TestPhaseLevelTestResult()
 {}
 
-void TestPhaseLevelTestResult::AppendSubtestResult( const boost::shared_ptr<const TestLevelTestResult>& subtestResult )
+void TestPhaseLevelTestResult::AppendSubtestResult( const shared_ptr<const TestLevelTestResult>& subtestResult )
 {
 
     this->AddSubtestResult( subtestResult );

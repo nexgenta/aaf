@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjNode.cpp,v 1.1 2005/08/05 20:20:51 greek_fire Exp $
+// $Id: AAFObjNode.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,7 @@
 //
 //=---------------------------------------------------------------------=
 
+//AAF Analyzer Base files
 #include "AAFObjNode.h"
 
 namespace {
@@ -33,12 +34,20 @@ using namespace aafanalyzer;
 
 namespace aafanalyzer {
 
+using namespace std;
+
 AAFObjNode::AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj) : Node(L""), _spIAAFObj(spIAAFObj)
 {
 }
 
-AAFObjNode::AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const std::basic_string<wchar_t>& name) 
+AAFObjNode::AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const basic_string<wchar_t>& name) 
 : Node(name), 
+  _spIAAFObj(spIAAFObj)
+{
+}
+
+AAFObjNode::AAFObjNode(IAAFSmartPointer<IAAFObject> spIAAFObj, const basic_string<wchar_t>& name, Node::LID lid)
+: Node(name, lid),
   _spIAAFObj(spIAAFObj)
 {
 }

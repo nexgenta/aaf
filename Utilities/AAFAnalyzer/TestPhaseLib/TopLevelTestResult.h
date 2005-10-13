@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TopLevelTestResult.h,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
+// $Id: TopLevelTestResult.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,25 +21,27 @@
 #ifndef __TOPLEVELTESTRESULT_h__
 #define __TOPLEVELTESTRESULT_h__
 
-//Project files
+//Test/Result files
 #include "HighLevelTestResult.h"
-#include "TestPhaseLevelTestResult.h"
 
 namespace aafanalyzer {
 
 using namespace std;
+using namespace boost;
+
+class TestPhaseLevelTestResult;
 
 class TopLevelTestResult : public HighLevelTestResult
 {
  public:
 
   TopLevelTestResult();
-  TopLevelTestResult( const AxString& name, const AxString& desc,
-                      const AxString& explain, const AxString& docRef,
+  TopLevelTestResult( const wstring& name, const wstring& desc,
+                      const wstring& explain, const wstring& docRef,
                       Result defaultResult );
   ~TopLevelTestResult();
 
-  void AppendSubtestResult( const boost::shared_ptr<const TestPhaseLevelTestResult>& subtestResult );
+  void AppendSubtestResult( const shared_ptr<const TestPhaseLevelTestResult>& subtestResult );
   const enum ResultLevel GetResultType() const;
 
   // prohibited

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestInfo.cpp,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $
+// $Id: TestInfo.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,8 +18,9 @@
 //
 //=---------------------------------------------------------------------=
 
+//Test/Result files
 #include "TestInfo.h"
-#include <iostream>
+
 namespace {
 
 using namespace aafanalyzer;
@@ -35,8 +36,9 @@ namespace aafanalyzer
 {
 
 using namespace std;
+using namespace boost;
 
-TestInfo::TestInfo(const AxString& name, const boost::shared_ptr<const std::vector<AxString> >& requirements)
+TestInfo::TestInfo(const wstring& name, const shared_ptr<const vector<wstring> >& requirements)
     : _name(name), _spRequirementIds(requirements)
 {
 }
@@ -50,12 +52,12 @@ TestInfo::~TestInfo()
 {
 }
 
-const AxString TestInfo::GetName() const
+const wstring TestInfo::GetName() const
 {
     return _name;
 }
 
-const boost::shared_ptr<const std::vector<AxString> > TestInfo::GetRequirementIds() const
+const shared_ptr<const vector<wstring> > TestInfo::GetRequirementIds() const
 {
     return _spRequirementIds;
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFMobReference.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: AAFMobReference.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,21 +21,20 @@
 #ifndef __AAFMOBREFERENCE_h__
 #define __AAFMOBREFERENCE_h__
 
-//project files
-#include "Edge.h"
-
-//boost files
-#include <boost/shared_ptr.hpp>
+//Analyzer Base files
+#include <Edge.h>
 
 namespace aafanalyzer {
+
+using namespace boost;
 
 class AAFMobReference : public Edge
 {
  public:
-  AAFMobReference(boost::shared_ptr<Node> spParent, boost::shared_ptr<Node> spChild);
+  AAFMobReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild);
   ~AAFMobReference();
 
-  bool Visit(boost::shared_ptr<Visitor> spVisitor);
+  bool Visit(shared_ptr<Visitor> spVisitor);
 
  private:
 

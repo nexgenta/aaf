@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.6 2005/09/28 19:34:17 ajakowpa Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.7 2005/10/13 19:33:59 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,12 +37,14 @@ endif
 include $(AAFBASE)/build/common.mk
 
 # Include directories
-INCLUDES = -I$(AAFSDKINCLUDEDIR) \
+INCLUDES ?= -I$(AAFSDKINCLUDEDIR) \
+	   -I../AnalyzerBase \
 	   -I../AAFAnalyzerBase \
+	   -I../EPAnalyzerBase \
+	   -I../RequirementLib \
+   	   -I../TestPhaseLib \
 	   -I../BaseTestImpl \
 	   -I../EditProtocolTestImpl \
-	   -I../TestPhaseLib \
-	   -I../RequirementLib \
 	   -I$(AAFBASE)/examples2/axLib
 
 

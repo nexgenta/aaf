@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestInfoRegistrar.h,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $
+// $Id: TestInfoRegistrar.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,6 +21,7 @@
 #ifndef __TESTINFOREGISTRAR_H_
 #define __TESTINFOREGISTRAR_H_
 
+//Test/Result files
 #include "TestRegistry.h"
 
 namespace aafanalyzer {

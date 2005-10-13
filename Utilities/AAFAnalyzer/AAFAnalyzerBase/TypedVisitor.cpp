@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.cpp,v 1.4 2005/07/26 16:30:16 greek_fire Exp $
+// $Id: TypedVisitor.cpp,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,9 +18,8 @@
 //
 //=---------------------------------------------------------------------=
 
+//AAF Analyzer Base files
 #include "TypedVisitor.h"
-
-//project files
 #include "AAFContainment.h"
 #include "AAFComponentReference.h"
 #include "AAFMobReference.h"

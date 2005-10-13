@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MobNodeMap.cpp,v 1.1 2005/08/05 20:19:57 greek_fire Exp $
+// $Id: MobNodeMap.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,7 @@
 //
 //=---------------------------------------------------------------------=
 
+//AAF Analyzer Base files
 #include "MobNodeMap.h"
 
 namespace {
@@ -31,6 +32,8 @@ using namespace aafanalyzer;
 //======================================================================
 //======================================================================
 namespace aafanalyzer {
+
+using namespace boost;
 
 //static variable
 MobNodeMap* MobNodeMap::_pMobNodeMap = NULL;
@@ -65,7 +68,7 @@ bool MobNodeMap::IsPresent(aafMobID_t mobid)
   return iter != _Map.end();
 }
 
-void MobNodeMap::AddMobNode(aafMobID_t mobid, boost::shared_ptr<Node> spNode)
+void MobNodeMap::AddMobNode(aafMobID_t mobid, shared_ptr<Node> spNode)
 {
   //add mob to map if it is not already present
   if(!IsPresent(mobid))
@@ -74,9 +77,17 @@ void MobNodeMap::AddMobNode(aafMobID_t mobid, boost::shared_ptr<Node> spNode)
   }
 }
 
-boost::shared_ptr<Node> MobNodeMap::GetMobNode(aafMobID_t mobid)
+void MobNodeMap::DecorateMobNode(aafMobID_t mobid, shared_ptr<Node> decoratedNode)
+{
+  if(IsPresent(mobid))
+  {
+    _Map[mobid] = decoratedNode;
+  }
+}
+
+shared_ptr<Node> MobNodeMap::GetMobNode(aafMobID_t mobid)
 { 
-  boost::shared_ptr<Node> spMobNode;
+  shared_ptr<Node> spMobNode;
 
   if(IsPresent(mobid))
   {

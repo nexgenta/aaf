@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementRegistry.h,v 1.1 2005/09/20 17:35:39 ajakowpa Exp $
+// $Id: RequirementRegistry.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,16 +21,19 @@
 #ifndef __REQUIREMENTREGISTRY_H_
 #define __REQUIREMENTREGISTRY_H_
 
-//Ax Files
-#include <AxTypes.h>
-
-//Boost Files
-#include <boost/shared_ptr.hpp>
-
-//Project Files
+//Requirement files
 #include "Requirement.h"
 
+//Boost files
+#include <boost/shared_ptr.hpp>
+
+//STL files
+#include <string>
+
 namespace aafanalyzer {
+
+using namespace std;
+using namespace boost;
 
 class RequirementRegistry
 {
@@ -40,8 +43,8 @@ class RequirementRegistry
   ~RequirementRegistry();
 
   static RequirementRegistry& GetInstance();
-  void Register( const boost::shared_ptr<const Requirement>& req );
-  const boost::shared_ptr<const Requirement> GetRequirement( const AxString& id ) const;
+  void Register( const shared_ptr<const Requirement>& req );
+  const shared_ptr<const Requirement> GetRequirement( const wstring& id ) const;
   const Requirement::RequirementMap& GetAllRequirements() const;
 
  private:

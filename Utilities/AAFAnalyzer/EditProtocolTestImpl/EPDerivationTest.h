@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.h,v 1.3 2005/09/20 17:48:22 ajakowpa Exp $
+// $Id: EPDerivationTest.h,v 1.4 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,8 +21,10 @@
 #ifndef __EPDerivatinTest_h__
 #define __EPDerivatinTest_h__
 
-#include <CompMobDependency.h>
+//Edit Protocol Test files
+#include "CompMobDependency.h"
 
+//Test/Result files
 #include <Test.h>
 
 namespace aafanalyzer {
@@ -30,12 +32,14 @@ namespace aafanalyzer {
 using namespace boost;
 using namespace std;
 
+class TestGraph;
+
 class EPDerivationTest : public Test
 {
  public:
 
   EPDerivationTest( wostream& log,
-		    shared_ptr<TestGraph> spGraph,
+		    shared_ptr<const TestGraph> spGraph,
 		    CompMobDependency::CompMobNodeVectorSP spTopLevelCompMobs );
   virtual ~EPDerivationTest();
 
@@ -51,7 +55,6 @@ class EPDerivationTest : public Test
   EPDerivationTest( const EPDerivationTest& );
   EPDerivationTest& operator=( const EPDerivationTest& );
 
-  shared_ptr<TestGraph> _spGraph;
   CompMobDependency::CompMobNodeVectorSP _spTopLevelCompMobs;
 };
 

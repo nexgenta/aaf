@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactory.cpp,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: TypedNodeFactory.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,8 +18,11 @@
 //
 //=---------------------------------------------------------------------=
 
+//AAF Analyzer Base files
 #include "TypedNodeFactory.h"
-#include "Node.h"
+
+//Analyzer Base files
+#include <Node.h>
 
 namespace {
 

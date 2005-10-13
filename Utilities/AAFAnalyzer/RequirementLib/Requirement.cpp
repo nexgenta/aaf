@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Requirement.cpp,v 1.1 2005/09/20 17:35:39 ajakowpa Exp $
+// $Id: Requirement.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,7 @@
 //
 //=---------------------------------------------------------------------=
 
+//Requirement files
 #include "Requirement.h"
 
 namespace {
@@ -34,11 +35,11 @@ using namespace aafanalyzer;
 namespace aafanalyzer 
 {
 
-Requirement::Requirement(const AxString& id,
+Requirement::Requirement(const wstring& id,
                          const RequirementType requirementType,
-                         const Category category, const AxString& name,
-                         const AxString& desc, const AxString& document,
-                         const AxString& version, const AxString& section):
+                         const Category category, const wstring& name,
+                         const wstring& desc, const wstring& document,
+                         const wstring& version, const wstring& section):
     _id( id ),
     _requirementType( requirementType ),
     _category( category ),
@@ -52,7 +53,7 @@ Requirement::Requirement(const AxString& id,
 Requirement::~Requirement()
 {}
 
-const AxString& Requirement::GetId() const
+const wstring& Requirement::GetId() const
 {
     return _id;
 }
@@ -67,27 +68,27 @@ const enum Requirement::Category Requirement::GetCategory() const
     return _category;
 }
 
-const AxString& Requirement::GetName() const
+const wstring& Requirement::GetName() const
 {
     return _name;
 }
 
-const AxString& Requirement::GetDescription() const
+const wstring& Requirement::GetDescription() const
 {
     return _description;
 }
 
-const AxString& Requirement::GetDocument() const
+const wstring& Requirement::GetDocument() const
 {
     return _document;
 }
 
-const AxString& Requirement::GetVersion() const
+const wstring& Requirement::GetVersion() const
 {
     return _version;
 }
 
-const AxString& Requirement::GetSection() const
+const wstring& Requirement::GetSection() const
 {
     return _section;
 }

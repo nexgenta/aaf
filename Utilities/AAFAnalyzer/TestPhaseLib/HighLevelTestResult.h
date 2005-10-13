@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: HighLevelTestResult.h,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
+// $Id: HighLevelTestResult.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,7 +21,7 @@
 #ifndef __HIGHLEVELTESTRESULT_h__
 #define __HIGHLEVELTESTRESULT_h__
 
-//Project files
+//Test/Result files
 #include "TestResult.h"
 
 namespace aafanalyzer {
@@ -43,8 +43,8 @@ class HighLevelTestResult : public TestResult
 
  protected:
   HighLevelTestResult();
-  HighLevelTestResult( const AxString& name, const AxString& desc,
-                       const AxString& explain, const AxString& docRef,
+  HighLevelTestResult( const wstring& name, const wstring& desc,
+                       const wstring& explain, const wstring& docRef,
                        Result defaultResult );
 
   // prohibited

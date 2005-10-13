@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: GraphBuilder.h,v 1.2 2005/08/05 20:15:46 greek_fire Exp $
+// $Id: GraphBuilder.h,v 1.3 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,18 +21,17 @@
 #ifndef __GRAPHBUILDER_h__
 #define __GRAPHBUILDER_h__
 
-//project files
-#include "TestGraph.h"
-
-//stl files
-#include <string>
-#include <map>
-
-//boost files
+//Boost files
 #include <boost/shared_ptr.hpp>
+
+//Ax files
+#include <AxTypes.h>
 
 namespace aafanalyzer {
 
+using namespace boost;
+
+class AAFGraphInfo;
 class NodeFactory;
 
 class GraphBuilder
@@ -42,7 +41,7 @@ class GraphBuilder
   GraphBuilder();
   ~GraphBuilder();
 
-  TestGraph CreateGraph(const std::basic_string<wchar_t>& fileName, boost::shared_ptr<NodeFactory> spFactory );
+  const shared_ptr<const AAFGraphInfo> CreateGraph(const AxString& fileName, shared_ptr<NodeFactory> spFactory );
 
  private:  
 

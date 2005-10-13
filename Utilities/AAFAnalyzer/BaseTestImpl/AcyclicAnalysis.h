@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicAnalysis.h,v 1.6 2005/09/20 17:48:10 ajakowpa Exp $ $Name:  $
+// $Id: AcyclicAnalysis.h,v 1.7 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,19 +21,27 @@
 #ifndef __ACYCLICANALYSIS_h__
 #define __ACYCLICANALYSIS_h__
 
-//project files
+//Test/Result files
 #include <Test.h>
-#include <TestLevelTestResult.h>
+
+//Ax files
+#include <AxTypes.h>
 
 namespace aafanalyzer {
+
+using namespace std;
+using namespace boost;
+    
+class TestLevelTestResult;
+class TestGraph;
 
 class AcyclicAnalysis : public Test
 {
  public:
-  AcyclicAnalysis(std::wostream& os, boost::shared_ptr<TestGraph> spTestGraph);
+  AcyclicAnalysis(wostream& os, shared_ptr<const TestGraph> spGraph);
   ~AcyclicAnalysis();
 
-  boost::shared_ptr<TestLevelTestResult> Execute();
+  shared_ptr<TestLevelTestResult> Execute();
   AxString GetName() const;
   AxString GetDescription() const;
   static const TestInfo GetTestInfo();

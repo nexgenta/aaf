@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhase.h,v 1.4 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
+// $Id: TestPhase.h,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,32 +21,33 @@
 #ifndef __TESTPHASE_h__
 #define __TESTPHASE_h__
 
-//test files
-#include "TestPhaseLevelTestResult.h"
-
-//stl files
-#include <iostream>
-#include <vector>
-#include <string>
-
-//boost files
+//Boost files
 #include <boost/shared_ptr.hpp>
 
+//STL file
+#include <string>
+#include <iostream>
+
 namespace aafanalyzer {
+
+using namespace std;
+using namespace boost;
+
+class TestPhaseLevelTestResult;
 
 class TestPhase
 {
  public:
-  TestPhase(std::wostream& os);
+  TestPhase(wostream& os);
   virtual ~TestPhase();
 
-  virtual AxString GetDescription() const;
-  virtual AxString GetName() const;
-  virtual boost::shared_ptr<TestPhaseLevelTestResult> Execute() = 0; 
-  std::wostream& GetOutStream() const; 
+  virtual wstring GetDescription() const;
+  virtual wstring GetName() const;
+  virtual shared_ptr<TestPhaseLevelTestResult> Execute() = 0; 
+  wostream& GetOutStream() const; 
 
  private:
-  std::wostream& _os;
+  wostream& _os;
 
   // prohibited
   TestPhase();

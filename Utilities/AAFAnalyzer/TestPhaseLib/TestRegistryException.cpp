@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistryException.cpp,v 1.1 2005/09/20 17:47:26 ajakowpa Exp $ $Name:  $
+// $Id: TestRegistryException.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,8 +18,8 @@
 //
 //=---------------------------------------------------------------------=
 
+//Test/Result files
 #include "TestRegistryException.h"
-#include <AxUtil.h>
 
 namespace {
 
@@ -36,7 +36,7 @@ namespace aafanalyzer
 {
 
 TestRegistryException::TestRegistryException( const wchar_t* what )
-  : AxEx( AxString(AxString(L"Test Registry: ") + AxString(what)).c_str() )
+  : AnalyzerException( wstring(wstring(L"Test Registry: ") + wstring(what)).c_str() )
 {}
 
 TestRegistryException::~TestRegistryException() throw()

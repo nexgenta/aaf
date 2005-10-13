@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementXMLException.h,v 1.1 2005/09/20 17:35:39 ajakowpa Exp $ $Name:  $
+// $Id: RequirementXMLException.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,15 +21,21 @@
 #ifndef __REQUIREMENTXMLEXCEPTION_H_
 #define __REQUIREMENTXMLEXCEPTION_H_
 
-//Ax files
-#include <AxEx.h>
+//Analyzer Base files
+#include <AnalyzerException.h>
 
-class RequirementXMLException : public AxEx {
+namespace aafanalyzer {
+
+using namespace std;
+
+class RequirementXMLException : public AnalyzerException {
 
 public:
 
     RequirementXMLException( const wchar_t* what );
     virtual ~RequirementXMLException() throw();
 };
+
+} // end of namespace diskstream
 
 #endif /*__REQUIREMENTXMLEXCEPTION_H_*/

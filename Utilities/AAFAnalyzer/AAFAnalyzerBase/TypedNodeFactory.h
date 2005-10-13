@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactory.h,v 1.1 2005/07/13 16:47:56 greek_fire Exp $
+// $Id: TypedNodeFactory.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,10 +24,12 @@
 //Ax files
 #include <AxSmartPointer.h>
 
-//boost files
+//Boost files
 #include <boost/shared_ptr.hpp>
 
 namespace aafanalyzer {
+
+using namespace boost;
 
 class Node;
 
@@ -37,7 +39,7 @@ class TypedNodeFactory
   TypedNodeFactory();
   virtual ~TypedNodeFactory();
 
-  virtual boost::shared_ptr<Node> CreateNode(IAAFObjectSP spObj) = 0;
+  virtual shared_ptr<Node> CreateNode(IAAFObjectSP spObj) = 0;
 
  private:
 

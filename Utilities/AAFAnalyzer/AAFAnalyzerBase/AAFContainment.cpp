@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFContainment.cpp,v 1.2 2005/07/26 16:30:16 greek_fire Exp $
+// $Id: AAFContainment.cpp,v 1.3 2005/10/13 19:33:58 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,7 @@
 //
 //=---------------------------------------------------------------------=
 
+//AAF Analyzer Base files
 #include "AAFContainment.h"
 #include "TypedVisitor.h"
 
@@ -35,7 +36,9 @@ using namespace aafanalyzer;
 namespace aafanalyzer 
 {
 
-AAFContainment::AAFContainment(boost::shared_ptr<Node> spParent, boost::shared_ptr<Node> spChild)
+using namespace boost;
+
+AAFContainment::AAFContainment(shared_ptr<Node> spParent, shared_ptr<Node> spChild)
   : Edge(spParent, spChild)
 {
 }
@@ -44,9 +47,9 @@ AAFContainment::~AAFContainment()
 {
 }
 
-bool AAFContainment::Visit(boost::shared_ptr<Visitor> spVisitor)
+bool AAFContainment::Visit(shared_ptr<Visitor> spVisitor)
 {
-  boost::shared_ptr<TypedVisitor> spTypedVis = boost::dynamic_pointer_cast<TypedVisitor>(spVisitor);
+  shared_ptr<TypedVisitor> spTypedVis = dynamic_pointer_cast<TypedVisitor>(spVisitor);
   if(spTypedVis)
   {
     return spTypedVis->EdgeVisit(*this);
