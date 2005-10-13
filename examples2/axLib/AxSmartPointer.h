@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.15 2005/08/24 21:22:48 jptrainor Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.16 2005/10/13 19:31:47 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -217,11 +217,13 @@ AXSP_TDEF_B( EssenceMultiAccess )
 AXSP_TDEF_B( TypeDefVariableArrayEx )
 
 // New 1.1 objects.
+AXSP_TDEF_A( AES3PCMDescriptor )
 AXSP_TDEF_A( AuxiliaryDescriptor )
 AXSP_TDEF_A( DescriptiveFramework )
 AXSP_TDEF_A( DescriptiveMarker )
 AXSP_TDEF_A( ImportDescriptor )
 AXSP_TDEF_A( KLVDataDefinition )
+AXSP_TDEF_A( MultipleDescriptor )
 AXSP_TDEF_A( PCMDescriptor )
 AXSP_TDEF_A( PhysicalDescriptor )
 AXSP_TDEF_A( RecordingDescriptor )
