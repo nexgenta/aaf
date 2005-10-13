@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.cpp,v 1.8 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.cpp,v 1.9 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,11 @@
 //
 //
 //=---------------------------------------------------------------------=
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
+#if defined(OM_USE_SCHEMASOFT_SS)
+
 #include "OMAssertions.h"
 #include "OMSSStructuredStorage.h"
 #include "StructuredStorage.h"
@@ -751,3 +756,6 @@ OMSSIStream::Clone(IStream FAR * FAR * /* ppstm */)
 	return STG_E_UNIMPLEMENTEDFUNCTION;
 }
 
+#endif // OM_USE_SCHEMASOFT_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE

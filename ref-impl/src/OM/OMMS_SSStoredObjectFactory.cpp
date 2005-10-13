@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.5 2004/11/23 15:27:27 stuart_hc Exp $ $Name:  $
+// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.6 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,9 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMMS_SSStoredObjectFactory.h"
 
 #include "OMRawStorageLockBytes.h"
@@ -325,3 +328,5 @@ static void checkStatus(HRESULT status)
     throw OMException(status);
   }
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

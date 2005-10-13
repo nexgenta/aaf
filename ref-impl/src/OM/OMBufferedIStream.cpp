@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMBufferedIStream.cpp,v 1.5 2004/11/23 15:27:26 stuart_hc Exp $ $Name:  $
+// $Id: OMBufferedIStream.cpp,v 1.6 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,9 +24,12 @@
 
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMBufferedIStream
-#include "OMBufferedIStream.h"
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMMSStructuredStorage.h"
+
+#include "OMBufferedIStream.h"
 #include "OMAssertions.h"
 
 HRESULT STDMETHODCALLTYPE
@@ -212,3 +215,5 @@ void OMBufferedIStream::write(const OMByte* bytes,
   ASSERT("IStream::Write() succeeded", SUCCEEDED(status));
   ASSERT("Successful write", bytesWritten == byteCount);
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

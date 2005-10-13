@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObjectFactory.h,v 1.2 2004/10/22 15:51:56 phil_tudor Exp $ $Name:  $
+// $Id: OMSSStoredObjectFactory.h,v 1.3 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 // @doc OMINTERNAL
 #ifndef OMMSSSTOREDOBJECTFACTORY_H
 #define OMMSSSTOREDOBJECTFACTORY_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMStoredObjectFactory.h"
 #include "OMDataTypes.h"
@@ -160,4 +162,6 @@ private:
 
 };
 
-#endif
+#endif // !OM_NO_STRUCTURED_STORAGE
+
+#endif // !OMSSSTOREDOBJECTFACTORY_H

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSF_SSStoredObjectFactory.cpp,v 1.3 2004/10/25 15:37:52 stuart_hc Exp $ $Name:  $
+// $Id: OMGSF_SSStoredObjectFactory.cpp,v 1.4 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,7 +23,12 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMGSF_SSStoredObjectFactory.h"
+
+#if defined(OM_USE_GSF_SS)
 
 #include "OMSSStoredObject.h"
 #include "OMAssertions.h"
@@ -205,3 +210,7 @@ static void checkStatus(HRESULT status)
     throw OMException(status);
   }
 }
+
+#endif // OM_USE_GSF_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE

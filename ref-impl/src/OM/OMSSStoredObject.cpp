@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.7 2004/11/30 18:56:07 akharkev Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.8 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,7 @@
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMSSStoredObject
 
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMSSStoredObject.h"
 
@@ -3286,3 +3287,5 @@ public:
 static MSSInitializer _MSSInitializer;
 
 #endif
+
+#endif // !OM_NO_STRUCTURED_STORAGE

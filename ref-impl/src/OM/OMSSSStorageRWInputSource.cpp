@@ -8,10 +8,15 @@
 *  Copyright (C) 2002 - 2003 Schema Software, Inc. All rights reserved.
 *  Portions Copyright (C) 2003 Metaglue Corparation. All rights reserved.
 *
-*  $Revision: 1.6 $
-*  $Date: 2004/12/01 21:37:18 $
+*  $Revision: 1.7 $
+*  $Date: 2005/10/13 16:45:14 $
 *  
 \******************************************************************************/
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
+#if defined(OM_USE_SCHEMASOFT_SS)
+
 #include "OMSSSStorageRWInputSource.h"
 
 
@@ -279,3 +284,6 @@ int openStructuredStorageInOMRawStorage (
 
 } //extern "C"
 
+#endif // OM_USE_SCHEMASOFT_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE

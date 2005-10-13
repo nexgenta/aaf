@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredStream.h,v 1.2 2005/08/22 20:56:40 tbingham Exp $ $Name:  $
+// $Id: OMSSStoredStream.h,v 1.3 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 // @doc OMINTERNAL
 #ifndef OMMSSSTOREDSTREAM_H
 #define OMMSSSTOREDSTREAM_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMMSStructuredStorage.h"
 #include "OMStoredStream.h"
@@ -91,4 +93,6 @@ private:
 
 };
 
-#endif
+#endif // !OM_NO_STRUCTURED_STORAGE
+
+#endif // !OMSSSTOREDSTREAM_H

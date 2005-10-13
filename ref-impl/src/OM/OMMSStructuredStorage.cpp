@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.18 2004/10/29 12:04:49 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.19 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,9 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMMSStructuredStorage.h"
 
 #include "OMAssertions.h"
@@ -639,3 +642,5 @@ void OMMSSFinalize(void)
   MSSSLibrary::destroy();
   MSCOMLibrary::destroy();
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

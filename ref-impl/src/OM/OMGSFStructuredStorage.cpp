@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.cpp,v 1.7 2005/09/21 04:44:19 rodrigc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.cpp,v 1.8 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,6 +18,11 @@
 //
 //
 //=---------------------------------------------------------------------=
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
+#if defined(OM_USE_GSF_SS)
+
 #include "OMAssertions.h"
 #include "OMGSFStructuredStorage.h"
 #include "OMUtilities.h"
@@ -876,3 +881,7 @@ OMGSFIStream::Clone(IStream FAR * FAR *ppstm)
 	TRACE("OMGSFIStream::Clone");
 	return STG_E_UNIMPLEMENTEDFUNCTION;
 }
+
+#endif // OM_USE_GSF_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE

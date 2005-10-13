@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMBufferedStream.cpp,v 1.4 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: OMBufferedStream.cpp,v 1.5 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,9 @@
 
 // @doc OMEXTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMBufferedStream
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMBufferedStream.h"
 
 #include "OMAssertions.h"
@@ -156,3 +159,5 @@ void OMBufferedStream::copyFromBuffer(OMByte* bytes, OMUInt32 byteCount)
   }
   _bufferCount = _bufferCount - byteCount;
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

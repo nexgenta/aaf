@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObjectFactory.cpp,v 1.2 2005/03/23 04:47:51 jptrainor Exp $ $Name:  $
+// $Id: OMSSStoredObjectFactory.cpp,v 1.3 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,9 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMINTERNAL
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMSSStoredObjectFactory.h"
 
 #include "OMSSStoredObject.h"
@@ -392,3 +395,5 @@ void OMSSStoredObjectFactory::writeSignature(
 
   fclose(f);
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

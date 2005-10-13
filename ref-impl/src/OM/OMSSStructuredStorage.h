@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStructuredStorage.h,v 1.2 2004/10/25 15:37:59 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStructuredStorage.h,v 1.3 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,7 +24,13 @@
 
 #ifndef OMSSSSTRUCTUREDSTORAGE_H
 #define OMSSSSTRUCTUREDSTORAGE_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMMSStructuredStorage.h"
+
+#if defined(OM_USE_SCHEMASOFT_SS)
+
 #include "OMRawStorage.h"
 #include "OMFile.h"
 #include "StructuredStorage.h"
@@ -240,4 +246,9 @@ private:
 	Stream*			_stream;
 	ULONG 			_referenceCount;
 };
+
+#endif // OM_USE_SCHEMASOFT_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE
+
 #endif

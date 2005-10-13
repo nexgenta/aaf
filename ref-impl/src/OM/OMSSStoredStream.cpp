@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredStream.cpp,v 1.3 2005/08/22 20:56:40 tbingham Exp $ $Name:  $
+// $Id: OMSSStoredStream.cpp,v 1.4 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,9 @@
 
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMSSStoredStream
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMSSStoredStream.h"
 
 #include "OMMSStructuredStorage.h"
@@ -179,3 +182,5 @@ static void checkStatus(HRESULT status)
     throw OMException(status);
   }
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

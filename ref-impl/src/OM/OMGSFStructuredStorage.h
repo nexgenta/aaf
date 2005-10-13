@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMGSFStructuredStorage.h,v 1.5 2004/12/06 18:47:57 stuart_hc Exp $ $Name:  $
+// $Id: OMGSFStructuredStorage.h,v 1.6 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,12 @@
 #ifndef OMGSFSTRUCTUREDSTORAGE_H
 #define OMGSFSTRUCTUREDSTORAGE_H
 
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMMSStructuredStorage.h"
+
+#if defined(OM_USE_GSF_SS)
+
 #include "OMRawStorage.h"
 #include "OMFile.h"
 
@@ -264,4 +269,8 @@ void OMGSFInitialize();
 
 void OMGSFFinalize();
 
-#endif
+#endif // OM_USE_GSF_SS
+
+#endif // !OM_NO_STRUCTURED_STORAGE
+
+#endif // !OMGSFSTRUCTUREDSTORAGE_H

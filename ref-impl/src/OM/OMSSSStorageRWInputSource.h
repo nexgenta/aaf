@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSSStorageRWInputSource.h,v 1.2 2004/09/10 17:13:10 stuart_hc Exp $ $Name:  $
+// $Id: OMSSSStorageRWInputSource.h,v 1.3 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,11 +31,14 @@
 * Authors: Bob Sabiston, Yuri Khramov, Mark Ambachtsheer
 ************************************************************************
 
-$Revision: 1.2 $
-$Date: 2004/09/10 17:13:10 $
+$Revision: 1.3 $
+$Date: 2005/10/13 16:45:14 $
 */
 #ifndef OMSSSSTORAGERWINPUTSOURCE_H
 #define OMSSSSTORAGERWINPUTSOURCE_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
+
 #include "OMRawStorage.h"
 #include "StructuredStorage.h"
 extern "C" int openStructuredStorageInOMRawStorage (
@@ -48,4 +51,7 @@ extern "C" int createStructuredStorageInOMRawStorageEx (
     StgMode in_accessMode,
     RootStorage** out_ppRoot,
     unsigned long in_sectorSize);
+
+#endif // !OM_NO_STRUCTURED_STORAGE
+
 #endif //OMSSSSTORAGERWINPUTSOURCE_H

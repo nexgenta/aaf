@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRawStorageLockBytes.cpp,v 1.18 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMRawStorageLockBytes.cpp,v 1.19 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,8 @@
 
 // @doc OMINTERNAL
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMRawStorageLockBytes
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMRawStorageLockBytes.h"
 
@@ -181,3 +183,5 @@ OMRawStorageLockBytes::Stat(STATSTG *pstatstg,
   memset(pstatstg, 0, sizeof(STATSTG));
   return NOERROR;
 }
+
+#endif // !OM_NO_STRUCTURED_STORAGE

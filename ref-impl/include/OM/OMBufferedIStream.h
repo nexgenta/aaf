@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMBufferedIStream.h,v 1.5 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMBufferedIStream.h,v 1.6 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 // @doc OMINTERNAL
 #ifndef OMBUFFEREDISTREAM_H
 #define OMBUFFEREDISTREAM_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMMSStructuredStorage.h"
 #include "OMBufferedStream.h"
@@ -102,4 +104,6 @@ private:
 
 };
 
-#endif
+#endif // ! OM_NO_STRUCTURED_STORAGE
+
+#endif // !OMBUFFEREDISTREAM_H

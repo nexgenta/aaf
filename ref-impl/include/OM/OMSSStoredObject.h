@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.h,v 1.1 2004/09/28 11:57:08 phil_tudor Exp $ $Name:  $
+// $Id: OMSSStoredObject.h,v 1.2 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,8 @@
 // @doc OMINTERNAL
 #ifndef OMMSSSTOREDOBJECT_H
 #define OMMSSSTOREDOBJECT_H
+
+#ifndef OM_NO_STRUCTURED_STORAGE
 
 #include "OMMSStructuredStorage.h"
 #include "OMStoredObject.h"
@@ -531,4 +533,6 @@ private:
 #endif
 };
 
-#endif
+#endif // !OM_NO_STRUCTURED_STORAGE
+
+#endif // !OMSSSTOREDOBJECT_H
