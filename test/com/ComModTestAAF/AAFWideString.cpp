@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFWideString.cpp,v 1.1 2005/07/25 21:03:56 montrowe Exp $ $Name:  $
+// $Id: AAFWideString.cpp,v 1.2 2005/10/14 19:46:30 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,7 +24,7 @@
 
 #include "AAFWideString.h"
 
-#if defined(OS_MACOS10)
+#if defined(OS_DARWIN) && defined(COMPILER_MWERKS)
 
 #pragma warn_possunwant off
 
