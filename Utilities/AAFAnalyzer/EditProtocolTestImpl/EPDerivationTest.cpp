@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.cpp,v 1.4 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: EPDerivationTest.cpp,v 1.5 2005/10/18 17:02:42 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -373,6 +373,11 @@ public:
 
 private:
 
+  // prohibited
+  MobChainVisitor();
+  MobChainVisitor( const MobChainVisitor& );
+  MobChainVisitor& operator=( const MobChainVisitor& );
+
   shared_ptr<DetailLevelTestResult> initializeResult()
   {
     
@@ -589,6 +594,11 @@ private:
   wostream& _log;
   shared_ptr<const TestGraph> _spGraph;
   shared_ptr<TestLevelTestResult> _spPhaseResult;
+  
+  // prohibited
+  Analyzer();
+  Analyzer& operator=( const Analyzer& );
+  
 };
 
 //======================================================================

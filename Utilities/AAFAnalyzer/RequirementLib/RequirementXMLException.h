@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementXMLException.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: RequirementXMLException.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,10 +30,17 @@ using namespace std;
 
 class RequirementXMLException : public AnalyzerException {
 
-public:
+  public:
 
     RequirementXMLException( const wchar_t* what );
     virtual ~RequirementXMLException() throw();
+    
+  private:
+  
+    // prohibited
+    RequirementXMLException();
+    RequirementXMLException& operator=( const RequirementXMLException& );
+    
 };
 
 } // end of namespace diskstream

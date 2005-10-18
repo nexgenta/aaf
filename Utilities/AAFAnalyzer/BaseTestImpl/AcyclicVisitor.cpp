@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.3 2005/10/13 20:55:36 ajakowpa Exp $
+// $Id: AcyclicVisitor.cpp,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,7 +84,7 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
   _spResult->SetExplanation(L"Cycle detected.!");
   _spResult->SetResult(TestResult::FAIL);
 
-  // FIXME - Dump something more useful than the vector of LIDs.
+  //TODO: Dump something more useful than the vector of LIDs.
   _os << "Nodes of the cycle:" << endl;
   for(unsigned int i = 0; i < _Vector.size(); i++)
   {

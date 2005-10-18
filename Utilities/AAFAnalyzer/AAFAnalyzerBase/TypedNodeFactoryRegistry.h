@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactoryRegistry.h,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: TypedNodeFactoryRegistry.h,v 1.7 2005/10/18 17:02:42 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -61,8 +61,8 @@ class TypedNodeFactoryRegistry
   Map _Map;  
 
   // prohibited
-  //TypedNodeFactoryRegistry( const TypedNodeFactoryRegistry& );
-  //TypedNodeFactoryRegistry& operator=( const TypedNodeFactoryRegistry& );
+  TypedNodeFactoryRegistry( const TypedNodeFactoryRegistry& );
+  TypedNodeFactoryRegistry& operator=( const TypedNodeFactoryRegistry& );
 };
 
 } // end of namespace diskstream

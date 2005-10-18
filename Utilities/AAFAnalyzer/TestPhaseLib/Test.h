@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.h,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: Test.h,v 1.7 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,6 +70,7 @@ protected:
   const ConstRequirementMapSP InitializeRequirements(const wstring& name);
 
   // prohibited
+  Test();
   Test(const Test&);
   Test& operator=( const Test& );
 };

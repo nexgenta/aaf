@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: HighLevelTestResult.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: HighLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,8 @@ class HighLevelTestResult : public TestResult
                        Result defaultResult );
 
   // prohibited
+  HighLevelTestResult( const HighLevelTestResult& );
+  HighLevelTestResult& operator=( const HighLevelTestResult& );
   
 };
 

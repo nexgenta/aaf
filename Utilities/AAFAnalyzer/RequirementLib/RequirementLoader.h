@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: RequirementLoader.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,6 +58,10 @@ public:
     wstring _currentDocument;
     wstring _currentVersion;
     wstring _currentSection;
+    
+    // prohibited
+    RequirementLoader( const RequirementLoader& );
+    RequirementLoader& operator=( const RequirementLoader& );
 
 };
 

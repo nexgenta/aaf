@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.3 2005/10/13 20:55:36 ajakowpa Exp $
+// $Id: AcyclicVisitor.h,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@ class AcyclicVisitor : public Visitor
 
  private:
  
-typedef set<Node::LID> Set;
+  typedef set<Node::LID> Set;
  
   bool IsPresent(Node::LID lid);
   void Erase(Node::LID lid);
@@ -60,9 +60,10 @@ typedef set<Node::LID> Set;
   wostream& _os;
   shared_ptr< DetailLevelTestResult > _spResult;
   Vector _Vector;
-Set _Set;
+  Set _Set;
 
   // prohibited
+  AcyclicVisitor();
   AcyclicVisitor( const AcyclicVisitor& );
   AcyclicVisitor& operator=( const AcyclicVisitor& );
 };

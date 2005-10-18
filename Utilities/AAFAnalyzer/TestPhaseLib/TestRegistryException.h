@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistryException.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: TestRegistryException.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,10 +30,16 @@ using namespace std;
 
 class TestRegistryException : public AnalyzerException {
 
-public:
+  public:
 
     TestRegistryException( const wchar_t* what );
     virtual ~TestRegistryException() throw();
+    
+  private:
+  
+    // prohibited
+    TestRegistryException& operator=( const TestRegistryException& );
+    
 };
 
 } // end of namespace diskstream

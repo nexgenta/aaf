@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.3 2005/10/13 20:26:29 ajakowpa Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,10 +130,10 @@ bool ResolveRefVisitor::PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node)
 	}
       }
       
-      // TODO - The next level of reference detail is to create the
-      // edges from the source clip to components ultimately
-      // references. The may be multiple referenced components in
-      // the event that the source clips points to a sequence.
+      //TODO: The next level of reference detail is to create the
+      //edges from the source clip to components ultimately
+      //references. The may be multiple referenced components in
+      //the event that the source clips points to a sequence.
       
     }
   }

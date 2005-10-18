@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.h,v 1.7 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: TestResult.h,v 1.8 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,6 +107,9 @@ class TestResult
   vector<wstring> _details;
 
   // prohibited
+  TestResult( const TestResult& );
+  TestResult& operator=( const TestResult& );
+  
 };
 
 } // end of namespace diskstream

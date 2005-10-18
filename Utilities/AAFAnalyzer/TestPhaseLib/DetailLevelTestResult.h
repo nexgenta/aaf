@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: DetailLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,8 @@ class DetailLevelTestResult : public LowLevelTestResult
  private:
  
   // prohibited
+  DetailLevelTestResult( const DetailLevelTestResult& );
+  DetailLevelTestResult& operator=( const DetailLevelTestResult& );
   
 };
 

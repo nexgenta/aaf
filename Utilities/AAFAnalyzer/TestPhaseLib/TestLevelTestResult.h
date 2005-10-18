@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestLevelTestResult.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: TestLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,6 +58,8 @@ class TestLevelTestResult : public LowLevelTestResult
   void CheckDescendantRequirements( const shared_ptr<const TestResult>& subtestResult, const wstring& name );
    
   // prohibited
+  TestLevelTestResult( const TestLevelTestResult& );
+  TestLevelTestResult operator=( const TestLevelTestResult& );
   
 };
 
