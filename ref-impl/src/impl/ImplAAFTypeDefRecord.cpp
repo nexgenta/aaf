@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.45 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.45.6.1 2005/10/19 15:13:36 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1111,6 +1111,14 @@ void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 	}
 }
 
+
+size_t ImplAAFTypeDefRecord::internalSize(void) const
+{
+  if (IsRegistered ())
+	return NativeSize ();
+  else
+	return PropValSize ();
+}
 
 size_t ImplAAFTypeDefRecord::internalSize(const OMByte* /*externalBytes*/,
 										  size_t /*externalBytesSize*/) const
