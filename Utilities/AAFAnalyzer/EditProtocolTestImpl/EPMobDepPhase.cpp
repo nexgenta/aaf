@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: EPMobDepPhase.cpp,v 1.7 2005/10/19 21:01:36 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,6 +98,10 @@ shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
   // with the identified root compositions.
   shared_ptr<EPDerivationTest> derivationTest( new EPDerivationTest(_log, _spGraph, spRootNodes) );
   spPhaseResult->AppendSubtestResult( derivationTest->Execute() );
+  
+  // Fourth, run the naming test
+  shared_ptr<EPNameTest> nameTest( new EPNameTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( nameTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
