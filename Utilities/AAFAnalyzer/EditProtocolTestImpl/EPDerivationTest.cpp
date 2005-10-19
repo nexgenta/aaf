@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.cpp,v 1.5 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: EPDerivationTest.cpp,v 1.6 2005/10/19 21:00:45 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -533,7 +533,18 @@ shared_ptr<DetailLevelTestResult> AnalyzeMobChain( wostream& log,
                            spReqs ) );
   
   AxCompositionMob axCompMob( spRootComposition->GetAAFObjectOfType() );
-  AxString mobName = axCompMob.GetName();
+  AxString mobName;
+  try
+  {
+    mobName = axCompMob.GetName();
+  }
+  catch ( const AxExHResult& ex )
+  {
+    if ( ex.getHResult() == AAFRESULT_PROP_NOT_PRESENT )
+    {
+      mobName = L"Unnamed Composition Mob";
+    }
+  }
   spResult->AddDetail( L"Analyzing root composition mob \"" + mobName + L"\"" );
 
   DepthFirstTraversal dft( spGraph->GetEdgeMap(),
