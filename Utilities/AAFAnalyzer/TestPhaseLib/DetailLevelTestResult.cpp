@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: DetailLevelTestResult.cpp,v 1.3 2005/10/19 13:34:49 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,12 @@ DetailLevelTestResult::~DetailLevelTestResult()
 
 void DetailLevelTestResult::AppendSubtestResult( const shared_ptr<const DetailLevelTestResult>& subtestResult )
 {
+    //Don't allow a test result to append itself
+    if (subtestResult.get() == this)
+    {
+        return;
+    }
+    
     this->AddSubtestResult( subtestResult );
 
     //If the result of the appended test is worse than any other subtest then
