@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.7 2005/10/19 21:01:36 ajakowpa Exp $
+// $Id: EPMobDepPhase.cpp,v 1.8 2005/10/25 19:26:17 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,6 +102,10 @@ shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
   // Fourth, run the naming test
   shared_ptr<EPNameTest> nameTest( new EPNameTest( _log, _spGraph ) );
   spPhaseResult->AppendSubtestResult( nameTest->Execute() );
+  
+  // Fifth, run the contained track test
+  shared_ptr<EPContainedTrackTest> trackTest( new EPContainedTrackTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( trackTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
