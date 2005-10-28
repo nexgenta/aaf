@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMobSlot.h,v 1.9 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxMobSlot.h,v 1.10 2005/10/28 19:03:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,6 +107,24 @@ private:
 	AxEventMobSlot& operator=( const AxEventMobSlot& );
 
 	IAAFEventMobSlotSP _spIaafEventMobSlot;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxStaticMobSlot : public AxMobSlot {
+public:
+    AxStaticMobSlot( IAAFStaticMobSlotSP spIaafStaticMobSlot );
+    ~AxStaticMobSlot();
+
+    operator IAAFStaticMobSlotSP ()
+    { return _spIaafStaticMobSlot; }
+
+private:
+    AxStaticMobSlot();
+    AxStaticMobSlot( const AxStaticMobSlot& );
+    AxStaticMobSlot& operator=( const AxStaticMobSlot& );
+
+    IAAFStaticMobSlotSP _spIaafStaticMobSlot;
 };
 
 //=---------------------------------------------------------------------=

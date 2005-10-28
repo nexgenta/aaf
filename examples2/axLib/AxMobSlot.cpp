@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMobSlot.cpp,v 1.10 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxMobSlot.cpp,v 1.11 2005/10/28 19:03:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -158,3 +158,13 @@ aafRational_t AxEventMobSlot::GetEditRate()
 
 	return rate;
 }
+
+//=---------------------------------------------------------------------=
+
+AxStaticMobSlot::AxStaticMobSlot( IAAFStaticMobSlotSP spIaafStaticMobSlot )
+:   AxMobSlot( AxQueryInterface<IAAFStaticMobSlot, IAAFMobSlot>(spIaafStaticMobSlot) ),
+    _spIaafStaticMobSlot( spIaafStaticMobSlot )
+{}
+
+AxStaticMobSlot::~AxStaticMobSlot()
+{}
