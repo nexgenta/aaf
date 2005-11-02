@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.h,v 1.27 2004/09/10 17:13:09 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.h,v 1.28 2005/11/02 22:14:36 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -262,6 +262,8 @@ public:
 
   virtual size_t internalSize(const OMByte* externalBytes,
 							  size_t externalBytesSize) const;
+
+  virtual size_t internalSize(void) const;
 
   virtual void internalize(const OMByte* externalBytes,
                            size_t externalBytesSize,
