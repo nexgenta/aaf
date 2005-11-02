@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.13 2005/10/25 19:26:17 ajakowpa Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.14 2005/11/02 20:58:49 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -178,6 +178,9 @@ void RegisterTests()
     TestInfoRegistrar<EPDerivationTest> epDerivationTest;
     TestInfoRegistrar<EPNameTest> epNameTest;
     TestInfoRegistrar<EPContainedTrackTest> epTrackTest;
+    TestInfoRegistrar<EPTrackContentsTest> epTrackContentsTest;
+    TestInfoRegistrar<EPLocatorTest> epLocatorTest;
+    TestInfoRegistrar<EPEditRateTest> epEditRateTest;
 
     //Register Dump Phase tests.
     TestInfoRegistrar<FileDumper> fileDumper;   

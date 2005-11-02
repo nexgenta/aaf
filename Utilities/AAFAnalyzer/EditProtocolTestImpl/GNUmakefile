@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2005/11/02 20:58:49 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@ endif
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
-INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AnalyzerBase -I../AAFAnalyzerBase -I../EPAnalyzerBase -I../RequirementLib -I../TestPhaseLib
+INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AnalyzerBase -I../AAFAnalyzerBase -I../EPAnalyzerBase -I../RequirementLib -I../TestPhaseLib -I/usr/local/include/libURI
 
 .PHONY : all
 all : EditProtocolTest
