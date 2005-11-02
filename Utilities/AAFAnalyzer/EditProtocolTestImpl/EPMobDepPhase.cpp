@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.8 2005/10/25 19:26:17 ajakowpa Exp $
+// $Id: EPMobDepPhase.cpp,v 1.9 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -106,6 +106,19 @@ shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
   // Fifth, run the contained track test
   shared_ptr<EPContainedTrackTest> trackTest( new EPContainedTrackTest( _log, _spGraph ) );
   spPhaseResult->AppendSubtestResult( trackTest->Execute() );
+  
+  // Sixth, run the track contents test
+  shared_ptr<EPTrackContentsTest> trackContentsTest( new EPTrackContentsTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( trackContentsTest->Execute() );
+  
+  // Seventh, run the locator test
+  shared_ptr<EPLocatorTest> locatorTest( new EPLocatorTest( _log, _spGraph ) );
+//TODO: Uncomment this line when the test is running properly.
+//  spPhaseResult->AppendSubtestResult( locatorTest->Execute() );
+
+  // Eighth, run the edit rate test
+  shared_ptr<EPEditRateTest> editRateTest( new EPEditRateTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( editRateTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 

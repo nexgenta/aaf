@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.h,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: TestRegistry.h,v 1.5 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,8 @@ class TestRegistry
 
   static TestRegistry& GetInstance();
   void Register( const TestInfo& info );
-  const shared_ptr<const Requirement::RequirementMap> GetRequirementsForTest( const wstring& name ) const;
+  const shared_ptr<Requirement::RequirementMap> GetRequirementsForTest( const wstring& name ) const;
+  const shared_ptr<const Requirement::RequirementMap> GetConstRequirementsForTest( const wstring& name ) const;
   const Requirement::RequirementMap& GetRequirementCoverage() const;
   bool VerifyTestResultCoverage(const shared_ptr<TopLevelTestResult> results) const;
   void UseUnsafeRequirements();

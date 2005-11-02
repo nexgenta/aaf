@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Test.cpp,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: Test.cpp,v 1.7 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,7 +50,7 @@ Test::Test(wostream& os, const TestInfo& info)
 const Test::ConstRequirementMapSP Test::InitializeRequirements(const wstring& name)
 {
     TestRegistry& reg = TestRegistry::GetInstance();
-    return reg.GetRequirementsForTest(name);
+    return reg.GetConstRequirementsForTest(name);
 }
 
 Test::~Test()

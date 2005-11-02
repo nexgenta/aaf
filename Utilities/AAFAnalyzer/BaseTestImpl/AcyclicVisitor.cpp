@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: AcyclicVisitor.cpp,v 1.5 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,9 +20,11 @@
 
 //Base Test files
 #include "AcyclicVisitor.h"
+#include "AcyclicAnalysis.h"
 
 //Test/Result files
 #include <DetailLevelTestResult.h>
+#include <TestRegistry.h>
 
 //Requirement files
 #include <Requirement.h>
@@ -56,9 +58,10 @@ AcyclicVisitor::  AcyclicVisitor(wostream& os)
                                          L"No cycles found.",
                                          L"", // DOCREF REQUIRED
                                          TestResult::PASS,
-                                         *(new Requirement::RequirementMapSP(new Requirement::RequirementMap())) ) )
+                                         //*(new Requirement::RequirementMapSP(new Requirement::RequirementMap()))
+                                         TestRegistry::GetInstance().GetRequirementsForTest( AcyclicAnalysis::GetTestInfo().GetName() )
+             )                         )
 {}
-//TODO: Pass a real RequirementVectorSP
 
 AcyclicVisitor::~AcyclicVisitor()
 {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.5 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,9 +20,11 @@
 
 //Base Test files
 #include "ResolveRefVisitor.h"
+#include "RefResolver.h"
 
 //Test/Result files
 #include <DetailLevelTestResult.h>
+#include <TestRegistry.h>
 
 //Requirement files
 #include <Requirement.h>
@@ -65,9 +67,9 @@ ResolveRefVisitor::ResolveRefVisitor(wostream& os, shared_ptr<EdgeMap> spEdgeMap
                            L"-",
                            L"-",
                            TestResult::PASS,
-                           *(new Requirement::RequirementMapSP(new Requirement::RequirementMap())) ) )
+                           TestRegistry::GetInstance().GetRequirementsForTest( RefResolver::GetTestInfo().GetName() )
+           )                          )
 {}
-//TODO: Pass a real RequirementVectorSP
 
 ResolveRefVisitor::~ResolveRefVisitor()
 {

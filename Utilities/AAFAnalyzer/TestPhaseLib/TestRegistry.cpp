@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: TestRegistry.cpp,v 1.3 2005/11/02 20:55:38 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -145,7 +145,14 @@ void TestRegistry::Register( const TestInfo& info )
 
 }
 
-const shared_ptr<const Requirement::RequirementMap> TestRegistry::GetRequirementsForTest( const wstring& name ) const
+const shared_ptr<Requirement::RequirementMap> TestRegistry::GetRequirementsForTest( const wstring& name ) const
+{
+    shared_ptr<const Requirement::RequirementMap> spConstReqs = this->GetConstRequirementsForTest( name );
+    Requirement::RequirementMapSP spReqs( new Requirement::RequirementMap( *spConstReqs) );
+    return spReqs;
+}
+
+const shared_ptr<const Requirement::RequirementMap> TestRegistry::GetConstRequirementsForTest( const wstring& name ) const
 {
     Map::const_iterator target = _testSet.find( name );
     if ( target == _testSet.end() )
