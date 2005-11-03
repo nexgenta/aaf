@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: DetailLevelTestResult.h,v 1.4 2005/11/03 14:57:59 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,7 @@ class DetailLevelTestResult : public LowLevelTestResult
 
   void AppendSubtestResult( const shared_ptr<const DetailLevelTestResult>& subtestResult );
   const enum ResultLevel GetResultType() const;
+  void AddInformationResult( const wstring& reqId, const wstring& explain, Result result );
  private:
  
   // prohibited
