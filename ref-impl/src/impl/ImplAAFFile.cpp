@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.151 2005/10/18 16:15:34 rodrigc Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.152 2005/11/03 22:18:44 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1421,8 +1421,49 @@ void ImplAAFFile::saveMirroredMetadata(void)
     {
       // should set a value meaning unconstrained here
     }
-  }
-}
+
+    // Essence containers
+    ImplAAFHeader* p_header = _head;
+
+    aafUInt32  essence_container_count = 0;
+    hr = p_header->CountEssenceContainers( &essence_container_count );
+    if( hr == AAFRESULT_SUCCESS && essence_container_count > 0 )
+    {
+        aafUID_t* p_essence_containers =
+            new aafUID_t[ essence_container_count ];
+
+        hr = p_header->GetEssenceContainers( essence_container_count,
+                                                 p_essence_containers );
+        if( hr == AAFRESULT_SUCCESS )
+        {
+            for( aafUInt32 i=0; i<essence_container_count; i++ )
+            {
+                OMKLVKey essence_container_label;
+                convert( essence_container_label,
+                         *(OMUniqueObjectIdentification*)(p_essence_containers+i) );
+
+                if( ! p_storage->containsEssenceContainerLabel( essence_container_label ) )
+                {
+                    p_storage->addEssenceContainerLabel( essence_container_label );
+                }
+            }
+        }
+        else if( hr == AAFRESULT_PROP_NOT_PRESENT )
+        {
+            // Ignore the error value
+            hr = AAFRESULT_SUCCESS;
+        }
+
+        delete[] p_essence_containers;
+        p_essence_containers = 0;
+      }
+      else if( hr == AAFRESULT_PROP_NOT_PRESENT )
+      {
+          // Ignore the error value
+          hr = AAFRESULT_SUCCESS;
+      }
+    }
+ }
 
 void ImplAAFFile::restoreMirroredMetadata(void)
 {
