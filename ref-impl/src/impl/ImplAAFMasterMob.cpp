@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.61 2005/11/02 23:48:31 rodrigc Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.62 2005/11/03 19:13:32 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -187,6 +187,7 @@ AAFRESULT STDMETHODCALLTYPE
 		// For AAF it is optional.
 			CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
 			    CreateInstance((ImplAAFObject **) &pSequence));
+			CHECK(pSequence->Initialize(pDataDef));
 			CHECK(pSequence->AppendComponent(pSrcClip));
 
 			CHECK(AppendNewStaticSlot(pSequence, masterSlotID, pSlotName, 
@@ -244,6 +245,7 @@ AAFRESULT STDMETHODCALLTYPE
 		// For AAF it is optional.
 			CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
 			    CreateInstance((ImplAAFObject **) &pSequence));
+			CHECK(pSequence->Initialize(pDataDef));
 			CHECK(pSequence->AppendComponent(pSrcClip));
 
 			CHECK(AppendNewTimelineSlot(editRate,pSequence, masterSlotID, pSlotName, 
