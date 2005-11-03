@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.h,v 1.26 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.h,v 1.27 2005/11/03 06:08:45 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,8 +49,8 @@
 #include <objbase.h>
 #elif defined (OM_USE_REFERENCE_SS)
 #include "h/storage.h"
-#elif defined(OM_USE_SCHEMASOFT_SS)
-/* XXX: need to get this out of here.  SchemaSoft stuff should not include
+#elif defined(OM_USE_SCHEMASOFT_SS) || defined(OM_USE_GSF_SS)
+/* XXX: need to get this out of here.  SchemaSoft and libgsf stuff should not include
  *      this header
  */
 #  define CHAR_REFERENCE_CHAR
