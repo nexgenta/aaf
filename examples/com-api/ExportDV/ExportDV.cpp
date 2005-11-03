@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.18 2005/09/06 22:30:57 tbingham Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.19 2005/11/03 22:21:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -359,6 +359,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 
 	/* Set the essence to indicate that you have finished writing the samples */
 	check(pEssenceAccess->CompleteWrite());
+	check(pHeader2->UpdateEssenceContainers());
 
 	pEssenceAccess->Release();
 
