@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.13 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
+# $Id: common.mk,v 1.14 2005/11/03 06:06:50 rodrigc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -81,7 +81,7 @@ endif
 #--------------------------------------------------------------------------
 ifdef LIBGSF_PATH
     PLATFORMLIBS += -L$(LIBGSF_PATH)/lib -lgsf-1 -lgobject-2.0 -lglib-2.0 -lz
-    ADD_CFLAGS += -I$(LIBGSF_PATH)/include -I$(LIBGSF_PATH)/include/glib-2.0 -I$(LIBGSF_PATH)/lib/glib-2.0/include -I$(LIBGSF_PATH)/include/libgsf-1 -DUSE_LIBGSF
+    ADD_CFLAGS += -I$(LIBGSF_PATH)/include -I$(LIBGSF_PATH)/include/glib-2.0 -I$(LIBGSF_PATH)/lib/glib-2.0/include -I$(LIBGSF_PATH)/include/libgsf-1
 	ADD_CFLAGS += -DOM_USE_GSF_SS
 	USE_SS=1
 endif
