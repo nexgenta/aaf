@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.67 2005/08/31 19:20:47 montrowe Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.68 2005/11/05 04:52:22 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,14 +28,10 @@
 #define AAFRESULT_FAILED(Status) ((AAFRESULT)(Status)<0)
 #define AAFRESULT_SUCCEEDED(Status) (!(AAFRESULT_FAILED(Status)))
 
-#ifndef MAKE_HRESULT
-#define MAKE_HRESULT(sev,fac,code) \
-    ((HRESULT) (((aafUInt32)(sev)<<31) | ((aafUInt32)(fac)<<16) | ((aafUInt32)(code))) )
-#endif
-
 // #define _FACILITY_AAF    FACILITY_ITF
 #define _FACILITY_AAF 0x12
-#define MAKE_AAFHRESULT( code ) MAKE_HRESULT( SEVERITY_ERROR, _FACILITY_AAF, code )
+#define MAKE_AAFHRESULT( code ) \
+    ((HRESULT) (((aafUInt32)(SEVERITY_ERROR)<<31) | ((aafUInt32)(_FACILITY_AAF)<<16) | ((aafUInt32)(code))) )
 
 /* SESSION/FILE Error Codes */
 #define AAFRESULT_BAD_SESSION                MAKE_AAFHRESULT(0x0010)
