@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.19 2004/08/29 18:18:17 jptrainor Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.20 2005/11/07 21:49:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,6 +53,10 @@ public:
 	IEnumAAFDataDefsSP GetDataDefs();
 	IEnumAAFOperationDefsSP GetOperationDefs();
 	IEnumAAFParameterDefsSP GetParameterDefs();
+    IEnumAAFPluginDefsSP GetPluginDefs();
+    IEnumAAFContainerDefsSP GetContainerDefs();
+    IEnumAAFInterpolationDefsSP GetInterpolationDefs();
+    IEnumAAFCodecDefsSP GetCodecDefs();
 
 	void RegisterOpaqueTypeDef( IAAFTypeDefSP );
 	void RegisterOperationDef( IAAFOperationDefSP );
@@ -60,6 +64,10 @@ public:
 	void RegisterCodecDef( IAAFCodecDefSP );
 	void RegisterKLVDataKey( const aafUID_t& uuid,
 				 IAAFTypeDefSP spTypeDef );
+    void RegisterDataDef( IAAFDataDefSP );
+    void RegisterPluginDef( IAAFPluginDefSP );
+    void RegisterContainerDef( IAAFContainerDefSP );
+    void RegisterInterpolationDef( IAAFInterpolationDefSP );
 
 	IUnknownSP CreateInstance( const aafUID_t& auid,
 				  			   const IID& iid );

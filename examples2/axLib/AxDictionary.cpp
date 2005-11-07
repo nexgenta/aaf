@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.cpp,v 1.11 2004/08/29 18:18:17 jptrainor Exp $ $Name:  $
+// $Id: AxDictionary.cpp,v 1.12 2005/11/07 21:49:58 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -213,6 +213,42 @@ IEnumAAFParameterDefsSP AxDictionary::GetParameterDefs()
 	return spIEnumAAFParameterDefs;
 }
 
+IEnumAAFPluginDefsSP AxDictionary::GetPluginDefs()
+{
+    IEnumAAFPluginDefsSP spIEnumAAFPluginDefs;
+
+    CHECK_HRESULT( _spIaafDictionary->GetPluginDefs( &spIEnumAAFPluginDefs ) );
+
+    return spIEnumAAFPluginDefs;
+}
+
+IEnumAAFContainerDefsSP AxDictionary::GetContainerDefs()
+{
+    IEnumAAFContainerDefsSP spIEnumAAFContainerDefs;
+
+    CHECK_HRESULT( _spIaafDictionary->GetContainerDefs( &spIEnumAAFContainerDefs ) );
+
+    return spIEnumAAFContainerDefs;
+}
+
+IEnumAAFInterpolationDefsSP AxDictionary::GetInterpolationDefs()
+{
+    IEnumAAFInterpolationDefsSP spIEnumAAFInterpolationDefs;
+
+    CHECK_HRESULT( _spIaafDictionary->GetInterpolationDefs( &spIEnumAAFInterpolationDefs ) );
+
+    return spIEnumAAFInterpolationDefs;
+}
+
+IEnumAAFCodecDefsSP AxDictionary::GetCodecDefs()
+{
+    IEnumAAFCodecDefsSP spIEnumAAFCodecDefs;
+
+    CHECK_HRESULT( _spIaafDictionary->GetCodecDefs( &spIEnumAAFCodecDefs ) );
+
+    return spIEnumAAFCodecDefs;
+}
+
 void AxDictionary::RegisterOpaqueTypeDef( IAAFTypeDefSP spTypeDef )
 {
 	CHECK_HRESULT( _spIaafDictionary->RegisterOpaqueTypeDef( spTypeDef ) );
@@ -237,6 +273,26 @@ void AxDictionary::RegisterParameterDef( IAAFParameterDefSP spIaafParameterDef )
 void AxDictionary::RegisterCodecDef( IAAFCodecDefSP spIaafCodecDef)
 {
 	CHECK_HRESULT( _spIaafDictionary->RegisterCodecDef( spIaafCodecDef ) );
+}
+
+void AxDictionary::RegisterDataDef( IAAFDataDefSP spIaafDataDef )
+{
+    CHECK_HRESULT( _spIaafDictionary->RegisterDataDef( spIaafDataDef ) );
+}
+
+void AxDictionary::RegisterPluginDef( IAAFPluginDefSP spIaafPluginDef )
+{
+    CHECK_HRESULT( _spIaafDictionary->RegisterPluginDef( spIaafPluginDef ) );
+}
+
+void AxDictionary::RegisterContainerDef( IAAFContainerDefSP spIaafContainerDef )
+{
+    CHECK_HRESULT( _spIaafDictionary->RegisterContainerDef( spIaafContainerDef ) );
+}
+
+void AxDictionary::RegisterInterpolationDef( IAAFInterpolationDefSP spIaafInterpolationDef )
+{
+    CHECK_HRESULT( _spIaafDictionary->RegisterInterpolationDef( spIaafInterpolationDef ) );
 }
 
 IUnknownSP AxDictionary::CreateInstance( const aafUID_t& auid,
