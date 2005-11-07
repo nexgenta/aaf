@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.cpp,v 1.4 2005/11/03 14:57:59 ajakowpa Exp $
+// $Id: DetailLevelTestResult.cpp,v 1.5 2005/11/07 19:41:56 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,8 +79,6 @@ const enum TestResult::ResultLevel DetailLevelTestResult::GetResultType() const
 
 void DetailLevelTestResult::AddInformationResult( const wstring& reqId, const wstring& explain, Result result )
 {
-//    shared_ptr<const Requirement> requirement = RequirementRegistry::GetInstance().GetRequirement( reqId );
-    
     Result reqStatus;
     if ( !this->ContainsRequirment( reqId, reqStatus ) )
     {
