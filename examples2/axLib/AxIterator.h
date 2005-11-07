@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxIterator.h,v 1.15 2005/11/07 21:49:58 ajakowpa Exp $ $Name:  $
+// $Id: AxIterator.h,v 1.16 2005/11/07 22:03:25 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -127,7 +127,7 @@ typedef AxIterator< IAAFSmartPointer2<IAAFContainerDef>,        IEnumAAFContaine
         AxContainerDefsIter;
         
 typedef AxIterator< IAAFSmartPointer2<IAAFInterpolationDef>,    IEnumAAFInterpolationDefs,  AddrOfSmartPointer2<IAAFInterpolationDef> >
-        AxInterpolationrDefsIter;
+        AxInterpolationDefsIter;
         
 typedef AxIterator< IAAFSmartPointer2<IAAFCodecDef>,            IEnumAAFCodecDefs,          AddrOfSmartPointer2<IAAFCodecDef> >
         AxCodecDefsIter;
