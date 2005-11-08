@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.20 2005/11/07 21:49:58 ajakowpa Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.21 2005/11/08 16:55:17 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@ class AxDictionary : public AxObject {
 
 public:
 	AxDictionary( IAAFDictionarySP spIaafDictionary );
+    AxDictionary( IAAFDictionary2SP spIaafDictionary );
 	~AxDictionary();
 
 	bool isKnownTypeDef( const aafUID_t& typeId );
@@ -57,6 +58,8 @@ public:
     IEnumAAFContainerDefsSP GetContainerDefs();
     IEnumAAFInterpolationDefsSP GetInterpolationDefs();
     IEnumAAFCodecDefsSP GetCodecDefs();
+    IEnumAAFKLVDataDefsSP GetKLVDataDefs();
+    IEnumAAFTaggedValueDefsSP GetTaggedValueDefs();
 
 	void RegisterOpaqueTypeDef( IAAFTypeDefSP );
 	void RegisterOperationDef( IAAFOperationDefSP );
@@ -68,6 +71,8 @@ public:
     void RegisterPluginDef( IAAFPluginDefSP );
     void RegisterContainerDef( IAAFContainerDefSP );
     void RegisterInterpolationDef( IAAFInterpolationDefSP );
+    void RegisterKLVDataDef( IAAFKLVDataDefinitionSP );
+    void RegisterTaggedValueDef( IAAFTaggedValueDefinitionSP );
 
 	IUnknownSP CreateInstance( const aafUID_t& auid,
 				  			   const IID& iid );
@@ -79,14 +84,16 @@ public:
 	aafUInt32 CountOpaqueTypeDefs();
 
 	inline operator IAAFDictionarySP ()
-	{ return _spIaafDictionary; }
+	{ return AxQueryInterface<IAAFDictionary2,IAAFDictionary>( _spIaafDictionary ); }
+    
+    inline operator IAAFDictionary2SP ()
+    { return _spIaafDictionary; }
 
 private:
 	AxDictionary();
 	AxDictionary( const AxDictionary& );
 	AxDictionary& operator=( const AxDictionary& );
-	
-	IAAFDictionarySP _spIaafDictionary;
+	IAAFDictionary2SP _spIaafDictionary;
 };
 
 //=---------------------------------------------------------------------=
