@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDefObject.h,v 1.6 2005/11/08 17:31:26 ajakowpa Exp $ $Name:  $
+// $Id: AxDefObject.h,v 1.7 2005/11/08 18:37:40 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,20 +173,42 @@ private:
 class AxDataDef: public AxDefObject {
 public:
 	AxDataDef( IAAFDataDefSP spIaafDataDef );
+    AxDataDef( IAAFDataDef2SP spIaafDataDef );
+    AxDataDef( IAAFDataDef3SP spIaafDataDef );
 	~AxDataDef();
+
+    void Initialize( const aafUID_t&,
+                const AxString& name,
+                const AxString& desc );
 
 	bool IsSoundKind();
 	bool IsPictureKind();
+    bool IsMatteKind();
+    bool IsPictureWithMatteKind();
+    bool IsEdgecodeKind();
+    bool IsTimecodeKind();
+    bool IsAuxiliaryKind();
+    bool IsDescriptiveMetadataKind();
+
+    bool DoesDataDefConvertTo ( IAAFDataDefSP );
+    bool IsDataDefOf ( IAAFDataDefSP );
+    bool DoesDataDefConvertFrom ( IAAFDataDefSP );
 		
 	inline operator IAAFDataDefSP ()
-	{ return _spIaafDataDef; }
+	{ return AxQueryInterface<IAAFDataDef3,IAAFDataDef>( _spIaafDataDef ); }
+    
+    inline operator IAAFDataDef2SP ()
+    { return AxQueryInterface<IAAFDataDef3,IAAFDataDef2>( _spIaafDataDef ); }
+    
+    inline operator IAAFDataDef3SP ()
+    { return _spIaafDataDef; }
 
 private:
 	AxDataDef();
 	AxDataDef( const AxDataDef& );
 	AxDataDef& operator=( const AxDataDef& );
 	
-	IAAFDataDefSP _spIaafDataDef;
+	IAAFDataDef3SP _spIaafDataDef;
 };
 
 //=---------------------------------------------------------------------=

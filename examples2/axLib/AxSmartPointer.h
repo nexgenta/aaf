@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.17 2005/11/08 16:55:17 ajakowpa Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.18 2005/11/08 18:37:40 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -219,6 +219,8 @@ AXSP_TDEF_B( TypeDefVariableArrayEx )
 // New 1.1 objects.
 AXSP_TDEF_A( AES3PCMDescriptor )
 AXSP_TDEF_A( AuxiliaryDescriptor )
+AXSP_TDEF_B( DataDef2 )
+AXSP_TDEF_B( DataDef3 )
 AXSP_TDEF_A( DescriptiveFramework )
 AXSP_TDEF_A( DescriptiveMarker )
 AXSP_TDEF_A( ImportDescriptor )
