@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDefObject.h,v 1.5 2004/09/02 12:51:02 jptrainor Exp $ $Name:  $
+// $Id: AxDefObject.h,v 1.6 2005/11/08 17:31:26 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -221,6 +221,64 @@ private:
 	AxOperationDef& operator=( const AxOperationDef& );
 	
 	IAAFOperationDefSP _spIaafOperationDef;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxKLVDataDef: public AxDefObject {
+public:
+    AxKLVDataDef( IAAFKLVDataDefinitionSP spIaafKLVDataDef );
+    ~AxKLVDataDef();
+
+    void Initialize( const aafUID_t&,
+                const AxString& name,
+                const AxString& desc );
+    
+    void AddParentProperty( IAAFPropertyDefSP );
+    void RemoveParentProperty( IAAFPropertyDefSP );
+    void SetKLVDataType( IAAFTypeDefSP );
+    
+    IEnumAAFPropertyDefsSP GetParentProperties();
+    aafUInt32 CountParentProperties();
+    IAAFTypeDefSP GetKLVDataType();
+    
+    inline operator IAAFKLVDataDefinitionSP ()
+    { return _spIaafKLVDataDef; }
+
+private:
+    AxKLVDataDef();
+    AxKLVDataDef( const AxKLVDataDef& );
+    AxKLVDataDef& operator=( const AxKLVDataDef& );
+    
+    IAAFKLVDataDefinitionSP _spIaafKLVDataDef;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxTaggedValueDef: public AxDefObject {
+public:
+    AxTaggedValueDef( IAAFTaggedValueDefinitionSP spIaafTaggedValueDef );
+    ~AxTaggedValueDef();
+
+    void Initialize( const aafUID_t&,
+                const AxString& name,
+                const AxString& desc );
+    
+    void AddParentProperty( IAAFPropertyDefSP );
+    void RemoveParentProperty( IAAFPropertyDefSP );
+    
+    IEnumAAFPropertyDefsSP GetParentProperties();
+    aafUInt32 CountParentProperties();
+    
+    inline operator IAAFTaggedValueDefinitionSP ()
+    { return _spIaafTaggedValueDef; }
+
+private:
+    AxTaggedValueDef();
+    AxTaggedValueDef( const AxTaggedValueDef& );
+    AxTaggedValueDef& operator=( const AxTaggedValueDef& );
+    
+    IAAFTaggedValueDefinitionSP _spIaafTaggedValueDef;
 };
 
 #endif
