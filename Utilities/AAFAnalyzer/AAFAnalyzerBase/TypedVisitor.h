@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.h,v 1.6 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: TypedVisitor.h,v 1.7 2005/11/14 19:46:50 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,9 +44,9 @@ class TypedVisitor : public Visitor
     virtual ~TypedVisitor();
 
     virtual bool EdgeVisit(AAFContainment& edge) { return true; }
-    virtual bool EdgeVisit(AAFComponentReference& edge) { return true; }
-    virtual bool EdgeVisit(AAFMobReference& edge) { return true; }
-    virtual bool EdgeVisit(AAFSlotReference& edge) { return true; }
+    virtual bool EdgeVisit(AAFComponentReference& edge) { return false; }
+    virtual bool EdgeVisit(AAFMobReference& edge) { return false; }
+    virtual bool EdgeVisit(AAFSlotReference& edge) { return false; }
 
 #include "TypedVisitor.h.gen"
 

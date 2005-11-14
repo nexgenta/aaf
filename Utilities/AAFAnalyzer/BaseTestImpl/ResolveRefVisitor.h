@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: ResolveRefVisitor.h,v 1.4 2005/11/14 19:46:50 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@ class ResolveRefVisitor : public TypedVisitor
   virtual ~ResolveRefVisitor();
 
   virtual bool PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node);
-
+  
   shared_ptr<const DetailLevelTestResult> GetTestResult() const;
 
  private:

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSlotReference.h,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: AAFSlotReference.h,v 1.3 2005/11/14 19:46:50 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,7 @@ class AAFSlotReference : public Edge
   ~AAFSlotReference();
 
   bool Visit(shared_ptr<Visitor> spVisitor);
+  virtual shared_ptr<Edge> CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const;
 
  private:
 

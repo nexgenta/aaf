@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedNodeFactory.cpp,v 1.3 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id$ $Name$
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,29 +18,31 @@
 //
 //=---------------------------------------------------------------------=
 
-//AAF Analyzer Base files
-#include "TypedNodeFactory.h"
+#ifndef __EPCastException_h_
+#define __EPCastException_h_
 
-namespace {
-
-using namespace aafanalyzer;
-
-} // end of namespace
-
-
-//======================================================================
-//======================================================================
-//======================================================================
+//Analyzer Base files
+#include <AnalyzerException.h>
 
 namespace aafanalyzer {
 
-TypedNodeFactory::TypedNodeFactory()
-{
-}
+using namespace std;
 
-TypedNodeFactory::~TypedNodeFactory()
-{
-}
+class EPCastException : public AnalyzerException {
 
+  public:
+
+    EPCastException( const wchar_t* what );
+    virtual ~EPCastException() throw();
+    
+  private:
+  
+    // prohibited
+    EPCastException();
+    EPCastException& operator=( const EPCastException& );
+    
+};
 
 } // end of namespace diskstream
+
+#endif /*__EPCastException_h_*/

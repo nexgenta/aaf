@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.14 2005/11/02 20:58:49 ajakowpa Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.15 2005/11/14 19:46:51 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,9 @@
 #include <RequirementMismatchException.h>
 #include <RequirementRegistryException.h>
 #include <Requirement.h>
+
+//Edit Protocol Analyzer Base files
+#include <EPCastException.h>
 
 //AAF Analyzer Base files
 #include <AAFGraphInfo.h>
@@ -390,6 +393,10 @@ int main( int argc, char** argv )
     wcout << ex.widewhat() << endl;
   }
   catch ( const TestRegistryException& ex )
+  {
+    wcout << ex.widewhat() << endl;
+  }
+  catch ( const EPCastException& ex )
   {
     wcout << ex.widewhat() << endl;
   }
