@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.12 2005/08/19 23:56:51 tbingham Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.13 2005/11/15 17:18:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -146,6 +146,16 @@ static const OMObjectIdentification Class_Root =
 
 static const OMPropertyId PID_Root_MetaDictionary  = 0x001;
 static const OMPropertyId PID_Root_Header          = 0x002;
+static const OMPropertyId PID_Root_ObjectDirectory = 0x003;
+static const OMPropertyId PID_Root_FormatVersion   = 0x004;
+
+static const OMPropertyId PID_InterchangeObject_InstanceUID = 0x3c0a;
+
+// {01011502-0000-0000-060E-2B3401010101}
+static const OMObjectIdentification Property_InterchangeObject_InstanceUID =
+{0x01011502, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01}};
+
+
 
 class OMPropertyDefinition;
 
