@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.h,v 1.13 2005/11/15 17:18:19 tbingham Exp $ $Name:  $
+// $Id: OMDictionary.h,v 1.14 2005/11/15 18:26:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2005, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -150,6 +150,14 @@ static const OMPropertyId PID_Root_ObjectDirectory = 0x003;
 static const OMPropertyId PID_Root_FormatVersion   = 0x004;
 
 static const OMPropertyId PID_InterchangeObject_InstanceUID = 0x3c0a;
+
+//{0d010301-0101-0100-060e-2b3401010102}
+const OMUniqueObjectIdentification Property_Root_MetaDictionary =
+{0x0d010301, 0x0101, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{0d010301-0102-0100-060e-2b3401010102}
+const OMUniqueObjectIdentification Property_Root_Header =
+{0x0d010301, 0x0102, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
 
 // {01011502-0000-0000-060E-2B3401010101}
 static const OMObjectIdentification Property_InterchangeObject_InstanceUID =
