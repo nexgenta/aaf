@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.216 2005/11/14 19:30:16 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.217 2005/11/15 18:37:58 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2158,10 +2158,22 @@ void OMKLVStoredObject::writePrimerPack(const OMDictionary* dictionary)
   OMUInt64 elementCountPosition = _storage->reserve(sizeof(elementCount));
   _storage->write(elementSize, _reorderBytes);
 
-  // Instance UID
+  // Object::InstanceUID     3c.0a
   _storage->write(PID_InterchangeObject_InstanceUID, _reorderBytes);
   OMKLVKey iuidk;
   convert(iuidk, Property_InterchangeObject_InstanceUID);
+  _storage->writeKLVKey(iuidk);
+  elementCount = elementCount + 1;
+  // ? Root::ObjectDirectory f7.03
+  // ? Root::FormatVersion   7f.04
+  // Root::MetaDictionary    00.01
+  _storage->write(PID_Root_MetaDictionary, _reorderBytes);
+  convert(iuidk, Property_Root_MetaDictionary);
+  _storage->writeKLVKey(iuidk);
+  elementCount = elementCount + 1;
+  // Root::Header            00.02
+  _storage->write(PID_Root_Header, _reorderBytes);
+  convert(iuidk, Property_Root_Header);
   _storage->writeKLVKey(iuidk);
   elementCount = elementCount + 1;
 
