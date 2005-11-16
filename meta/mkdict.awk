@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkdict.awk,v 1.54 2005/11/16 20:50:20 tbingham Exp $ $Name:  $
+# $Id: mkdict.awk,v 1.55 2005/11/16 20:55:43 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -1012,7 +1012,12 @@ BEGIN {
                          $C["ul_9"], $C["ul_10"], $C["ul_11"], $C["ul_12"],
                          $C["ul_13"], $C["ul_14"], $C["ul_15"], $C["ul_16"], "    ");
 	  ppid = formatTag( $C["r_tag"] );
-      printf("  AAF_PROPERTY(%s,%s,\n    %s,\n    %s,\n    %s,\n    %s,\n    %s)\n", $C[SYM], pguid, ppid, type, mandatory, uid, class);
+      if (ppid == "0x0000") {
+        comment = " // dynamic";
+      } else {
+        comment = "";
+      }
+      printf("  AAF_PROPERTY(%s,%s,\n    %s,%s\n    %s,\n    %s,\n    %s,\n    %s)\n", $C[SYM], pguid, ppid, comment, type, mandatory, uid, class);
     }
 
   # Types Register
