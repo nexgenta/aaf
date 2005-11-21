@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.20 2005/01/12 04:23:14 jfpanisset Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.21 2005/11/21 17:09:35 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -417,6 +417,59 @@ private:
 	AxGPITrigger& operator=( const AxGPITrigger& );
 
 	IAAFGPITriggerSP _spIaafGPITrigger;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxTimecodeStream : public AxSegment {
+
+public:
+    AxTimecodeStream( IAAFTimecodeStreamSP spIaafTimecodeStream );
+    virtual ~AxTimecodeStream();
+
+    aafTimecode_t GetPositionTimecode ( aafPosition_t position );
+    aafInt32 GetUserDataLength ();
+    aafRational_t GetSampleRate ();
+    aafTimecodeSourceType_t GetSourceType ();
+    aafUInt32 GetSampleSize ();
+    aafUInt32 GetSourceBufLen ();
+    void GetUserDataAtPosition ( aafPosition_t position, aafInt32 buflen, aafDataBuffer_t buffer );
+    void GetSource( aafUInt32 valueSize, aafDataBuffer_t pValue, aafUInt32* bytesRead );
+
+    void SetPositionTimecode ( aafPosition_t position, aafTimecode_t timecode);
+    void SetUserDataAtPosition ( aafPosition_t position, aafInt32 buflen, aafDataBuffer_t buffer );
+    void SetSampleRate ( aafRational_t sampleRate );
+    void SetSourceType ( aafTimecodeSourceType_t sourceType );
+    void SetSource (aafUInt32 valueSize, aafDataBuffer_t pValue);
+    
+    inline operator IAAFTimecodeStreamSP ()
+    { return _spIaafTimecodeStream; }
+
+private:
+    AxTimecodeStream();
+    AxTimecodeStream( const AxTimecodeStream& );
+    AxTimecodeStream& operator=( const AxTimecodeStream& );
+
+    IAAFTimecodeStreamSP _spIaafTimecodeStream;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxTimecodeStream12M : public AxTimecodeStream {
+
+public:
+    AxTimecodeStream12M( IAAFTimecodeStream12MSP spIaafTimecodeStream12M );
+    virtual ~AxTimecodeStream12M();
+
+    inline operator IAAFTimecodeStream12MSP ()
+    { return _spIaafTimecodeStream12M; }
+
+private:
+    AxTimecodeStream12M();
+    AxTimecodeStream12M( const AxTimecodeStream12M& );
+    AxTimecodeStream12M& operator=( const AxTimecodeStream12M& );
+
+    IAAFTimecodeStream12MSP _spIaafTimecodeStream12M;
 };
 
 //=---------------------------------------------------------------------=
