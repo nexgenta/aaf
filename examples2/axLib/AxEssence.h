@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.h,v 1.26 2005/09/29 15:57:20 ajakowpa Exp $ $Name:  $
+// $Id: AxEssence.h,v 1.27 2005/11/21 20:23:52 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -485,6 +485,32 @@ private:
 	AxEssenceFormat& operator=( const AxEssenceFormat& );
 	
 	IAAFEssenceFormatSP _spIaafEssenceFormat;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxAuxiliaryDescriptor : public AxPhysicalDescriptor {
+public:
+    AxAuxiliaryDescriptor( IAAFAuxiliaryDescriptorSP spIaafAuxiliaryDescriptor );
+    ~AxAuxiliaryDescriptor();
+    
+    void Initialize();
+
+    AxString GetMimeType ();
+    AxString GetCharSet ();
+    
+    void SetMimeType ( const AxString& mimeType );
+    void SetCharSet ( const AxString& charSet );
+
+    inline operator IAAFAuxiliaryDescriptorSP ()
+    { return _spIaafAuxiliaryDescriptor; }
+
+private:
+    AxAuxiliaryDescriptor();
+    AxAuxiliaryDescriptor( const AxAuxiliaryDescriptor& );
+    AxAuxiliaryDescriptor& operator=( const AxAuxiliaryDescriptor& );
+
+    IAAFAuxiliaryDescriptorSP _spIaafAuxiliaryDescriptor;
 };
 
 #endif

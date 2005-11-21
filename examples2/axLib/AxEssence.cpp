@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.cpp,v 1.25 2005/09/29 15:57:20 ajakowpa Exp $ $Name:  $
+// $Id: AxEssence.cpp,v 1.26 2005/11/21 20:23:52 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -839,6 +839,69 @@ void AxEssenceFormat::GetFormatSpecifier( const aafUID_t& essenceFormatCode,
 					 valueSize,
 					 pValue,
 					 &bytesRead ) );
+}
+
+//=---------------------------------------------------------------------=
+
+AxAuxiliaryDescriptor::AxAuxiliaryDescriptor( IAAFAuxiliaryDescriptorSP spIaafAuxiliaryDescriptor )
+:   AxPhysicalDescriptor( AxQueryInterface<IAAFAuxiliaryDescriptor, IAAFPhysicalDescriptor>(spIaafAuxiliaryDescriptor) ),
+    _spIaafAuxiliaryDescriptor( spIaafAuxiliaryDescriptor )
+{}
+
+AxAuxiliaryDescriptor::~AxAuxiliaryDescriptor()
+{}
+
+void AxAuxiliaryDescriptor::Initialize()
+{
+    // noop
+}
+
+AxString AxAuxiliaryDescriptor::GetMimeType ()
+{
+    aafUInt32 sizeInBytes = 0;
+
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->GetMimeTypeBufLen( &sizeInBytes ) );
+
+    // size is in bytes!  Divide by sizeof(aafCharacter) to allocate correctly
+    // sized aafCharacter array.  Add one to account for possible rounding.
+
+    int sizeInChars = (sizeInBytes /sizeof(aafCharacter)) + 1;
+    std::vector< aafCharacter > buf( sizeInChars );
+
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->GetMimeType( &buf[0], sizeInChars*sizeof(aafCharacter) ) );
+    
+    AxString mimeType( &buf[0] );
+
+    return mimeType;
+}
+
+AxString AxAuxiliaryDescriptor::GetCharSet ()
+{
+    aafUInt32 sizeInBytes = 0;
+
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->GetCharSetBufLen( &sizeInBytes ) );
+
+    // size is in bytes!  Divide by sizeof(aafCharacter) to allocate correctly
+    // sized aafCharacter array.  Add one to account for possible rounding.
+
+    int sizeInChars = (sizeInBytes /sizeof(aafCharacter)) + 1;
+    std::vector< aafCharacter > buf( sizeInChars );
+
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->GetCharSet( &buf[0], sizeInChars*sizeof(aafCharacter) ) );
+    
+    AxString charSet( &buf[0] );
+
+    return charSet;
+}
+    
+void AxAuxiliaryDescriptor::SetMimeType ( const AxString& mimeType )
+{
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->SetMimeType( mimeType.c_str() ) );
+}
+
+void AxAuxiliaryDescriptor::SetCharSet ( const AxString& charSet )
+{
+    CHECK_HRESULT( _spIaafAuxiliaryDescriptor->SetCharSet( charSet.c_str() ) );
 }
 
 //=---------------------------------------------------------------------=
