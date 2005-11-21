@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.cpp,v 1.9 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: EPDerivationTest.cpp,v 1.10 2005/11/21 15:29:49 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -243,6 +243,15 @@ public:
             _spResult->SetResult( TestResult::FAIL );
         }
       }
+    
+      //TODO: This should not be necessary.  There needs to be a requirement
+      //      that fails on an illegal End Of Chain.  Until something fails,
+      //      this code must be here to ensure a failure is reported.
+      if ( _spResult->GetResult() == TestResult::PASS )
+      {
+          _spResult->SetResult( TestResult::FAIL );
+      }
+      
       _spResult->SetExplanation( L"Source Clip is out of place in the derrivation chain." );
       return false;
     }
