@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.22 2005/11/22 17:29:22 ajakowpa Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.23 2005/11/22 19:21:46 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,6 +225,9 @@ public:
 
 	aafSlotID_t GetSourceMobSlotID();
 	void SetSourceMobSlotID( const aafSlotID_t& slotid );
+    
+    operator IAAFSourceReferenceSP ()
+    { return _spIaafSourceReference; }
 
 private:
 	AxSourceReference();
