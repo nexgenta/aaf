@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.24 2005/11/22 17:29:22 ajakowpa Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.25 2005/11/22 21:12:08 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -915,5 +915,52 @@ AxTimecodeStream12M::AxTimecodeStream12M( IAAFTimecodeStream12MSP spIaafTimecode
 
 AxTimecodeStream12M::~AxTimecodeStream12M()
 {}
+
+//=---------------------------------------------------------------------=
+
+AxDescriptiveMarker::AxDescriptiveMarker( IAAFDescriptiveMarkerSP spIaafDescriptiveMarker )
+:   AxCommentMarker( AxQueryInterface<IAAFDescriptiveMarker, IAAFCommentMarker>(spIaafDescriptiveMarker) ),
+    _spIaafDescriptiveMarker( spIaafDescriptiveMarker )
+{}
+
+AxDescriptiveMarker::~AxDescriptiveMarker()
+{}
+
+void AxDescriptiveMarker::Initialize()
+{
+    // noop
+}
+
+std::vector<aafUInt32> AxDescriptiveMarker::GetDescribedSlotIDs()
+{
+    aafUInt32 numberOfElements = 0;
+
+    CHECK_HRESULT( _spIaafDescriptiveMarker->GetDescribedSlotIDsSize( &numberOfElements ) );
+    
+    std::vector<aafUInt32> describedSlotIds; 
+
+    CHECK_HRESULT( _spIaafDescriptiveMarker->GetDescribedSlotIDs( numberOfElements, &(describedSlotIds[0]) ) ); 
+    
+    return describedSlotIds;
+}
+
+IAAFDescriptiveFrameworkSP AxDescriptiveMarker::GetDescriptiveFramework()
+{
+    IAAFDescriptiveFrameworkSP descriptiveFramework;
+
+    CHECK_HRESULT( _spIaafDescriptiveMarker->GetDescriptiveFramework( &descriptiveFramework ) );
+
+    return descriptiveFramework;
+}
+
+void AxDescriptiveMarker::SetDescribedSlotIDs( aafUInt32 numberElements, aafUInt32* describedSlotIDs )
+{
+    CHECK_HRESULT( _spIaafDescriptiveMarker->SetDescribedSlotIDs( numberElements, describedSlotIDs ) );
+}
+
+void AxDescriptiveMarker::SetDescriptiveFramework( IAAFDescriptiveFrameworkSP descriptiveFramework )
+{
+    CHECK_HRESULT( _spIaafDescriptiveMarker->SetDescriptiveFramework( descriptiveFramework ) );
+}
 
 //=---------------------------------------------------------------------=

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.23 2005/11/22 19:21:46 ajakowpa Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.24 2005/11/22 21:12:08 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,8 @@
 #include "AxTypes.h"
 #include "AxSmartPointer.h"
 #include "AxObject.h"
+
+#include <vector>
 
 //=---------------------------------------------------------------------=
 
@@ -492,6 +494,33 @@ private:
     AxTimecodeStream12M& operator=( const AxTimecodeStream12M& );
 
     IAAFTimecodeStream12MSP _spIaafTimecodeStream12M;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxDescriptiveMarker : public AxCommentMarker {
+
+public:
+    AxDescriptiveMarker( IAAFDescriptiveMarkerSP spIaafDescriptiveMarker );
+    virtual ~AxDescriptiveMarker();
+    
+    void Initialize();
+    
+    std::vector<aafUInt32> GetDescribedSlotIDs();
+    IAAFDescriptiveFrameworkSP GetDescriptiveFramework();
+    
+    void SetDescribedSlotIDs( aafUInt32 numberElements, aafUInt32* describedSlotIDs );
+    void SetDescriptiveFramework( IAAFDescriptiveFrameworkSP descriptiveFramework );
+
+    inline operator IAAFDescriptiveMarkerSP ()
+    { return _spIaafDescriptiveMarker; }
+
+private:
+    AxDescriptiveMarker();
+    AxDescriptiveMarker( const AxDescriptiveMarker& );
+    AxDescriptiveMarker& operator=( const AxDescriptiveMarker& );
+
+    IAAFDescriptiveMarkerSP _spIaafDescriptiveMarker;
 };
 
 //=---------------------------------------------------------------------=
