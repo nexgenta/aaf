@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.18 2005/11/08 18:37:40 ajakowpa Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.19 2005/11/22 17:29:22 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -95,6 +95,7 @@ AXSP_TDEF_A( ClassDef )
 AXSP_TDEF_A( CodecDef )
 AXSP_TDEF_A( CommentMarker )
 AXSP_TDEF_A( Component )
+AXSP_TDEF_B( Component2 )
 AXSP_TDEF_A( CompositionMob )
 AXSP_TDEF_A( ConstantValue )
 AXSP_TDEF_A( ContainerDef )
