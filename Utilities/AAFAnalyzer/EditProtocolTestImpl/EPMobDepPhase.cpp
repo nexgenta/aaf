@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.10 2005/11/21 15:29:49 ajakowpa Exp $
+// $Id: EPMobDepPhase.cpp,v 1.11 2005/11/24 17:10:47 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -123,6 +123,10 @@ shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
   // Ninth, run the effect test
   shared_ptr<EPEffectTest> effectTest( new EPEffectTest( _log, _spGraph ) );
   spPhaseResult->AppendSubtestResult( effectTest->Execute() );
+  
+  // Tenth, run the annotation test
+  shared_ptr<EPAnnotationTest> annotationTest( new EPAnnotationTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( annotationTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 
