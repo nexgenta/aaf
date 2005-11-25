@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.19 2005/11/22 17:29:22 ajakowpa Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.20 2005/11/25 14:51:23 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -224,6 +224,7 @@ AXSP_TDEF_B( DataDef2 )
 AXSP_TDEF_B( DataDef3 )
 AXSP_TDEF_A( DescriptiveFramework )
 AXSP_TDEF_A( DescriptiveMarker )
+AXSP_TDEF_B( Header2 )
 AXSP_TDEF_A( ImportDescriptor )
 AXSP_TDEF_A( KLVDataDefinition )
 AXSP_TDEF_A( MultipleDescriptor )
