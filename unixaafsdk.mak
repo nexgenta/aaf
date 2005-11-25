@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: unixaafsdk.mak,v 1.14 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
+# $Id: unixaafsdk.mak,v 1.15 2005/11/25 15:48:41 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -218,6 +218,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)/AAFFileMode.h \
 	$(AAFSDK_INCLUDE)/AAFInterpolatorDefs.h \
 	$(AAFSDK_INCLUDE)/AAFMetaDictionary.h \
+	$(AAFSDK_INCLUDE)/AAFOPDefs.h \
 	$(AAFSDK_INCLUDE)/AAFOperationCategories.h \
 	$(AAFSDK_INCLUDE)/AAFOperationDefs.h \
 	$(AAFSDK_INCLUDE)/AAFParameterDefs.h \
@@ -471,6 +472,9 @@ $(AAFSDK_INCLUDE)/AAFMetaDictionary.h : $(TOOLKIT_INCLUDE)/AAFMetaDictionary.h
 $(AAFSDK_INCLUDE)/AAFOperationCategories.h : $(TOOLKIT_INCLUDE)/AAFOperationCategories.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFOperationCategories.h $@
 
+$(AAFSDK_INCLUDE)/AAFOPDefs.h : $(TOOLKIT_INCLUDE)/AAFOPDefs.h
+	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFOPDefs.h $@
+	
 $(AAFSDK_INCLUDE)/AAFOperationDefs.h : $(TOOLKIT_INCLUDE)/AAFOperationDefs.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFOperationDefs.h $@
 
