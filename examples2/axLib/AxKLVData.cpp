@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxKLVData.cpp,v 1.4 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxKLVData.cpp,v 1.5 2005/11/28 21:37:45 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,23 @@ void AxKLVData::Initialize( aafUID_t  key,
 						   const_cast<aafDataBuffer_t>(pValue) ) );
 }
 
+aafUID_t AxKLVData::GetKey()
+{
+    aafUID_t key;
+    
+    CHECK_HRESULT( _spIaafKLVData->GetKey( &key ) );
+    
+    return key;
+}
 
+void AxKLVData::GetValue( aafUInt32 valueSize, aafDataBuffer_t pValue, aafUInt32* bytesRead)
+{
+    CHECK_HRESULT( _spIaafKLVData->GetValue( valueSize, pValue, bytesRead ) );
+}
+
+void AxKLVData::SetValue( aafUInt32 valueSize, aafDataBuffer_t pValue )
+{
+    CHECK_HRESULT( _spIaafKLVData->SetValue( valueSize, pValue ) );
+}
 
 
