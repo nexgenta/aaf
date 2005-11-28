@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.cpp,v 1.13 2005/11/08 16:55:17 ajakowpa Exp $ $Name:  $
+// $Id: AxDictionary.cpp,v 1.14 2005/11/28 18:32:22 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -94,6 +94,23 @@ bool AxDictionary::isKnownParameterDef( const aafUID_t& paramId )
 	}
 
 	return result;
+}
+
+bool AxDictionary::isKnownInterpolationDef( const aafUID_t& intId )
+{
+    IAAFInterpolationDefSP spIaafInterpolationDef;
+
+    HRESULT hr = _spIaafDictionary->LookupInterpolationDef( intId, &spIaafInterpolationDef );
+
+    bool result = true;
+    if ( AAFRESULT_NO_MORE_OBJECTS == hr ) {
+        result = false;
+    }
+    else if ( AAFRESULT_SUCCESS != hr ) {
+        CHECK_HRESULT( hr );
+    }
+
+    return result;
 }
 
 void AxDictionary::RegisterClassDef( IAAFClassDefSP spIaafClassDef )

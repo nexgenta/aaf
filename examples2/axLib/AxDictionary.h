@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxDictionary.h,v 1.21 2005/11/08 16:55:17 ajakowpa Exp $ $Name:  $
+// $Id: AxDictionary.h,v 1.22 2005/11/28 18:32:22 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,7 @@ public:
 	bool isKnownTypeDef( const aafUID_t& typeId );
 	bool isKnownOperationDef( const aafUID_t& opId );
 	bool isKnownParameterDef( const aafUID_t& paramId );
+    bool isKnownInterpolationDef( const aafUID_t& intId );
 	
 	void RegisterClassDef( IAAFClassDefSP spIaafClassDef );
 
