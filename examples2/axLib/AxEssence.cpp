@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.cpp,v 1.27 2005/11/30 20:50:54 ajakowpa Exp $ $Name:  $
+// $Id: AxEssence.cpp,v 1.28 2005/11/30 21:12:06 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -905,6 +905,14 @@ void AxAuxiliaryDescriptor::SetCharSet ( const AxString& charSet )
 }
 
 //=---------------------------------------------------------------------=
+
+AxSoundDescriptor::AxSoundDescriptor( IAAFSoundDescriptorSP spIaafSoundDescriptor )
+:   AxFileDescriptor( AxQueryInterface<IAAFSoundDescriptor, IAAFFileDescriptor>(spIaafSoundDescriptor) ),
+    _spIaafSoundDescriptor( spIaafSoundDescriptor )
+{}
+
+AxSoundDescriptor::~AxSoundDescriptor()
+{}
 
 aafUID_t AxSoundDescriptor::GetCompression()
 {
