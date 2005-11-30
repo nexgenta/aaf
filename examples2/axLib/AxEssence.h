@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.h,v 1.27 2005/11/21 20:23:52 ajakowpa Exp $ $Name:  $
+// $Id: AxEssence.h,v 1.28 2005/11/30 20:50:54 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -511,6 +511,42 @@ private:
     AxAuxiliaryDescriptor& operator=( const AxAuxiliaryDescriptor& );
 
     IAAFAuxiliaryDescriptorSP _spIaafAuxiliaryDescriptor;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxSoundDescriptor : public AxFileDescriptor {
+public:
+    AxSoundDescriptor( IAAFSoundDescriptorSP spIaafSoundDescriptor );
+    ~AxSoundDescriptor();
+    
+    aafUID_t GetCompression();
+    aafUInt32 GetChannelCount();
+    aafRational_t GetAudioSamplingRate();
+    aafBoolean_t IsLocked();
+    aafElectroSpatialFormulation_t GetElectroSpatialFormulation();
+    aafInt8 GetAudioRefLevel();
+    aafInt8 GetDialNorm();
+    aafUInt32 GetQuantizationBits();
+                    
+    void SetCompression( aafUID_constref compression );
+    void SetChannelCount( aafUInt32 channelCount );
+    void SetAudioSamplingRate( aafRational_t rate );
+    void SetIsLocked( aafBoolean_t locked );
+    void SetElectroSpatialFormulation( aafElectroSpatialFormulation_t formulation );
+    void SetAudioRefLevel( aafInt8 level );
+    void SetDialNorm( aafInt8 dialNorm );
+    void SetQuantizationBits( aafUInt32 bitsCount );
+
+    inline operator IAAFSoundDescriptorSP ()
+    { return _spIaafSoundDescriptor; }
+
+private:
+    AxSoundDescriptor();
+    AxSoundDescriptor( const AxSoundDescriptor& );
+    AxSoundDescriptor& operator=( const AxSoundDescriptor& );
+
+    IAAFSoundDescriptorSP _spIaafSoundDescriptor;
 };
 
 #endif
