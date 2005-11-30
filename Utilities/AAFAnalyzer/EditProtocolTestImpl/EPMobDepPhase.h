@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.h,v 1.8 2005/11/24 17:10:47 ajakowpa Exp $ $Name:  $
+// $Id: EPMobDepPhase.h,v 1.9 2005/11/30 16:49:09 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,9 @@
 #include <EPEditRateTest.h>
 #include <EPEffectTest.h>
 #include <EPAnnotationTest.h>
+#include <EPDefinitionTest.h>
+#include <EPHeaderTest.h>
+#include <EPParameterTest.h>
 
 //Test/Result files
 #include <TestPhase.h>
