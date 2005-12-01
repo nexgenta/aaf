@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPMobDepPhase.cpp,v 1.12 2005/11/30 16:49:09 ajakowpa Exp $
+// $Id: EPMobDepPhase.cpp,v 1.13 2005/12/01 19:18:18 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,6 +139,10 @@ shared_ptr<TestPhaseLevelTestResult> EPMobDepPhase::Execute()
   // Thirteenth, run the parameter test
   shared_ptr<EPParameterTest> parameterTest( new EPParameterTest( _log, _spGraph ) );
   spPhaseResult->AppendSubtestResult( parameterTest->Execute() );
+  
+  // Fourteenth, run the multi-channel audio test
+  shared_ptr<EPMultiChannelAudioTest> mcaTest( new EPMultiChannelAudioTest( _log, _spGraph ) );
+  spPhaseResult->AppendSubtestResult( mcaTest->Execute() );
 
   spPhaseResult->SetResult( spPhaseResult->GetAggregateResult() );
 

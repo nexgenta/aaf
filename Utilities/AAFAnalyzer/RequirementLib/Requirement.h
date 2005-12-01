@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Requirement.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: Requirement.h,v 1.4 2005/12/01 19:18:18 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,7 @@ using namespace boost;
 class Requirement
 {
 public:
-    enum RequirementType {FILE, APP};
+    enum RequirementType {FILE, APP, DEFINITION};
     enum Category        {COMPOSITIONAL, ANNOTATIONS, ADHOC};
 
     Requirement(const wstring& id,

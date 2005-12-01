@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: RequirementLoader.cpp,v 1.3 2005/12/01 19:18:18 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -127,6 +127,10 @@ void RequirementLoader::StartElement(const wstring& name, const char** attribs)
         else if ( type == L"file" )
         {
             _currentType = Requirement::FILE;
+        }
+        else if ( type == L"definition" )
+        {
+            _currentType = Requirement::DEFINITION;
         }
         else
         {
