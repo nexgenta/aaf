@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxSmartPointer.h,v 1.21 2005/12/01 17:18:12 ajakowpa Exp $ $Name:  $
+// $Id: AxSmartPointer.h,v 1.22 2005/12/02 19:52:45 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -232,6 +232,7 @@ AXSP_TDEF_A( MultipleDescriptor )
 AXSP_TDEF_A( PCMDescriptor )
 AXSP_TDEF_A( PhysicalDescriptor )
 AXSP_TDEF_A( RecordingDescriptor )
+AXSP_TDEF_B( RGBADescriptor2 )
 AXSP_TDEF_A( SoundDescriptor )
 AXSP_TDEF_A( TaggedValueDefinition )
 AXSP_TDEF_B( TimelineMobSlot2 )

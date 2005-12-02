@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxEssence.cpp,v 1.28 2005/11/30 21:12:06 ajakowpa Exp $ $Name:  $
+// $Id: AxEssence.cpp,v 1.29 2005/12/02 19:52:45 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -556,6 +556,145 @@ aafUInt32 AxCDCIDescriptor::GetColorRange()
   aafUInt32 colorRange;
   CHECK_HRESULT( _spIaafCDCIDescriptor->GetColorRange( &colorRange ) );
   return colorRange;
+}
+
+//=---------------------------------------------------------------------=
+
+AxRGBADescriptor::AxRGBADescriptor( IAAFRGBADescriptorSP sp )
+: AxDigitalImageDescriptor( AxQueryInterface<IAAFRGBADescriptor, IAAFDigitalImageDescriptor>( sp ) ),
+    _spIaafRGBADescriptor( AxQueryInterface<IAAFRGBADescriptor, IAAFRGBADescriptor2>( sp ) )
+{}
+
+AxRGBADescriptor::AxRGBADescriptor( IAAFRGBADescriptor2SP sp )
+: AxDigitalImageDescriptor( AxQueryInterface<IAAFRGBADescriptor2, IAAFDigitalImageDescriptor>( sp ) ),
+    _spIaafRGBADescriptor( sp )
+{}
+
+AxRGBADescriptor::~AxRGBADescriptor()
+{}
+
+void AxRGBADescriptor::SetPixelLayout( std::vector<aafRGBAComponent_t> pixelLayoutArray )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetPixelLayout( pixelLayoutArray.size(), &(pixelLayoutArray[0]) ) );
+}
+
+void AxRGBADescriptor::SetPalette( std::vector<aafUInt8> palette )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetPalette( palette.size(), &(palette[0]) ) );
+}
+
+void AxRGBADescriptor::SetPaletteLayout( std::vector<aafRGBAComponent_t> paletteLayoutArray )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetPaletteLayout( paletteLayoutArray.size(), &(paletteLayoutArray[0]) ) );
+}
+
+void AxRGBADescriptor::SetComponentMaxRef( aafUInt32 componentMaxRef )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetComponentMaxRef( componentMaxRef ) );
+}
+
+void AxRGBADescriptor::SetComponentMinRef( aafUInt32 componentMinRef )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetComponentMinRef( componentMinRef ) );
+}
+
+void AxRGBADescriptor::SetAlphaMaxRef( aafUInt32 alphaMaxRef )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetAlphaMaxRef( alphaMaxRef ) );
+}
+
+void AxRGBADescriptor::SetAlphaMinRef( aafUInt32 alphaMinRef )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetAlphaMinRef( alphaMinRef ) );
+}
+
+void AxRGBADescriptor::SetScanningDirection( aafScanningDirection_t scanningDirection )
+{
+    CHECK_HRESULT( _spIaafRGBADescriptor->SetScanningDirection( scanningDirection ) );
+}
+
+std::vector<aafRGBAComponent_t> AxRGBADescriptor::GetPixelLayout()
+{
+    aafUInt32 numberElements;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->CountPixelLayoutElements( &numberElements ) );
+    
+    std::vector<aafRGBAComponent_t> pixelLayoutArray( numberElements );
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetPixelLayout( numberElements, &(pixelLayoutArray[0]) ) );
+    
+    return pixelLayoutArray;
+}
+
+std::vector<aafUInt8> AxRGBADescriptor::GetPalette()
+{
+    aafUInt32 sizeInBytes;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetPaletteSize( &sizeInBytes ) );
+    
+    std::vector<aafUInt8> palette( sizeInBytes / sizeof( aafUInt8 ) );
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetPalette( sizeInBytes, &(palette[0]) ) );
+    
+    return palette;
+}
+
+std::vector<aafRGBAComponent_t> AxRGBADescriptor::GetPaletteLayout()
+{
+    aafUInt32 numberElements;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->CountPaletteLayoutElements( &numberElements ) );
+    
+    std::vector<aafRGBAComponent_t> paletteLayoutArray( numberElements );
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetPaletteLayout( numberElements, &(paletteLayoutArray[0]) ) );
+    
+    return paletteLayoutArray;
+}
+
+aafUInt32 AxRGBADescriptor::GetComponentMaxRef()
+{
+    aafUInt32 componentMaxRef;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetComponentMaxRef( &componentMaxRef ) );
+    
+    return componentMaxRef;
+}
+
+aafUInt32 AxRGBADescriptor::GetComponentMinRef()
+{
+    aafUInt32 componentMinRef;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetComponentMinRef( &componentMinRef ) );
+    
+    return componentMinRef;
+}
+
+aafUInt32 AxRGBADescriptor::GetAlphaMaxRef()
+{
+    aafUInt32 alphaMaxRef;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetAlphaMaxRef( &alphaMaxRef ) );
+    
+    return alphaMaxRef;
+}
+
+aafUInt32 AxRGBADescriptor::GetAlphaMinRef()
+{
+    aafUInt32 alphaMinRef;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetAlphaMinRef( &alphaMinRef ) );
+    
+    return alphaMinRef;
+}
+
+aafScanningDirectionType_t AxRGBADescriptor::GetScanningDirection()
+{
+    aafScanningDirectionType_t scanningDirection;
+    
+    CHECK_HRESULT( _spIaafRGBADescriptor->GetScanningDirection( &scanningDirection ) );
+    
+    return scanningDirection;
 }
 
 //=---------------------------------------------------------------------=
