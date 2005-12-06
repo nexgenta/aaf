@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.h,v 1.9 2005/11/14 19:46:50 ajakowpa Exp $ $Name:  $
+// $Id: RefResolver.h,v 1.10 2005/12/06 16:50:49 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,6 @@ using namespace boost;
 
 class TestLevelTestResult;
 class TestGraph;
-class AxClassDef;
 
 class RefResolver : public Test
 {

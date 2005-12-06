@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2005/10/13 19:33:58 ajakowpa Exp $
+# $Id: GNUmakefile,v 1.9 2005/12/06 16:50:49 ajakowpa Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@ check :
 	cd TestFiles && $(MAKE) $@
 	cd TestStructure && $(MAKE) $@
 
-.PHONY: clean
-clean:
+.PHONY : clean
+clean :
 	cd TestFiles && $(MAKE) GENDEPS=0 $@
 	cd TestStructure && $(MAKE) GENDEPS=0 $@
