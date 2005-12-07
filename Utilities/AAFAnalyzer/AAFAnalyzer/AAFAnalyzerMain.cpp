@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.20 2005/12/07 17:57:45 ajakowpa Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.21 2005/12/07 21:43:29 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -252,7 +252,7 @@ ostream& operator<<( ostream& os, const Usage& )
   os << "Valid usages are: " << endl;
   os << "AAFAnalyzer [options] filename.aaf requirement_filename.xml" << endl;
   os << "AAFAnalyzer [requirement output] requirement_filename.xml" << endl;
-  os << "[options] = -dump | -uncheckedrequirements | [requirement output]" << endl;
+  os << "[options] = -dump | -uncheckedrequirements | -verbose | [requirement output]" << endl;
   os << "[requirement output] = -allreqs | -coverage" << endl;
   os << endl;
   os << "-dump: Output graph of AAF file" << endl;
