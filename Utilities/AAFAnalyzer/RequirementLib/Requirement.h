@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Requirement.h,v 1.4 2005/12/01 19:18:18 ajakowpa Exp $ $Name:  $
+// $Id: Requirement.h,v 1.5 2005/12/20 18:43:31 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,10 @@ class Requirement
 {
 public:
     enum RequirementType {FILE, APP, DEFINITION};
-    enum Category        {COMPOSITIONAL, ANNOTATIONS, ADHOC};
+    enum Category        {GENERAL, IMPORT_EXPORT, COMPOSITIONAL, METADATA,
+                          MIXDOWN, AUXILIARY_FILE, ANNOTATIONS, EFFECT,
+                          OPTIONAL_PROPERTIES, STRUCTURED_STORAGE, PROTOCOL,
+                          ADHOC};
 
     Requirement(const wstring& id,
                 const RequirementType requirementType,
@@ -48,7 +51,7 @@ public:
                 const wstring& version,
                 const wstring& section);
     ~Requirement();
-    
+
     const wstring& GetId() const;
     const enum RequirementType GetRequirementType() const;
     const enum Category GetCategory() const;
@@ -57,7 +60,7 @@ public:
     const wstring& GetDocument() const;
     const wstring& GetVersion() const;
     const wstring& GetSection() const;
-    
+
     typedef map< const wstring, shared_ptr<const Requirement> > RequirementMap;
     typedef shared_ptr<RequirementMap> RequirementMapSP;
 
