@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2005/11/02 20:58:49 ajakowpa Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.7 2005/12/20 16:45:02 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,6 @@
 
 PROGNAME = AAFAnalyzer
 
-PROGLIBS = -Lusr/local/lib -lEditProtocolTest -lBaseTest -lTestPhase -lRequirement -lEPAnalyzerBase -lAAFAnalyzerBase -lAnalyzerBase -lexpat -lURI
+PROGLIBS = -lEditProtocolTest -lBaseTest -lTestPhase -lRequirement -lEPAnalyzerBase -lAAFAnalyzerBase -lAnalyzerBase -lexpat
 
 include ../aafanalyzer.mk
