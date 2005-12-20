@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.cpp,v 1.12 2005/12/06 16:50:49 ajakowpa Exp $
+// $Id: EPDerivationTest.cpp,v 1.13 2005/12/20 14:35:25 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -247,7 +247,7 @@ public:
         return true;
       }
     }
-    catch ( const AxExHResult& ex )
+    catch ( const AxExHResult& )
     {
       successfulTransition = false;
       detailMsg = L"Source Clip does not have a Source Reference property.";

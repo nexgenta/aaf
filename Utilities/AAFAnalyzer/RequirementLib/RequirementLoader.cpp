@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.cpp,v 1.3 2005/12/01 19:18:18 ajakowpa Exp $
+// $Id: RequirementLoader.cpp,v 1.4 2005/12/20 14:35:25 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,12 @@
 #include "RequirementLoader.h"
 #include "RequirementRegistry.h"
 #include "RequirementXMLException.h"
+
+/* On  Windows,  this  should  be  set  if  Expat is going to be linked 
+   statically with the code that calls it; this is required to get all the
+   right MSVC magic annotations correct. This is ignored on other platforms.
+*/
+#define XML_STATIC
 
 //Expat files
 #include <expat.h>

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.21 2005/12/07 21:43:29 ajakowpa Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.22 2005/12/20 14:35:25 ajakowpa Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -211,7 +211,8 @@ void RegisterTests()
     TestInfoRegistrar<EPNameTest> epNameTest;
     TestInfoRegistrar<EPContainedTrackTest> epTrackTest;
     TestInfoRegistrar<EPTrackContentsTest> epTrackContentsTest;
-    TestInfoRegistrar<EPLocatorTest> epLocatorTest;
+    //TODO: Uncomment when Locator Test is being run.
+	//TestInfoRegistrar<EPLocatorTest> epLocatorTest;
     TestInfoRegistrar<EPEditRateTest> epEditRateTest;
     TestInfoRegistrar<EPEffectTest> epEffectTest;
     TestInfoRegistrar<EPAnnotationTest> epAnnotationTest;
