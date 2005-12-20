@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.35 2005/09/01 03:49:36 jptrainor Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.36 2005/12/20 14:32:37 ajakowpa Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -89,6 +89,7 @@
 # 07-MAR-2001 : tjb copy OMF toolkit DLL once only.                           #
 # 19-MAR-2001 : akharkev Use update.cmd when copying over checked in files.   #
 # 26-DEC-2001 : whoopy include AAFSDKBuild.h in files to be updated for SDK   #
+# 16-DEC-2005 : ajakowpak include AAFOPDefs.h in files to be updated for SDK. #
 ###############################################################################
 
 
@@ -247,6 +248,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)\AAFFileMode.h \
 	$(AAFSDK_INCLUDE)\AAFInterpolatorDefs.h \
 	$(AAFSDK_INCLUDE)\AAFMetaDictionary.h \
+	$(AAFSDK_INCLUDE)\AAFOPDefs.h \
 	$(AAFSDK_INCLUDE)\AAFOperationCategories.h \
 	$(AAFSDK_INCLUDE)\AAFOperationDefs.h \
 	$(AAFSDK_INCLUDE)\AAFParameterDefs.h \
@@ -521,6 +523,9 @@ $(AAFSDK_INCLUDE)\AAFInterpolatorDefs.h : $(TOOLKIT_INCLUDE)\AAFInterpolatorDefs
 
 $(AAFSDK_INCLUDE)\AAFMetaDictionary.h : $(TOOLKIT_INCLUDE)\AAFMetaDictionary.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFMetaDictionary.h $@
+
+$(AAFSDK_INCLUDE)\AAFOPDefs.h : $(TOOLKIT_INCLUDE)\AAFOPDefs.h
+	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFOPDefs.h $@
 
 $(AAFSDK_INCLUDE)\AAFOperationCategories.h : $(TOOLKIT_INCLUDE)\AAFOperationCategories.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)\AAFOperationCategories.h $@
