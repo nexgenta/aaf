@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.h,v 1.7 2005/11/14 19:46:50 ajakowpa Exp $ $Name:  $
+// $Id: TypedVisitor.h,v 1.8 2005/12/23 19:13:57 ajakowpa Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,10 @@ class TypedVisitor : public Visitor
 #include "TypedVisitor.h.gen"
 
   private:
-  
+
+    virtual bool DefaultPreOrderBehaviour() { return true; }
+    virtual bool DefaultPostOrderBehaviour() { return true; }
+
     // prohibited
     TypedVisitor( const TypedVisitor& );
     TypedVisitor& operator=( const TypedVisitor& );
