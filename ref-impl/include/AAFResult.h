@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.68 2005/11/05 04:52:22 rodrigc Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.69 2006/01/12 18:49:06 rodrigc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -76,6 +76,7 @@
 #define AAFRESULT_GETSIZE_FAILURE            MAKE_AAFHRESULT(0x0037)
 #define AAFRESULT_GETEXTENT_FAILURE          MAKE_AAFHRESULT(0x0038)
 #define AAFRESULT_SETEXTENT_FAILURE          MAKE_AAFHRESULT(0x0039)
+#define AAFRESULT_FILE_BEING_MODIFIED        MAKE_AAFHRESULT(0x003A)
 
 /* MEDIA Error Codes */
 #define AAFRESULT_DESCSAMPRATE              MAKE_AAFHRESULT(0x0064)
