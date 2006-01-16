@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.4 2005/10/18 17:02:42 ajakowpa Exp $
+// $Id: AcyclicVisitor.h,v 1.5 2006/01/16 19:24:29 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,8 @@ class AcyclicVisitor : public Visitor
 {
  public:
 
-  typedef vector<Node::LID> Vector;
+  //typedef vector<Node::LID> Vector;
+  typedef vector<shared_ptr<Node> > Vector;
 
   AcyclicVisitor(wostream& os);
   virtual ~AcyclicVisitor();
