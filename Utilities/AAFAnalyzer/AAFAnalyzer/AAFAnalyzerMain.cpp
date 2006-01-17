@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.22 2005/12/20 14:35:25 ajakowpa Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.23 2006/01/17 20:29:31 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -405,7 +405,11 @@ int main( int argc, char** argv )
     LoadPhase load( wcout, fileName );
     shared_ptr<const TestPhaseLevelTestResult> spSubResult( load.Execute() );
     spResult->AppendSubtestResult(spSubResult);
-
+	if (spSubResult->GetResult()==TestResult::FAIL){
+		OutputVerboseResultMsgs(spResult, 0);
+		throw AnalyzerException(L"Load phase failed.  Further tests aborted.");
+	}
+    
     //Store the test graph info so the AAF file is not inadvertantley closed.
     shared_ptr<const AAFGraphInfo> graphInfo = load.GetTestGraphInfo();
 

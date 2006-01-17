@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.8 2006/01/16 19:24:29 jlow Exp $
+// $Id: AcyclicVisitor.cpp,v 1.9 2006/01/17 20:29:30 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,7 +25,7 @@
 //Test/Result files
 #include <DetailLevelTestResult.h>
 #include <TestRegistry.h>
-#include <AnalyzerException.h>
+
 //Requirement files
 #include <Requirement.h>
 
@@ -150,7 +150,6 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
   _spResult->SetResult(TestResult::FAIL);
   _Vector.pop_back();
   
-  throw AnalyzerException(L"Graph not acyclic.");
 
   return false;
 }
