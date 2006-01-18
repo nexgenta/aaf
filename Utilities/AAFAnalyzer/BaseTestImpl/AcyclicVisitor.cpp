@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.9 2006/01/17 20:29:30 jlow Exp $
+// $Id: AcyclicVisitor.cpp,v 1.10 2006/01/18 15:54:14 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -143,11 +143,13 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
 	}
   
   }
-  cycle+=newl;
-  //_os<<endl;
   
-  _spResult->SetExplanation(L"Cycle detected!" +newl +cycle);
+  _spResult->SetExplanation(L"Cycle(s) detected!");
   _spResult->SetResult(TestResult::FAIL);
+  _spResult->AddInformationResult(
+            L"REQ_EP_256",
+            cycle,
+            TestResult::FAIL );
   _Vector.pop_back();
   
 

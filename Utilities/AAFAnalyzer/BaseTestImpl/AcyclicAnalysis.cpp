@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicAnalysis.cpp,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: AcyclicAnalysis.cpp,v 1.7 2006/01/18 15:54:14 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,6 +77,7 @@ shared_ptr<TestLevelTestResult> AcyclicAnalysis::Execute()
   shared_ptr<TestLevelTestResult> spResult(new TestLevelTestResult(me, spMyReqs ));
   spResult->SetName(GetName());
   spResult->SetDescription(GetDescription());
+  spResult->SetExplanation(L"Test Failed - See \"AcyclicVisitor\" for details");
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode()); 
   
@@ -105,7 +106,7 @@ const TestInfo AcyclicAnalysis::GetTestInfo()
 {
     shared_ptr<vector<AxString> > spReqIds(new vector<AxString>);
     //TODO: Push actual requirements.
-//    spReqIds->push_back(L"Requirement Id");
+    spReqIds->push_back(L"REQ_EP_256");  // Acyclic graph requirement
     return TestInfo(L"AcyclicAnalysis", spReqIds);
 }
 
