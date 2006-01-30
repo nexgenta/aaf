@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.23 2006/01/17 20:29:31 jlow Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.24 2006/01/30 19:55:56 jlow Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -406,7 +406,14 @@ int main( int argc, char** argv )
     shared_ptr<const TestPhaseLevelTestResult> spSubResult( load.Execute() );
     spResult->AppendSubtestResult(spSubResult);
 	if (spSubResult->GetResult()==TestResult::FAIL){
-		OutputVerboseResultMsgs(spResult, 0);
+		if ( verboseOutput.first )
+    	{
+        	OutputVerboseResultMsgs(spResult, 0);
+    	}
+    	else
+    	{
+        	OutputSimpleResultMsgs( spResult );
+    	}
 		throw AnalyzerException(L"Load phase failed.  Further tests aborted.");
 	}
     
