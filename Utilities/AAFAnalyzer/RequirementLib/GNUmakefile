@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2006/01/30 20:03:20 jlow Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,9 @@ INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AnalyzerB
 .PHONY : all
 all : Requirement
 
+.PHONY : gcov
+gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
+gcov :	Requirement
 
 .PHONY : Requirement
 Requirement : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libRequirement$(LIB)
