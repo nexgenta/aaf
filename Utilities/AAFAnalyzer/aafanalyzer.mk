@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.7 2005/10/13 19:33:59 ajakowpa Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.8 2006/01/30 19:54:00 jlow Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,10 @@ AXLIBDIR = $(AAFBUILDDIR)/$(AXLIBPACKAGE)/$(AAFTARGETDIR)
 
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET) $(LIBDIR)
+
+.PHONY : gcov
+gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
+gcov : $(OBJDIR) $(BINTARGET) $(LIBDIR)
 
 ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS) $(LIBDIR)

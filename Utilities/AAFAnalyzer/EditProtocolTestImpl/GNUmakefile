@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2005/12/20 16:45:02 ajakowpa Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2006/01/30 19:54:01 jlow Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,9 @@ INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AnalyzerB
 .PHONY : all
 all : EditProtocolTest
 
+.PHONY : gcov
+gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
+gcov :	EditProtocolTest
 
 .PHONY : EditProtocolTest
 EditProtocolTest : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libEditProtocolTest$(LIB)

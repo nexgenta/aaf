@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2005/12/06 16:50:49 ajakowpa Exp $
+# $Id: GNUmakefile,v 1.10 2006/01/30 19:54:00 jlow Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,11 @@ AAFBASE ?= ../../..
 all:
 	cd TestFiles && $(MAKE)
 	cd TestStructure && $(MAKE)
+
+.PHONY : gcov
+gcov :	
+	cd TestFiles && $(MAKE) gcov
+	cd TestStructure && $(MAKE) gcov
 	
 .PHONY : RegressionTestStructure
 RegressionTestStructure :
@@ -35,7 +40,7 @@ RegressionTestStructure :
 .PHONY : RegressionTestFiles
 RegressionTestFiles :
 	cd TestFiles && $(MAKE)
-	
+
 .PHONY : check
 check :
 	cd TestFiles && $(MAKE) $@
