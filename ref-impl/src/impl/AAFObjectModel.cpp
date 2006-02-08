@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.cpp,v 1.17 2004/11/23 17:29:52 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.cpp,v 1.18 2006/02/08 16:40:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1287,8 +1287,12 @@ void AAFObjectModel::SortPropertyDefinitions(void)
   for (i = 0; i < countPropertyDefinitions(); ++i)
   {
     currentPid = sPropertyDefinitionsByPid[i]->pid();
-    assert (currentPid != previousPid);
-    previousPid = currentPid;
+    // Only check non-zero pids, we may have several zero-valued pids
+    // which are dynamic-pids that haven't yet been assigned a value.
+    if (currentPid != 0) {
+      assert (currentPid != previousPid);
+      previousPid = currentPid;
+    }
   }
 #endif
 
