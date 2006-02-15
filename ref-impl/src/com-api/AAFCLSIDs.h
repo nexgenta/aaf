@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.9 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.10 2006/02/15 23:02:41 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,7 @@ EXTERN_C const CLSID CLSID_EnumAAFStorablePropVals;
 EXTERN_C const CLSID CLSID_AAFAES3PCMDescriptor;
 EXTERN_C const CLSID CLSID_AAFAIFCDescriptor;
 EXTERN_C const CLSID CLSID_AAFAuxiliaryDescriptor;
+EXTERN_C const CLSID CLSID_AAFBWFImportDescriptor;
 EXTERN_C const CLSID CLSID_AAFCDCIDescriptor;
 EXTERN_C const CLSID CLSID_AAFCachePageAllocator;
 EXTERN_C const CLSID CLSID_AAFClassDef;
@@ -67,6 +68,7 @@ EXTERN_C const CLSID CLSID_AAFDataDef;
 EXTERN_C const CLSID CLSID_AAFDefObject;
 EXTERN_C const CLSID CLSID_AAFDescriptiveFramework;
 EXTERN_C const CLSID CLSID_AAFDescriptiveMarker;
+EXTERN_C const CLSID CLSID_AAFDescriptiveObject;
 EXTERN_C const CLSID CLSID_AAFDictionary;
 EXTERN_C const CLSID CLSID_AAFDigitalImageDescriptor;
 EXTERN_C const CLSID CLSID_AAFEdgecode;
@@ -96,6 +98,7 @@ EXTERN_C const CLSID CLSID_AAFMasterMob;
 EXTERN_C const CLSID CLSID_AAFMetaDefinition;
 EXTERN_C const CLSID CLSID_AAFMob;
 EXTERN_C const CLSID CLSID_AAFMobSlot;
+EXTERN_C const CLSID CLSID_AAFMPEGVideoDescriptor;
 EXTERN_C const CLSID CLSID_AAFMultipleDescriptor;
 EXTERN_C const CLSID CLSID_AAFNestedScope;
 EXTERN_C const CLSID CLSID_AAFNetworkLocator;
@@ -116,6 +119,7 @@ EXTERN_C const CLSID CLSID_AAFRGBADescriptor;
 EXTERN_C const CLSID CLSID_AAFRandomFile;
 EXTERN_C const CLSID CLSID_AAFRandomRawStorage;
 EXTERN_C const CLSID CLSID_AAFRawStorage;
+EXTERN_C const CLSID CLSID_AAFRIFFChunk;
 EXTERN_C const CLSID CLSID_AAFRecordingDescriptor;
 EXTERN_C const CLSID CLSID_AAFScopeReference;
 EXTERN_C const CLSID CLSID_AAFSegment;
@@ -181,6 +185,7 @@ EXTERN_C const CLSID CLSID_EnumAAFPluginLocators;
 EXTERN_C const CLSID CLSID_EnumAAFProperties;
 EXTERN_C const CLSID CLSID_EnumAAFPropertyDefs;
 EXTERN_C const CLSID CLSID_EnumAAFPropertyValues;
+EXTERN_C const CLSID CLSID_EnumAAFRIFFChunk;
 EXTERN_C const CLSID CLSID_EnumAAFSegments;
 EXTERN_C const CLSID CLSID_EnumAAFTaggedValueDefs;
 EXTERN_C const CLSID CLSID_EnumAAFTaggedValues;

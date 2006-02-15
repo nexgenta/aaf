@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.h,v 1.5 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
+// $Id: CAAFEnumValidation.h,v 1.6 2006/02/15 23:02:41 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,7 @@ bool Is_aafCheckWarnings_t_Valid(aafCheckWarnings_t param);
 bool Is_aafColorSiting_t_Valid(aafColorSiting_t param);
 bool Is_aafColorSpace_t_Valid(aafColorSpace_t param);
 bool Is_aafCompressEnable_t_Valid(aafCompressEnable_t param);
+bool Is_aafContentScanningType_t_Valid(aafContentScanningType_t param);
 bool Is_aafCriteriaType_t_Valid(aafCriteriaType_t param);
 bool Is_aafDefinitionCritType_t_Valid(aafDefinitionCritType_t param);
 bool Is_aafDefinitionKind_t_Valid(aafDefinitionKind_t param);

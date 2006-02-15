@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFRoot.cpp,v 1.4 2005/06/09 12:11:21 montrowe Exp $ $Name:  $
+// $Id: ImplAAFRoot.cpp,v 1.5 2006/02/15 23:02:42 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

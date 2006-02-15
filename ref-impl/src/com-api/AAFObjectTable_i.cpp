@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.9 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.10 2006/02/15 23:02:41 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,6 +49,7 @@
 #include "CAAFAES3PCMDescriptor.h"
 #include "CAAFAIFCDescriptor.h"
 #include "CAAFAuxiliaryDescriptor.h"
+#include "CAAFBWFImportDescriptor.h"
 #include "CAAFCDCIDescriptor.h"
 #include "CAAFCachePageAllocator.h"
 #include "CAAFClassDef.h"
@@ -64,6 +65,7 @@
 #include "CAAFDefObject.h"
 #include "CAAFDescriptiveFramework.h"
 #include "CAAFDescriptiveMarker.h"
+#include "CAAFDescriptiveObject.h"
 #include "CAAFDictionary.h"
 #include "CAAFDigitalImageDescriptor.h"
 #include "CAAFEdgecode.h"
@@ -93,6 +95,7 @@
 #include "CAAFMetaDefinition.h"
 #include "CAAFMob.h"
 #include "CAAFMobSlot.h"
+#include "CAAFMPEGVideoDescriptor.h"
 #include "CAAFMultipleDescriptor.h"
 #include "CAAFNestedScope.h"
 #include "CAAFNetworkLocator.h"
@@ -113,6 +116,7 @@
 #include "CAAFRandomFile.h"
 #include "CAAFRandomRawStorage.h"
 #include "CAAFRawStorage.h"
+#include "CAAFRIFFChunk.h"
 #include "CAAFRecordingDescriptor.h"
 #include "CAAFScopeReference.h"
 #include "CAAFSegment.h"
@@ -178,6 +182,7 @@
 #include "CEnumAAFProperties.h"
 #include "CEnumAAFPropertyDefs.h"
 #include "CEnumAAFPropertyValues.h"
+#include "CEnumAAFRIFFChunk.h"
 #include "CEnumAAFSegments.h"
 #include "CEnumAAFTaggedValueDefs.h"
 #include "CEnumAAFTaggedValues.h"

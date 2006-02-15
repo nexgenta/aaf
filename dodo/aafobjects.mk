@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.158 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.159 2006/02/15 23:02:47 jlow Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -61,6 +61,7 @@ HUMAN_TYPED_IMPL="\
 	AAFAES3PCMDescriptor \
 	AAFAIFCDescriptor \
 	AAFAuxiliaryDescriptor \
+	AAFBWFImportDescriptor \
 	AAFCDCIDescriptor \
 	AAFCachePageAllocator \
 	AAFClassDef \
@@ -76,6 +77,7 @@ HUMAN_TYPED_IMPL="\
 	AAFDefObject \
 	AAFDescriptiveFramework \
 	AAFDescriptiveMarker \
+	AAFDescriptiveObject \
 	AAFDictionary \
 	AAFDigitalImageDescriptor \
 	AAFEdgecode \
@@ -105,6 +107,7 @@ HUMAN_TYPED_IMPL="\
 	AAFMetaDefinition \
 	AAFMob  \
 	AAFMobSlot \
+	AAFMPEGVideoDescriptor \
 	AAFMultipleDescriptor \
 	AAFNestedScope\
 	AAFNetworkLocator \
@@ -125,6 +128,7 @@ HUMAN_TYPED_IMPL="\
 	AAFRandomFile \
 	AAFRandomRawStorage \
 	AAFRawStorage \
+	AAFRIFFChunk \
 	AAFRecordingDescriptor \
 	AAFScopeReference \
 	AAFSegment \
@@ -190,6 +194,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFProperties \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
+	EnumAAFRIFFChunk \
 	EnumAAFSegments \
 	EnumAAFTaggedValueDefs \
 	EnumAAFTaggedValues \

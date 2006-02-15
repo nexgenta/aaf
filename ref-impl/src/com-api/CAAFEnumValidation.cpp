@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.9 2005/06/10 21:12:40 montrowe Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.10 2006/02/15 23:02:41 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -187,6 +187,19 @@ bool Is_aafCompressEnable_t_Valid(aafCompressEnable_t param)
   switch (param) {
     case kAAFCompressionEnable:
     case kAAFCompressionDisable:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool Is_aafContentScanningType_t_Valid(aafContentScanningType_t param)
+{
+  switch (param) {
+    case kAAFContentScanning_NotKnown:
+    case kAAFContentScanning_Progressive:
+    case kAAFContentScanning_Interlace:
+    case kAAFContentScanning_Mixed:
       return true;
     default:
       return false;
