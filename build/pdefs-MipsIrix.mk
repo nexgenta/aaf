@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-MipsIrix.mk,v 1.11 2004/10/19 13:28:14 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-MipsIrix.mk,v 1.12 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@
 #
 # Sets:
 #	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL, BYTE_ORDER,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
 #	UUIDLIB
 #
 #------------------------------------------------------------------------------
@@ -140,9 +140,3 @@ LIB ?= .a
 DLL ?= .so
 
 
-#------------------------------------------------------------------------------
-# Intel machines are Little Endian (lower byte first)
-# Mac, HP, SUN, etc. are Big Endian (higher byte first)
-# BYTE_ORDER = -DLITTLEENDIAN=1
-#------------------------------------------------------------------------------
-BYTE_ORDER = -DBIGENDIAN=1

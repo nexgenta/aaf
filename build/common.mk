@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.14 2005/11/03 06:06:50 rodrigc Exp $ $Name:  $
+# $Id: common.mk,v 1.15 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -178,7 +178,7 @@ AAFSDKLIBDIR      = $(AAFSDK)/lib/$(AAFTARGETDIR)
 # CFLAGS components are defined in platform-specific 
 # definitions file pdefs-$(AAFPLATFORM).mk
 #----------------------------------------------------------
-CFLAGS = $(DBG_FLAGS) $(ADD_CFLAGS) $(PLATFORM_CFLAGS) $(BYTE_ORDER)
+CFLAGS = $(DBG_FLAGS) $(ADD_CFLAGS) $(PLATFORM_CFLAGS)
 
 # U_OPTS should be defined as whether use_unicode or 
 # no_unicode in platform-specific .def file

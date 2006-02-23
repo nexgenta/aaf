@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-SparcSolaris.mk,v 1.4 2004/07/08 17:43:38 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-SparcSolaris.mk,v 1.5 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@
 #
 # Sets:
 #	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL, BYTE_ORDER,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
 #	UUIDLIB
 #
 #------------------------------------------------------------------------------
@@ -124,11 +124,4 @@ EXE ?=
 LIB ?= .a
 DLL ?= .so
 
-
-#------------------------------------------------------------------------------
-# Intel machines are Little Endian (lower byte first)
-# Mac, HP, SUN, etc. are Big Endian (higher byte first)
- BYTE_ORDER = -DBIGENDIAN=1
-#------------------------------------------------------------------------------
-#BYTE_ORDER = -DLITTLEENDIAN=1
 

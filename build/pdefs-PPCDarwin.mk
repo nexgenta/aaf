@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-PPCDarwin.mk,v 1.7 2005/04/11 11:31:21 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-PPCDarwin.mk,v 1.8 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@
 #
 # Sets:
 #	COMPILER, PLATFORM_CFLAGS, RPATH_OPT,
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL, BYTE_ORDER,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
 #	UUIDLIB, PLATFORMLIBS
 #
 #------------------------------------------------------------------------------
@@ -107,13 +107,6 @@ EXE ?=
 LIB ?= .a
 DLL ?= .dylib
 
-
-#------------------------------------------------------------------------------
-# Intel machines are Little Endian (lower byte first)
-# Mac PPC, HP, SUN, etc. are Big Endian (higher byte first)
-# BYTE_ORDER = -DLITTLEENDIAN=1
-#------------------------------------------------------------------------------
-BYTE_ORDER = -DBIGENDIAN=1
 
 #------------------------------------------------------------------------------
 #  Get OS revision and add version specific libs as needed.
