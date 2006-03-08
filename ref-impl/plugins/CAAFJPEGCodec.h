@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.h,v 1.19 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.h,v 1.20 2006/03/08 14:29:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -445,6 +445,7 @@ private:
 	aafUInt16 _padBytesPerRow;
 	aafUInt32 _compression_IJG_Quality;
 	aafInt32 _resolutionID;
+	aafInt32 _imageSize;
 
 
 	// Data do define and hold the sample image buffer used for raw sub-sampled

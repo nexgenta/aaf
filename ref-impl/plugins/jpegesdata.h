@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: jpegesdata.h,v 1.5 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: jpegesdata.h,v 1.6 2006/03/08 14:29:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@
 
 /* Standard data source and destination managers: stdio streams. */
 /* Caller is responsible for opening the file before and closing after. */
-EXTERN(void) jpeg_essencestream_dest JPP((j_compress_ptr cinfo, IAAFEssenceStream * outstream));
+EXTERN(void) jpeg_essencestream_dest JPP((j_compress_ptr cinfo, aafInt32 resID, aafInt32 width, aafInt32 height, IAAFEssenceStream * outstream));
 EXTERN(void) jpeg_essencestream_src JPP((j_decompress_ptr cinfo, IAAFEssenceStream * instream, aafUInt32 samplesize));
 EXTERN(void) jpeg_essencestream_srcCleanup JPP((j_decompress_ptr cinfo));
 

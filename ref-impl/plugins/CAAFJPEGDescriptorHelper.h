@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGDescriptorHelper.h,v 1.13 2004/11/22 15:02:45 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGDescriptorHelper.h,v 1.14 2006/03/08 14:29:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -119,6 +119,7 @@ public:
 	STDMETHOD (GetResolutionID) ( aafInt32 *p_resid );
 	STDMETHOD (SetResolutionID) ( aafInt32  resolutionID );
 	STDMETHOD (SetFirstFrameOffset) ( aafInt32  firstFrameOffset );
+	STDMETHOD (SetImageSize) ( aafInt32  imageSize );
 	STDMETHOD (SetFrameSampleSize) ( aafInt32 frameSampleSize );
 
 private:
