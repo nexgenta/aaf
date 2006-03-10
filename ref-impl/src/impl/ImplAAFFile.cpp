@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.152 2005/11/03 22:18:44 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.153 2006/03/10 21:56:46 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,7 +173,7 @@ const aafUID_t *mapStructuredStorageFileKind_DefaultToActual(const aafUID_t *fk_
 #if defined(OM_USE_WINDOWS_SS) || defined(OM_USE_MACINTOSH_SS) || defined(OM_USE_MACINTOSH_WRAPPED_SS) || defined(OM_USE_REFERENCE_SS)
 		return &kAAFFileKind_AafM4KBinary;
 #elif defined(OM_USE_SCHEMASOFT_SS)
-		return &kAAFFileKind_AafS512Binary;
+		return &kAAFFileKind_AafS4KBinary;
 #elif defined(OM_USE_GSF_SS)
 		return &kAAFFileKind_AafG4KBinary;
 #endif
