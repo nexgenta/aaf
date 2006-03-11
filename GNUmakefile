@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.14 2004/09/23 13:54:51 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.15 2006/03/11 14:34:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -77,6 +77,7 @@ test : install
 .PHONY : check
 check : test
 	cd test && $(MAKE) $@
+	cd examples && $(MAKE) $@
 
 #
 # Binary distributions

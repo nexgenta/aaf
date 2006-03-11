@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2006/03/11 14:34:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -29,6 +29,9 @@ all: com-examples
 com-examples:
 	cd com-api; $(MAKE)
 
+.PHONY : check
+check :
+	cd com-api && $(MAKE) $@
 
 clean:
 	cd com-api; $(MAKE) GENDEPS=0 $@
@@ -37,5 +40,3 @@ clean:
 .PHONY : realclean
 realclean :
 	cd com-api; $(MAKE) GENDEPS=0 $@
-
-

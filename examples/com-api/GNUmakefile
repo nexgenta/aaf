@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2006/03/10 19:03:26 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2006/03/11 14:34:57 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -96,10 +96,12 @@ ExportPCM :
 ImportPCM :
 	cd ImportPCM && $(MAKE)
 
+# Run InfoDumper check last since all generated AAF files will be available to test
 .PHONY : check
-check :
+check : all
 	cd ExportJPEG && $(MAKE) $@
 	cd ImportJPEG && $(MAKE) $@
+	cd InfoDumper && $(MAKE) $@
 
 .PHONY : clean
 clean :

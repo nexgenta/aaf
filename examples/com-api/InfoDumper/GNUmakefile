@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2006/03/11 14:34:57 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,3 +26,8 @@
 EXAMPLE = InfoDumper
 
 include ../comexamplerules.mk
+
+TEST_CMD = env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/InfoDumper$(EXE)
+.PHONY : check
+check : $(AAFSDKBINDIR)/InfoDumper$(EXE)
+	for f in ../*/*.aaf ../../../test/com/*/*.aaf; do echo InfoDumper $$f; $(TEST_CMD) $$f > /dev/null || exit $$?; done
