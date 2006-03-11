@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.55 2006/03/11 11:49:34 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.56 2006/03/11 21:23:12 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1380,7 +1380,7 @@ HRESULT STDMETHODCALLTYPE
 					// Record the ImageSize value which is last stream position
 					aafPosition_t streampos = 0;
 					checkResult(_stream->GetPosition(&streampos));
-					_imageSize = streampos;
+					_imageSize = static_cast<aafInt32>(streampos);
 					
 					// Update the return values.
 					samplesXfered++;
