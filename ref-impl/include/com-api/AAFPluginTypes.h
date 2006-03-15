@@ -59,7 +59,7 @@ void __RPC_USER MIDL_user_free( void * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPluginTypes.h,v 1.7 2005/08/31 19:13:55 montrowe Exp $ $Name:  $
+// $Id: AAFPluginTypes.h,v 1.8 2006/03/15 17:49:59 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
