@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2005/03/07 16:56:01 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2006/03/23 17:52:36 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -91,6 +91,12 @@ realclean : clean
 # MultiGenTest is in good working order.
 TEST_LIB_NAME = libcom-api.so
 ifeq ($(AAFPLATFORM),PPCDarwin)
+TEST_LIB_NAME = libcom-api.dylib
+endif
+ifeq ($(AAFPLATFORM),i386Darwin)
+TEST_LIB_NAME = libcom-api.dylib
+endif
+ifeq ($(AAFPLATFORM),UniversalDarwin)
 TEST_LIB_NAME = libcom-api.dylib
 endif
 
