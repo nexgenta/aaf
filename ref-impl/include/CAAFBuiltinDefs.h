@@ -2,7 +2,7 @@
 #define __CAAFBuiltinDefs_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBuiltinDefs.h,v 1.6 2006/02/15 23:01:34 jlow Exp $ $Name:  $
+// $Id: CAAFBuiltinDefs.h,v 1.7 2006/03/24 18:10:55 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -163,6 +163,8 @@ public:
   CLASS_DEF_METHOD(ContentStorage);
   CLASS_DEF_METHOD(ControlPoint);
   CLASS_DEF_METHOD(DataDef);
+  CLASS_DEF_METHOD(DataEssenceDescriptor);
+  CLASS_DEF_METHOD(DescriptiveClip);
   CLASS_DEF_METHOD(DescriptiveFramework);
   CLASS_DEF_METHOD(DescriptiveMarker);
   CLASS_DEF_METHOD(DescriptiveObject);
@@ -213,6 +215,7 @@ public:
   CLASS_DEF_METHOD(SourceMob);
   CLASS_DEF_METHOD(SourceReference);
   CLASS_DEF_METHOD(StaticMobSlot);
+  CLASS_DEF_METHOD(SubDescriptor);
   CLASS_DEF_METHOD(TIFFDescriptor);
   CLASS_DEF_METHOD(TaggedValue);
   CLASS_DEF_METHOD(TaggedValueDefinition);

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFDataDefs.h,v 1.15 2006/02/15 23:01:34 jlow Exp $ $Name:  $
+// $Id: AAFDataDefs.h,v 1.16 2006/03/24 18:10:55 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
