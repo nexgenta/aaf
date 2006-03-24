@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.159 2006/02/15 23:02:47 jlow Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.160 2006/03/24 17:48:57 jlow Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -74,7 +74,9 @@ HUMAN_TYPED_IMPL="\
 	AAFContentStorage \
 	AAFControlPoint \
 	AAFDataDef \
+	AAFDataEssenceDescriptor \
 	AAFDefObject \
+	AAFDescriptiveClip \
 	AAFDescriptiveFramework \
 	AAFDescriptiveMarker \
 	AAFDescriptiveObject \
@@ -140,6 +142,7 @@ HUMAN_TYPED_IMPL="\
 	AAFSourceMob \
 	AAFSourceReference \
 	AAFStaticMobSlot \
+	AAFSubDescriptor \
 	AAFTIFFDescriptor \
 	AAFTaggedValue \
 	AAFTaggedValueDefinition \
@@ -194,8 +197,9 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFProperties \
 	EnumAAFPropertyDefs \
 	EnumAAFPropertyValues \
-	EnumAAFRIFFChunk \
+	EnumAAFRIFFChunks \
 	EnumAAFSegments \
+	EnumAAFSubDescriptors \
 	EnumAAFTaggedValueDefs \
 	EnumAAFTaggedValues \
 	EnumAAFTypeDefs "
