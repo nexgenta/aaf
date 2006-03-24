@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFRIFFChunk.cpp,v 1.1 2006/02/15 23:02:40 jlow Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.cpp,v 1.1 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,8 +26,8 @@
 
 
 
-#include "CEnumAAFRIFFChunk.h"
-#include "ImplEnumAAFRIFFChunk.h"
+#include "CAAFDescriptiveClip.h"
+#include "ImplAAFDescriptiveClip.h"
 #include "AAFResult.h"
 #include "CAAFEnumValidation.h"
 
@@ -39,148 +39,73 @@
 
 
 
-#include "CAAFRIFFChunk.h"
-#include "ImplAAFRIFFChunk.h"
-
-
-// CLSID for EnumAAFRIFFChunk 
-// {ac3a788e-7814-43a6-8826-f3491e2489cf}
-EXTERN_C const CLSID CLSID_EnumAAFRIFFChunk = { 0xac3a788e, 0x7814, 0x43a6, { 0x88, 0x26, 0xf3, 0x49, 0x1e, 0x24, 0x89, 0xcf } };
+// CLSID for AAFDescriptiveClip 
+// {fcc3639d-7ee5-4fe4-8bb3-b810c0e9e600}
+EXTERN_C const CLSID CLSID_AAFDescriptiveClip = { 0xfcc3639d, 0x7ee5, 0x4fe4, { 0x8b, 0xb3, 0xb8, 0x10, 0xc0, 0xe9, 0xe6, 0x00 } };
 
 
 
 
 
-CEnumAAFRIFFChunk::CEnumAAFRIFFChunk (IUnknown * pControllingUnknown, aafBool doInit)
-  : CAAFRoot (pControllingUnknown, kAAFFalse)
+
+CAAFDescriptiveClip::CAAFDescriptiveClip (IUnknown * pControllingUnknown, aafBool doInit)
+  : CAAFSourceClip (pControllingUnknown, kAAFFalse)
 {
   if (doInit)
     {
-      ImplEnumAAFRIFFChunk * newRep;
-      newRep = new ImplEnumAAFRIFFChunk;
+      ImplAAFDescriptiveClip * newRep;
+      newRep = new ImplAAFDescriptiveClip;
       assert (newRep);
       InitRep (newRep);
     }
 }
 
 
-CEnumAAFRIFFChunk::~CEnumAAFRIFFChunk ()
+CAAFDescriptiveClip::~CAAFDescriptiveClip ()
 {
 }
 
 
 
 HRESULT STDMETHODCALLTYPE
-    CEnumAAFRIFFChunk::NextOne (IAAFRIFFChunk ** ppRIFFChunk)
+    CAAFDescriptiveClip::Initialize (IAAFDataDef * pDataDef,
+        aafLength_constref  length,
+        aafSourceRef_t  sourceRef)
 {
   HRESULT hr;
 
-  ImplEnumAAFRIFFChunk * ptr;
+  ImplAAFDescriptiveClip * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplEnumAAFRIFFChunk*> (pO);
+  ptr = static_cast<ImplAAFDescriptiveClip*> (pO);
   assert (ptr);
 
   //
-  // set up for ppRIFFChunk
+  // set up for pDataDef
   //
-  ImplAAFRIFFChunk * internalppRIFFChunk = NULL;
-  ImplAAFRIFFChunk ** pinternalppRIFFChunk = NULL;
-  if (ppRIFFChunk)
+  ImplAAFDataDef * internalpDataDef = NULL;
+  if (pDataDef)
     {
-      pinternalppRIFFChunk = &internalppRIFFChunk;
-    }
-
-  try
-    {
-      hr = ptr->NextOne
-       (pinternalppRIFFChunk);
-    }
-  catch (OMException& e)
-    {
-      // OMExceptions should be handled by the impl code. However, if an
-      // unhandled OMException occurs, control reaches here. We must not
-      // allow the unhandled exception to reach the client code, so we
-      // turn it into a failure status code.
-      //
-      // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
-      //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
-    }
-  catch (OMAssertionViolation &)
-    {
-      // Control reaches here if there is a programming error in the
-      // impl code that was detected by an assertion violation.
-      // We must not allow the assertion to reach the client code so
-      // here we turn it into a failure status code.
-      //
-      hr = AAFRESULT_ASSERTION_VIOLATION;
-    }
-  catch (...)
-    {
-      // We CANNOT throw an exception out of a COM interface method!
-      // Return a reasonable exception code.
-      //
-      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-    }
-
-  //
-  // cleanup for ppRIFFChunk
-  //
-  if (SUCCEEDED(hr))
-    {
-      IUnknown *pUnknown;
       HRESULT hStat;
-
-      if (internalppRIFFChunk)
-        {
-          pUnknown = static_cast<IUnknown *> (internalppRIFFChunk->GetContainer());
-          hStat = pUnknown->QueryInterface(IID_IAAFRIFFChunk, (void **)ppRIFFChunk);
-          assert (SUCCEEDED (hStat));
-          //pUnknown->Release();
-          internalppRIFFChunk->ReleaseReference(); // We are through with this pointer.
-        }
-    }
-  return hr;
-}
-
-
-HRESULT STDMETHODCALLTYPE
-    CEnumAAFRIFFChunk::Next (aafUInt32  count,
-        IAAFRIFFChunk ** ppRIFFChunk,
-        aafUInt32 *  pFetched)
-{
-  HRESULT hr;
-
-  ImplEnumAAFRIFFChunk * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<ImplEnumAAFRIFFChunk*> (pO);
-  assert (ptr);
-
-  //
-  // set up for ppRIFFChunk
-  //
-  ImplAAFRIFFChunk ** internalppRIFFChunk = NULL;
-  assert (count >= 0);
-  internalppRIFFChunk = new ImplAAFRIFFChunk*[count];
-  assert (internalppRIFFChunk);
-
-  ImplAAFRIFFChunk ** pinternalppRIFFChunk = NULL;
-  if (ppRIFFChunk)
-    {
-      pinternalppRIFFChunk = internalppRIFFChunk;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pDataDef->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpDataDef = static_cast<ImplAAFDataDef*>(arg);
+      assert (internalpDataDef);
     }
 
   try
     {
-      hr = ptr->Next
-       (count,
-        pinternalppRIFFChunk,
-        pFetched);
+      hr = ptr->Initialize
+       (internalpDataDef,
+        length,
+        sourceRef);
     }
   catch (OMException& e)
     {
@@ -212,46 +137,32 @@ HRESULT STDMETHODCALLTYPE
     }
 
   //
-  // cleanup for ppRIFFChunk
+  // no cleanup necessary for pDataDef
   //
-  if (SUCCEEDED(hr)||hr==AAFRESULT_NO_MORE_OBJECTS)
-    {
-      IUnknown *pUnknown;
-      HRESULT hStat;
-      aafUInt32 localIdx;
-	  assert (count >= 0);
-	  for (localIdx = 0; localIdx < *pFetched; localIdx++)
-		{
-		  pUnknown = static_cast<IUnknown *> (internalppRIFFChunk[localIdx]->GetContainer());
-		  hStat = pUnknown->QueryInterface(IID_IAAFRIFFChunk, (void **)(ppRIFFChunk+localIdx));
-		  assert (SUCCEEDED (hStat));
-		  //pUnknown->Release();
-		  internalppRIFFChunk[localIdx]->ReleaseReference(); // We are through with this pointer.
-		}
-    }
-  delete[] internalppRIFFChunk;
-  internalppRIFFChunk = 0;
   return hr;
 }
 
 
+
 HRESULT STDMETHODCALLTYPE
-    CEnumAAFRIFFChunk::Skip (aafUInt32  count)
+    CAAFDescriptiveClip::SetSourceTrackIDs (aafUInt32  numberElements,
+        aafUInt32*  pSourceTrackIDs)
 {
   HRESULT hr;
 
-  ImplEnumAAFRIFFChunk * ptr;
+  ImplAAFDescriptiveClip * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplEnumAAFRIFFChunk*> (pO);
+  ptr = static_cast<ImplAAFDescriptiveClip*> (pO);
   assert (ptr);
 
 
   try
     {
-      hr = ptr->Skip
-       (count);
+      hr = ptr->SetSourceTrackIDs
+       (numberElements,
+        pSourceTrackIDs);
     }
   catch (OMException& e)
     {
@@ -286,20 +197,26 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+
 HRESULT STDMETHODCALLTYPE
-    CEnumAAFRIFFChunk::Reset ()
+    CAAFDescriptiveClip::GetSourceTrackIDs (aafUInt32  numberElements,
+        aafUInt32*  pSourceTrackIDs)
 {
-  ImplEnumAAFRIFFChunk * ptr;
+  HRESULT hr;
+
+  ImplAAFDescriptiveClip * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplEnumAAFRIFFChunk*> (pO);
+  ptr = static_cast<ImplAAFDescriptiveClip*> (pO);
   assert (ptr);
-  HRESULT hr;
+
 
   try
     {
-      hr = ptr->Reset();
+      hr = ptr->GetSourceTrackIDs
+       (numberElements,
+        pSourceTrackIDs);
     }
   catch (OMException& e)
     {
@@ -335,31 +252,22 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CEnumAAFRIFFChunk::Clone (IEnumAAFRIFFChunk ** ppEnum)
+    CAAFDescriptiveClip::GetSourceTrackIDsSize (aafUInt32 *  numberElements)
 {
   HRESULT hr;
 
-  ImplEnumAAFRIFFChunk * ptr;
+  ImplAAFDescriptiveClip * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplEnumAAFRIFFChunk*> (pO);
+  ptr = static_cast<ImplAAFDescriptiveClip*> (pO);
   assert (ptr);
 
-  //
-  // set up for ppEnum
-  //
-  ImplEnumAAFRIFFChunk * internalppEnum = NULL;
-  ImplEnumAAFRIFFChunk ** pinternalppEnum = NULL;
-  if (ppEnum)
-    {
-      pinternalppEnum = &internalppEnum;
-    }
 
   try
     {
-      hr = ptr->Clone
-       (pinternalppEnum);
+      hr = ptr->GetSourceTrackIDsSize
+       (numberElements);
     }
   catch (OMException& e)
     {
@@ -390,23 +298,6 @@ HRESULT STDMETHODCALLTYPE
       hr = AAFRESULT_UNEXPECTED_EXCEPTION;
     }
 
-  //
-  // cleanup for ppEnum
-  //
-  if (SUCCEEDED(hr))
-    {
-      IUnknown *pUnknown;
-      HRESULT hStat;
-
-      if (internalppEnum)
-        {
-          pUnknown = static_cast<IUnknown *> (internalppEnum->GetContainer());
-          hStat = pUnknown->QueryInterface(IID_IEnumAAFRIFFChunk, (void **)ppEnum);
-          assert (SUCCEEDED (hStat));
-          //pUnknown->Release();
-          internalppEnum->ReleaseReference(); // We are through with this pointer.
-        }
-    }
   return hr;
 }
 
@@ -418,7 +309,7 @@ inline int EQUAL_UID(const GUID & a, const GUID & b)
 {
   return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
 }
-HRESULT CEnumAAFRIFFChunk::InternalQueryInterface
+HRESULT CAAFDescriptiveClip::InternalQueryInterface
 (
     REFIID riid,
     void **ppvObj)
@@ -427,19 +318,19 @@ HRESULT CEnumAAFRIFFChunk::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IClassFactory interface 
-    if (EQUAL_UID(riid,IID_IEnumAAFRIFFChunk)) 
+    if (EQUAL_UID(riid,IID_IAAFDescriptiveClip)) 
     { 
-        *ppvObj = (IEnumAAFRIFFChunk *)this; 
+        *ppvObj = (IAAFDescriptiveClip *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
 
     // Always delegate back to base implementation.
-    return CAAFRoot::InternalQueryInterface(riid, ppvObj);
+    return CAAFSourceClip::InternalQueryInterface(riid, ppvObj);
 }
 
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(EnumAAFRIFFChunk)
+AAF_DEFINE_FACTORY(AAFDescriptiveClip)
 

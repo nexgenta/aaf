@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.10 2006/02/15 23:02:40 jlow Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.11 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,7 +84,9 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFContentStorage)
 	AAF_OBJECT_ENTRY(AAFControlPoint)
 	AAF_OBJECT_ENTRY(AAFDataDef)
+	AAF_OBJECT_ENTRY(AAFDataEssenceDescriptor)
 	AAF_OBJECT_ENTRY(AAFDefObject)
+	AAF_OBJECT_ENTRY(AAFDescriptiveClip)
 	AAF_OBJECT_ENTRY(AAFDescriptiveFramework)
 	AAF_OBJECT_ENTRY(AAFDescriptiveMarker)
 	AAF_OBJECT_ENTRY(AAFDescriptiveObject)
@@ -150,6 +152,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFSourceMob)
 	AAF_OBJECT_ENTRY(AAFSourceReference)
 	AAF_OBJECT_ENTRY(AAFStaticMobSlot)
+	AAF_OBJECT_ENTRY(AAFSubDescriptor)
 	AAF_OBJECT_ENTRY(AAFTIFFDescriptor)
 	AAF_OBJECT_ENTRY(AAFTaggedValue)
 	AAF_OBJECT_ENTRY(AAFTaggedValueDefinition)
@@ -204,8 +207,9 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(EnumAAFProperties)
 	AAF_OBJECT_ENTRY(EnumAAFPropertyDefs)
 	AAF_OBJECT_ENTRY(EnumAAFPropertyValues)
-	AAF_OBJECT_ENTRY(EnumAAFRIFFChunk)
+	AAF_OBJECT_ENTRY(EnumAAFRIFFChunks)
 	AAF_OBJECT_ENTRY(EnumAAFSegments)
+	AAF_OBJECT_ENTRY(EnumAAFSubDescriptors)
 	AAF_OBJECT_ENTRY(EnumAAFTaggedValueDefs)
 	AAF_OBJECT_ENTRY(EnumAAFTaggedValues)
 	AAF_OBJECT_ENTRY(EnumAAFTypeDefs)

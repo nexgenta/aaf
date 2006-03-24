@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEventMobSlot.h,v 1.9 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEventMobSlot.h,v 1.10 2006/03/24 18:23:37 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,6 +66,22 @@ public:
         (aafRational_t *  pEditRate);
 
 
+  //****************
+  // GetEventSlotOrigin()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetEventSlotOrigin
+        // @parm [out,retval] EventSlotOrigin property value
+        (aafPosition_t *  result);
+
+  //****************
+  // SetEventSlotOrigin()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEventSlotOrigin
+        // @parm [in] EventSlotOrigin property value
+        (aafPosition_t  value);
+
 
 
 
@@ -75,6 +91,7 @@ public:
 
 protected:
   OMFixedSizeProperty<aafRational_t>	_editRate;
+  OMFixedSizeProperty<aafPosition_t>	_eventSlotOrigin;
 };
 
 #endif // ! __ImplAAFEventMobSlot_h__

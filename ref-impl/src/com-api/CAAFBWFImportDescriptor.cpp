@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFBWFImportDescriptor.cpp,v 1.1 2006/02/15 23:02:40 jlow Exp $ $Name:  $
+// $Id: CAAFBWFImportDescriptor.cpp,v 1.2 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -449,7 +449,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFBWFImportDescriptor::GetUnknownBWFChunks (IEnumAAFRIFFChunk ** ppEnum)
+    CAAFBWFImportDescriptor::GetUnknownBWFChunks (IEnumAAFRIFFChunks ** ppEnum)
 {
   HRESULT hr;
 
@@ -463,8 +463,8 @@ HRESULT STDMETHODCALLTYPE
   //
   // set up for ppEnum
   //
-  ImplEnumAAFRIFFChunk * internalppEnum = NULL;
-  ImplEnumAAFRIFFChunk ** pinternalppEnum = NULL;
+  ImplEnumAAFRIFFChunks * internalppEnum = NULL;
+  ImplEnumAAFRIFFChunks ** pinternalppEnum = NULL;
   if (ppEnum)
     {
       pinternalppEnum = &internalppEnum;
@@ -515,7 +515,7 @@ HRESULT STDMETHODCALLTYPE
       if (internalppEnum)
         {
           pUnknown = static_cast<IUnknown *> (internalppEnum->GetContainer());
-          hStat = pUnknown->QueryInterface(IID_IEnumAAFRIFFChunk, (void **)ppEnum);
+          hStat = pUnknown->QueryInterface(IID_IEnumAAFRIFFChunks, (void **)ppEnum);
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.

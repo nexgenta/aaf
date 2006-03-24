@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: ImplAAFBWFImportDescriptor.cpp,v 1.1 2006/02/15 23:02:43 jlow Exp $ $Name:  $
+// $Id: ImplAAFBWFImportDescriptor.cpp,v 1.2 2006/03/24 18:23:37 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 #include "ImplAAFBWFImportDescriptor.h"
 #endif
 
-extern "C" const aafClassID_t CLSID_EnumAAFRIFFChunk;
+extern "C" const aafClassID_t CLSID_EnumAAFRIFFChunks;
 #include <assert.h>
 #include <string.h>
 #include <wchar.h>
@@ -183,13 +183,13 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFBWFImportDescriptor::GetUnknownBWFChunks (
-      ImplEnumAAFRIFFChunk ** ppEnum)
+      ImplEnumAAFRIFFChunks ** ppEnum)
 {
   if (NULL == ppEnum)
 	return AAFRESULT_NULL_PARAM;
   *ppEnum = 0;
 	
-  ImplEnumAAFRIFFChunk *theEnum = (ImplEnumAAFRIFFChunk *)CreateImpl (CLSID_EnumAAFRIFFChunk);
+  ImplEnumAAFRIFFChunks *theEnum = (ImplEnumAAFRIFFChunks *)CreateImpl (CLSID_EnumAAFRIFFChunks);
 	
   XPROTECT()
 	{
@@ -197,7 +197,7 @@ AAFRESULT STDMETHODCALLTYPE
 			new OMStrongReferenceVectorIterator<ImplAAFRIFFChunk>(_unknownBWFChunks);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
-		CHECK(theEnum->Initialize(&CLSID_EnumAAFRIFFChunk, this, iter));
+		CHECK(theEnum->Initialize(&CLSID_EnumAAFRIFFChunks, this, iter));
 	  *ppEnum = theEnum;
 	}
   XEXCEPT

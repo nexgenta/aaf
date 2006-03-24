@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.9 2006/02/15 23:02:42 jlow Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.10 2006/03/24 18:23:37 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,7 +66,9 @@ extern "C" const aafClassID_t CLSID_AAFContainerDef;
 extern "C" const aafClassID_t CLSID_AAFContentStorage;
 extern "C" const aafClassID_t CLSID_AAFControlPoint;
 extern "C" const aafClassID_t CLSID_AAFDataDef;
+extern "C" const aafClassID_t CLSID_AAFDataEssenceDescriptor;
 extern "C" const aafClassID_t CLSID_AAFDefObject;
+extern "C" const aafClassID_t CLSID_AAFDescriptiveClip;
 extern "C" const aafClassID_t CLSID_AAFDescriptiveFramework;
 extern "C" const aafClassID_t CLSID_AAFDescriptiveMarker;
 extern "C" const aafClassID_t CLSID_AAFDescriptiveObject;
@@ -132,6 +134,7 @@ extern "C" const aafClassID_t CLSID_AAFSourceClip;
 extern "C" const aafClassID_t CLSID_AAFSourceMob;
 extern "C" const aafClassID_t CLSID_AAFSourceReference;
 extern "C" const aafClassID_t CLSID_AAFStaticMobSlot;
+extern "C" const aafClassID_t CLSID_AAFSubDescriptor;
 extern "C" const aafClassID_t CLSID_AAFTIFFDescriptor;
 extern "C" const aafClassID_t CLSID_AAFTaggedValue;
 extern "C" const aafClassID_t CLSID_AAFTaggedValueDefinition;
@@ -186,8 +189,9 @@ extern "C" const aafClassID_t CLSID_EnumAAFPluginLocators;
 extern "C" const aafClassID_t CLSID_EnumAAFProperties;
 extern "C" const aafClassID_t CLSID_EnumAAFPropertyDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFPropertyValues;
-extern "C" const aafClassID_t CLSID_EnumAAFRIFFChunk;
+extern "C" const aafClassID_t CLSID_EnumAAFRIFFChunks;
 extern "C" const aafClassID_t CLSID_EnumAAFSegments;
+extern "C" const aafClassID_t CLSID_EnumAAFSubDescriptors;
 extern "C" const aafClassID_t CLSID_EnumAAFTaggedValueDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFTaggedValues;
 extern "C" const aafClassID_t CLSID_EnumAAFTypeDefs;

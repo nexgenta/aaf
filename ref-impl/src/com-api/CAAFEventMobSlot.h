@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEventMobSlot.h,v 1.5 2005/06/09 12:11:18 montrowe Exp $ $Name:  $
+// $Id: CAAFEventMobSlot.h,v 1.6 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,6 +113,53 @@ public:
   STDMETHOD (SetEditRate) (
     // Edit rate property value 
     /*[in]*/ aafRational_t *  pEditRate);
+
+  //***********************************************************
+  //
+  // GetEventSlotOrigin()
+  //
+  // This method will return the EventSlotOrigin of this mob slot.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pEventSlotOrigin pointer is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pEventSlotOrigin arg is NULL.
+  //
+  STDMETHOD (GetEventSlotOrigin) (
+    // EventSlotOrigin property value 
+    /*[out,retval]*/ aafPosition_t *  pEventSlotOrigin);
+
+
+  //***********************************************************
+  //
+  // SetEventSlotOrigin()
+  //
+  // This method will set the EventSlotOrigin of this mob slot.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.).
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  //
+  STDMETHOD (SetEventSlotOrigin) (
+    // EventSlotOrigin property value 
+    /*[in]*/ aafPosition_t  eventSlotOrigin);
 
 
 

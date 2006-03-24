@@ -1,12 +1,11 @@
 //@doc
-//@class    EnumAAFRIFFChunk | Implementation class for EnumAAFRIFFChunk
-#ifndef __ImplEnumAAFRIFFChunk_h__
-#define __ImplEnumAAFRIFFChunk_h__
+//@class    EnumAAFLocators | Implementation class for EnumAAFLocators
+#ifndef __ImplEnumAAFSubDescriptors_h__
+#define __ImplEnumAAFSubDescriptors_h__
 
 //=---------------------------------------------------------------------=
 //
-//
-// $Id: ImplEnumAAFRIFFChunk.h,v 1.1 2006/02/15 23:02:43 jlow Exp $ $Name:  $
+// $Id: ImplEnumAAFSubDescriptors.h,v 1.1 2006/03/24 18:23:37 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -19,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -28,14 +27,11 @@
 //
 //=---------------------------------------------------------------------=
 
-
-
 #include "ImplAAFEnumerator.h"
 
-#include "ImplAAFRIFFChunk.h"
+#include "ImplAAFSubDescriptor.h"
 
-typedef ImplAAFEnumerator<ImplAAFRIFFChunk> ImplEnumAAFRIFFChunk;
+typedef ImplAAFEnumerator<ImplAAFSubDescriptor> ImplEnumAAFSubDescriptors;
 
-#endif // ! __ImplEnumAAFRIFFChunk_h__
-
+#endif // ! __ImplEnumAAFSubDescriptors_h__
 

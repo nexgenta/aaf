@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFBWFImportDescriptor.h,v 1.1 2006/02/15 23:02:41 jlow Exp $ $Name:  $
+// $Id: CAAFBWFImportDescriptor.h,v 1.2 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -246,7 +246,7 @@ public:
   //
   // Return the enumeration for all RIFFChunk objects on this component.  The returned
   /// enumerator is AddRef()ed before it is returned.  The enumerator
-  /// is implemented as a EnumAAFRIFFChunk.
+  /// is implemented as a EnumAAFRIFFChunks.
   /// 
   /// Succeeds if all of the following are true:
   /// - the ppEnum pointer is valid.
@@ -265,7 +265,7 @@ public:
   //
   STDMETHOD (GetUnknownBWFChunks) (
     // RIFFChunk objects 
-    /*[out]*/ IEnumAAFRIFFChunk ** ppEnum);
+    /*[out]*/ IEnumAAFRIFFChunks ** ppEnum);
 
 
   //***********************************************************

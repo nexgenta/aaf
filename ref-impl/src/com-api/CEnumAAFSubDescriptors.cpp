@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEventMobSlot.cpp,v 1.9 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CEnumAAFSubDescriptors.cpp,v 1.1 2006/03/24 18:18:38 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,8 +26,8 @@
 
 
 
-#include "CAAFEventMobSlot.h"
-#include "ImplAAFEventMobSlot.h"
+#include "CEnumAAFSubDescriptors.h"
+#include "ImplEnumAAFSubDescriptors.h"
 #include "AAFResult.h"
 #include "CAAFEnumValidation.h"
 
@@ -38,50 +38,220 @@
 #include <string.h>
 
 
-
-// CLSID for AAFEventMobSlot 
-// {e684d765-b935-11d2-bf9d-00104bc9156d}
-EXTERN_C const CLSID CLSID_AAFEventMobSlot = { 0xe684d765, 0xb935, 0x11d2, { 0xbf, 0x9d, 0x00, 0x10, 0x4b, 0xc9, 0x15, 0x6d } };
+#include "CAAFSubDescriptor.h"
+#include "ImplAAFSubDescriptor.h"
 
 
+// CLSID for EnumAAFSubDescriptors 
+// {08406d65-14d9-4681-8346-8a342c9b8ba6}
+EXTERN_C const CLSID CLSID_EnumAAFSubDescriptors = { 0x08406d65, 0x14d9, 0x4681, { 0x83, 0x46, 0x8a, 0x34, 0x2c, 0x9b, 0x8b, 0xa6 } };
 
 
 
-CAAFEventMobSlot::CAAFEventMobSlot (IUnknown * pControllingUnknown, aafBool doInit)
-  : CAAFMobSlot (pControllingUnknown, kAAFFalse)
+
+
+CEnumAAFSubDescriptors::CEnumAAFSubDescriptors (IUnknown * pControllingUnknown, aafBool doInit)
+  : CAAFRoot (pControllingUnknown, kAAFFalse)
 {
   if (doInit)
     {
-      ImplAAFEventMobSlot * newRep;
-      newRep = new ImplAAFEventMobSlot;
+      ImplEnumAAFSubDescriptors * newRep;
+      newRep = new ImplEnumAAFSubDescriptors;
       assert (newRep);
       InitRep (newRep);
     }
 }
 
 
-CAAFEventMobSlot::~CAAFEventMobSlot ()
+CEnumAAFSubDescriptors::~CEnumAAFSubDescriptors ()
 {
 }
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEventMobSlot::GetEditRate (aafRational_t *  pEditRate)
+    CEnumAAFSubDescriptors::NextOne (IAAFSubDescriptor ** ppSubDescriptor)
 {
   HRESULT hr;
 
-  ImplAAFEventMobSlot * ptr;
+  ImplEnumAAFSubDescriptors * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplAAFEventMobSlot*> (pO);
+  ptr = static_cast<ImplEnumAAFSubDescriptors*> (pO);
+  assert (ptr);
+
+  //
+  // set up for ppSubDescriptor
+  //
+  ImplAAFSubDescriptor * internalppSubDescriptor = NULL;
+  ImplAAFSubDescriptor ** pinternalppSubDescriptor = NULL;
+  if (ppSubDescriptor)
+    {
+      pinternalppSubDescriptor = &internalppSubDescriptor;
+    }
+
+  try
+    {
+      hr = ptr->NextOne
+       (pinternalppSubDescriptor);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // cleanup for ppSubDescriptor
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppSubDescriptor)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppSubDescriptor->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFSubDescriptor, (void **)ppSubDescriptor);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppSubDescriptor->ReleaseReference(); // We are through with this pointer.
+        }
+    }
+  return hr;
+}
+
+
+
+HRESULT STDMETHODCALLTYPE
+    CEnumAAFSubDescriptors::Next (aafUInt32  count,
+        IAAFSubDescriptor ** ppSubDescriptors,
+        aafUInt32 *  pFetched)
+{
+  HRESULT hr;
+
+  ImplEnumAAFSubDescriptors * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplEnumAAFSubDescriptors*> (pO);
+  assert (ptr);
+
+  //
+  // set up for ppSubDescriptors
+  //
+  ImplAAFSubDescriptor ** internalppSubDescriptors = NULL;
+  assert (count >= 0);
+  internalppSubDescriptors = new ImplAAFSubDescriptor*[count];
+  assert (internalppSubDescriptors);
+
+  ImplAAFSubDescriptor ** pinternalppSubDescriptors = NULL;
+  if (ppSubDescriptors)
+    {
+      pinternalppSubDescriptors = internalppSubDescriptors;
+    }
+
+  try
+    {
+      hr = ptr->Next
+       (count,
+        pinternalppSubDescriptors,
+        pFetched);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // cleanup for ppSubDescriptors
+  //
+  if (SUCCEEDED(hr)||hr==AAFRESULT_NO_MORE_OBJECTS)
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+      aafUInt32 localIdx;
+	  assert (count >= 0);
+	  for (localIdx = 0; localIdx < *pFetched; localIdx++)
+		{
+		  pUnknown = static_cast<IUnknown *> (internalppSubDescriptors[localIdx]->GetContainer());
+		  hStat = pUnknown->QueryInterface(IID_IAAFSubDescriptor, (void **)(ppSubDescriptors+localIdx));
+		  assert (SUCCEEDED (hStat));
+		  //pUnknown->Release();
+		  internalppSubDescriptors[localIdx]->ReleaseReference(); // We are through with this pointer.
+		}
+    }
+  delete[] internalppSubDescriptors;
+  internalppSubDescriptors = 0;
+  return hr;
+}
+
+
+
+HRESULT STDMETHODCALLTYPE
+    CEnumAAFSubDescriptors::Skip (aafUInt32  count)
+{
+  HRESULT hr;
+
+  ImplEnumAAFSubDescriptors * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplEnumAAFSubDescriptors*> (pO);
   assert (ptr);
 
 
   try
     {
-      hr = ptr->GetEditRate
-       (pEditRate);
+      hr = ptr->Skip
+       (count);
     }
   catch (OMException& e)
     {
@@ -118,73 +288,19 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEventMobSlot::SetEditRate (aafRational_t *  pEditRate)
+    CEnumAAFSubDescriptors::Reset ()
 {
-  HRESULT hr;
-
-  ImplAAFEventMobSlot * ptr;
+  ImplEnumAAFSubDescriptors * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplAAFEventMobSlot*> (pO);
+  ptr = static_cast<ImplEnumAAFSubDescriptors*> (pO);
   assert (ptr);
-
-
-  try
-    {
-      hr = ptr->SetEditRate
-       (pEditRate);
-    }
-  catch (OMException& e)
-    {
-      // OMExceptions should be handled by the impl code. However, if an
-      // unhandled OMException occurs, control reaches here. We must not
-      // allow the unhandled exception to reach the client code, so we
-      // turn it into a failure status code.
-      //
-      // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
-      //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
-    }
-  catch (OMAssertionViolation &)
-    {
-      // Control reaches here if there is a programming error in the
-      // impl code that was detected by an assertion violation.
-      // We must not allow the assertion to reach the client code so
-      // here we turn it into a failure status code.
-      //
-      hr = AAFRESULT_ASSERTION_VIOLATION;
-    }
-  catch (...)
-    {
-      // We CANNOT throw an exception out of a COM interface method!
-      // Return a reasonable exception code.
-      //
-      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
-    }
-
-  return hr;
-}
-
-
-HRESULT STDMETHODCALLTYPE
-    CAAFEventMobSlot::GetEventSlotOrigin (aafPosition_t *  pEventSlotOrigin)
-{
   HRESULT hr;
 
-  ImplAAFEventMobSlot * ptr;
-  ImplAAFRoot * pO;
-  pO = GetRepObject ();
-  assert (pO);
-  ptr = static_cast<ImplAAFEventMobSlot*> (pO);
-  assert (ptr);
-
-
   try
     {
-      hr = ptr->GetEventSlotOrigin
-       (pEventSlotOrigin);
+      hr = ptr->Reset();
     }
   catch (OMException& e)
     {
@@ -221,22 +337,31 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFEventMobSlot::SetEventSlotOrigin (aafPosition_t  eventSlotOrigin)
+    CEnumAAFSubDescriptors::Clone (IEnumAAFSubDescriptors ** ppEnum)
 {
   HRESULT hr;
 
-  ImplAAFEventMobSlot * ptr;
+  ImplEnumAAFSubDescriptors * ptr;
   ImplAAFRoot * pO;
   pO = GetRepObject ();
   assert (pO);
-  ptr = static_cast<ImplAAFEventMobSlot*> (pO);
+  ptr = static_cast<ImplEnumAAFSubDescriptors*> (pO);
   assert (ptr);
 
+  //
+  // set up for ppEnum
+  //
+  ImplEnumAAFSubDescriptors * internalppEnum = NULL;
+  ImplEnumAAFSubDescriptors ** pinternalppEnum = NULL;
+  if (ppEnum)
+    {
+      pinternalppEnum = &internalppEnum;
+    }
 
   try
     {
-      hr = ptr->SetEventSlotOrigin
-       (eventSlotOrigin);
+      hr = ptr->Clone
+       (pinternalppEnum);
     }
   catch (OMException& e)
     {
@@ -267,11 +392,25 @@ HRESULT STDMETHODCALLTYPE
       hr = AAFRESULT_UNEXPECTED_EXCEPTION;
     }
 
+  //
+  // cleanup for ppEnum
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppEnum)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppEnum->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IEnumAAFSubDescriptors, (void **)ppEnum);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppEnum->ReleaseReference(); // We are through with this pointer.
+        }
+    }
   return hr;
 }
-
-
-
 
 //
 // 
@@ -280,7 +419,7 @@ inline int EQUAL_UID(const GUID & a, const GUID & b)
 {
   return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
 }
-HRESULT CAAFEventMobSlot::InternalQueryInterface
+HRESULT CEnumAAFSubDescriptors::InternalQueryInterface
 (
     REFIID riid,
     void **ppvObj)
@@ -289,19 +428,19 @@ HRESULT CAAFEventMobSlot::InternalQueryInterface
         return E_INVALIDARG;
 
     // We only support the IClassFactory interface 
-    if (EQUAL_UID(riid,IID_IAAFEventMobSlot)) 
+    if (EQUAL_UID(riid,IID_IEnumAAFSubDescriptors)) 
     { 
-        *ppvObj = (IAAFEventMobSlot *)this; 
+        *ppvObj = (IEnumAAFSubDescriptors *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
 
     // Always delegate back to base implementation.
-    return CAAFMobSlot::InternalQueryInterface(riid, ppvObj);
+    return CAAFRoot::InternalQueryInterface(riid, ppvObj);
 }
 
 //
 // Define the contrete object support implementation.
 // 
-AAF_DEFINE_FACTORY(AAFEventMobSlot)
+AAF_DEFINE_FACTORY(EnumAAFSubDescriptors)
 
