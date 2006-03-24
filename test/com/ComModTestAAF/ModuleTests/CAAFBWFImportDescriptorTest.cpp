@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.1 2006/02/15 23:02:47 jlow Exp $ $Name:  $
+// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.2 2006/03/24 18:27:54 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -251,7 +251,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFMob*					pMob = NULL;
 	IAAFEssenceDescriptor*		pEssDesc = NULL;
 	IAAFBWFImportDescriptor*	pBWFImportDesc = NULL;
-	IEnumAAFRIFFChunk*			pEnum = NULL;
+	IEnumAAFRIFFChunks*			pEnum = NULL;
 	IAAFRIFFChunk*				pRIFFChunk = NULL;
 	IAAFRIFFChunk*				pRIFFChunkTest = NULL;
 	IEnumAAFMobs*				pMobIter = NULL;
