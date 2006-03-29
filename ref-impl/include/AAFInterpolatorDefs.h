@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFInterpolatorDefs.h,v 1.11 2006/03/24 18:10:54 jlow Exp $ $Name:  $
+// $Id: AAFInterpolatorDefs.h,v 1.12 2006/03/29 17:58:44 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
