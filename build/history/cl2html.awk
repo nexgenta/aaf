@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cl2html.awk,v 1.72 2005/10/04 16:22:17 tbingham Exp $ $Name:  $
+# $Id: cl2html.awk,v 1.73 2006/04/05 15:23:53 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -282,15 +282,15 @@ function entry(entrytext) {
     dir = fields[1];
     files = trim(fields[2], 1);
     gsub(" ", "", files);
-    n = split(files, names, ",");
+    n = split(files, fnames, ",");
 #    printf("<!--[%d]-->\n", n);
 #    for (i = 1; i <= n; i++) {
-#      printf("<!--[%d : \"%s\"]-->\n", i, names[i]);
+#      printf("<!--[%d : \"%s\"]-->\n", i, fnames[i]);
 #    }
     /* Insert directory names */
-    files = dir names[1];
+    files = dir fnames[1];
     for (i = 2; i <= n; i++) {
-      files = files ", " dir names[i];
+      files = files ", " dir fnames[i];
     }
     cs = 3; /* Start of comment */
   } else {
