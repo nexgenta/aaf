@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cl2html.awk,v 1.73 2006/04/05 15:23:53 tbingham Exp $ $Name:  $
+# $Id: cl2html.awk,v 1.74 2006/04/05 15:33:05 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -104,7 +104,6 @@ function printHeader() {
   printf("<title>%s</title>\n", TITLE);
   printf("</head>\n");
   printf("<body>\n");
-  printKey();
   printf("<h1 align=center>%s</h1>\n", TITLE);
   printf("\
 <table>\n\
@@ -141,6 +140,8 @@ function printValidatesIcon() {
 
 function printTrailer() {
   printf("</table>\n");
+
+  printKey();
 
   printValidatesIcon();
 
