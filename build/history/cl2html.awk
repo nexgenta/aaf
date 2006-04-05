@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cl2html.awk,v 1.74 2006/04/05 15:33:05 tbingham Exp $ $Name:  $
+# $Id: cl2html.awk,v 1.75 2006/04/05 15:46:20 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -142,6 +142,8 @@ function printTrailer() {
   printf("</table>\n");
 
   printKey();
+
+  printf("<a href=\"Changes-index.html\"> index </a>\n");
 
   printValidatesIcon();
 
