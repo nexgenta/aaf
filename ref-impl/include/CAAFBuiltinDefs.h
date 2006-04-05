@@ -2,7 +2,7 @@
 #define __CAAFBuiltinDefs_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBuiltinDefs.h,v 1.7 2006/03/24 18:10:55 jlow Exp $ $Name:  $
+// $Id: CAAFBuiltinDefs.h,v 1.8 2006/04/05 13:42:42 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -149,6 +149,7 @@ public:
   //
   // Class Def 'get' methods
   //
+  CLASS_DEF_METHOD(AES3PCMDescriptor);
   CLASS_DEF_METHOD(AIFCDescriptor);
   CLASS_DEF_METHOD(AuxiliaryDescriptor);
   CLASS_DEF_METHOD(BWFImportDescriptor);

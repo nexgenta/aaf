@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: CAAFSubDescriptorTest.cpp,v 1.1 2006/03/24 18:28:29 jlow Exp $ $Name:  $
+// $Id: CAAFSubDescriptorTest.cpp,v 1.2 2006/04/05 13:42:42 jlow Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,16 +28,24 @@
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
 
-
+// Test routine defined in CAAFEssenceDescriptorTest.cpp
+extern "C" HRESULT CAAFEssenceDescriptor_test(
+    testMode_t mode);
 
 // Required function prototype.
-
+extern "C" HRESULT CAAFSubDescriptor_test(
+    testMode_t mode);
 extern "C" HRESULT CAAFSubDescriptor_test(
     testMode_t mode)
 {
   // SubDescriptor is an abstract base class.  By itself, there
   // is nothing to test other than that a concrete instance of a
-  // SubDescriptor can be correctly contained by concrete class.
-	HRESULT  hr = AAFRESULT_NOT_IMPLEMENTED;
-	return hr;
+  // SubDescriptor can be correctly contained by a
+  // EssenceDescriptor.  This is tested in
+  // CAAFEssenceDescriptorTest.cpp and there is little point in
+  // repeating the code here.  The test is re-executed here to ensure
+  // "ComModAAF AAFSubDescriptor" executes a meaningful test in
+  // the event it is run on its own.
+
+  return CAAFEssenceDescriptor_test( mode);
 }
