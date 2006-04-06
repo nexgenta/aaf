@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxParameter.cpp,v 1.3 2005/11/28 18:06:37 ajakowpa Exp $
+// $Id: AxParameter.cpp,v 1.4 2006/04/06 21:50:56 jfpanisset Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,6 +59,25 @@ void AxConstantValue::GetValue( aafUInt32 valueSize,
 				aafUInt32* bytesRead )
 {
   CHECK_HRESULT( _spIaafConstantValue->GetValue( valueSize, pValue, bytesRead ) );
+}
+
+aafUInt32 AxConstantValue::GetValueBufLen()
+{
+  aafUInt32 valueBufLen;
+  CHECK_HRESULT( _spIaafConstantValue->GetValueBufLen( &valueBufLen ) );
+  return valueBufLen;
+}
+
+IAAFTypeDefSP AxConstantValue::GetTypeDefinition()
+{
+  IAAFTypeDefSP typeDefinition;
+  CHECK_HRESULT( _spIaafConstantValue->GetTypeDefinition( &typeDefinition ) );
+  return typeDefinition;
+}
+
+void AxConstantValue::SetValue( aafUInt32 valueSize, aafDataBuffer_t pValue )
+{
+  CHECK_HRESULT( _spIaafConstantValue->SetValue( valueSize, pValue ) );
 }
 
 //=---------------------------------------------------------------------=
@@ -137,3 +156,70 @@ void AxVaryingValue::GetInterpolatedValue( aafRational_t inputValue, aafInt32 va
 }
 
 //=---------------------------------------------------------------------=
+
+AxControlPoint::AxControlPoint( IAAFControlPointSP spIaafControlPoint )
+  : AxObject( AxQueryInterface<IAAFControlPoint, IAAFObject>( spIaafControlPoint ) ),
+    _spIaafControlPoint( spIaafControlPoint )
+{}
+
+AxControlPoint::~AxControlPoint()
+{}
+
+void AxControlPoint::Initialize( IAAFVaryingValueSP spIaafVaryingValue, aafRational_constref time, aafUInt32 valueSize, aafDataBuffer_t buffer )
+{
+  CHECK_HRESULT( _spIaafControlPoint->Initialize( spIaafVaryingValue, time, valueSize, buffer ) );
+}
+
+aafRational_t AxControlPoint::GetTime()
+{
+  aafRational_t time;
+  CHECK_HRESULT( _spIaafControlPoint->GetTime( &time ) );
+  return time;
+}
+
+aafEditHint_t AxControlPoint::GetEditHint()
+{
+  aafEditHint_t editHint;
+  CHECK_HRESULT( _spIaafControlPoint->GetEditHint( &editHint ) );
+  return editHint;
+}
+
+aafUInt32 AxControlPoint::GetValueBufLen()
+{
+  aafUInt32 valueBufLen;
+  CHECK_HRESULT( _spIaafControlPoint->GetValueBufLen( &valueBufLen ) );
+  return valueBufLen;
+}
+
+aafUInt32 AxControlPoint::GetValue( aafUInt32 valueSize, aafDataBuffer_t buffer )
+{
+  aafUInt32 bytesRead = 0;
+  CHECK_HRESULT( _spIaafControlPoint->GetValue( valueSize, buffer, &bytesRead ) );
+  return bytesRead;
+}
+
+void AxControlPoint::SetTime( aafRational_t time )
+{
+  CHECK_HRESULT( _spIaafControlPoint->SetTime( time ) );
+}
+
+void AxControlPoint::SetEditHint( aafEditHint_t editHint )
+{
+  CHECK_HRESULT( _spIaafControlPoint->SetEditHint( editHint ) );
+}
+
+IAAFTypeDefSP AxControlPoint::GetTypeDefinition()
+{
+  IAAFTypeDefSP typeDef;
+  CHECK_HRESULT( _spIaafControlPoint->GetTypeDefinition( &typeDef ) );
+  return typeDef;
+}
+
+void AxControlPoint::SetValue( aafUInt32 valueSize, aafDataBuffer_t buffer )
+{
+  CHECK_HRESULT( _spIaafControlPoint->SetValue( valueSize, buffer ) );
+}
+
+//=---------------------------------------------------------------------=
+
+
