@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.218 2005/11/15 21:52:02 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.219 2006/04/10 18:10:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1514,7 +1514,7 @@ void OMKLVStoredObject::flatSave(const OMPropertySet& properties) const
         // persist them as such. In AAF they'll eventually become a new kind
         // of reference. tjb 11/14/05
         //
-        if ((id == 0x0201) || (id == 0x3004) || (id == 0x3005)){
+        if ((id == 0x0201) || (id == 0x3004) || (id == 0x3005) || (id == 0x0b01) || (id == 0x4e01)){
           OMUniqueObjectIdentification k = r.identification();
           _storage->write(id, _reorderBytes);
           OMPropertySize s = sizeof(OMKLVKey);
