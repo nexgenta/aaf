@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginManager.cpp,v 1.42 2005/03/12 19:36:51 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFPluginManager.cpp,v 1.43 2006/04/28 18:50:27 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -992,7 +992,7 @@ AAFRESULT
 		key = *((aafUID_t*)iter->key);
 		found = memcmp((char *)&pdata.category, (char*)(&category), sizeof(aafUID_t)) == 0;
 		if(!found)
-			found = memcmp((char *)&pdata.category, (char*)(&noCat), sizeof(aafUID_t)) == 0;		
+			found = memcmp((char *)&category, (char*)(&noCat), sizeof(aafUID_t)) == 0;		
 		firstTimeThru = false;
 	} while(!found);
 
@@ -1024,7 +1024,7 @@ AAFRESULT
 		key = *((aafUID_t*)iter->key);
 		found = memcmp((char *)&pdata.category, (char*)(&category), sizeof(aafUID_t)) == 0;
 		if(!found)
-			found = memcmp((char *)&pdata.category, (&noCat), sizeof(aafUID_t)) == 0;		
+			found = memcmp((char *)&category, (&noCat), sizeof(aafUID_t)) == 0;		
 	} while(!found);
 
 	if(found)
