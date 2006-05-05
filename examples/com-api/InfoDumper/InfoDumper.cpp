@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.30 2006/05/05 19:09:35 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.31 2006/05/05 19:14:29 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2711,6 +2711,14 @@ static bool dumpFile (aafCharacter * pwFileName,
 	    {
 	      cerr << "File " << name
 		   << " not found"
+		   << endl;
+	      return false;
+	    }
+	  else if (hr==AAFRESULT_NOT_READABLE)
+	    {
+		  // The file cannot be opened for read, it may or may not exist
+	      cerr << "File " << name
+		   << " cannot be opened for read"
 		   << endl;
 	      return false;
 	    }
