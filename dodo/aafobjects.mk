@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.160 2006/03/24 17:48:57 jlow Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.161 2006/05/16 18:42:05 heydowns Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,10 @@ AAFCOMINTERFACESONLY="\
 	AAFDigitalImageDescriptor2 \
 	AAFEndian \
 	AAFEssenceDataEx \
+	AAFEssenceDescriptor2 \
 	AAFEssenceMultiAccess \
+	AAFEventMobSlot2 \
+	AAFFileDescriptor2 \
 	AAFHeader2 \
 	AAFMasterMob2 \
 	AAFMasterMobEx \
