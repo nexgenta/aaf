@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFFileDescriptor.dod,v 1.26 2006/05/16 18:17:50 heydowns Exp $ $Name:  $
+#c $Id: AAFFileDescriptor.dod,v 1.27 2006/05/16 20:02:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -236,4 +236,4 @@ AD_XMETHOD1(GetContainerFormat,
 AD_COM_METH(.method-SetLinkedSlotID)
 AD_COM_METH(.method-GetLinkedSlotID)
 
-AD_COM_EXT_CLASS_END(IAAFFileDescriptor2)
+AD_COM_EXT_CLASS_END(AAFFileDescriptor2)

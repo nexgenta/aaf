@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFEventMobSlot.dod,v 1.12 2006/05/16 18:17:50 heydowns Exp $ $Name:  $
+#c $Id: AAFEventMobSlot.dod,v 1.13 2006/05/16 20:02:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -101,4 +101,4 @@ AD_OVERRIDE(.method-SetSegment)
 AD_COM_METH(.method-GetEventSlotOrigin)
 AD_COM_METH(.method-SetEventSlotOrigin)
 
-AD_COM_EXT_CLASS_END(IAAFEventMobSlot2)
+AD_COM_EXT_CLASS_END(AAFEventMobSlot2)

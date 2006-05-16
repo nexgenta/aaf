@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFEssenceDescriptor.dod,v 1.21 2006/05/16 18:17:50 heydowns Exp $ $Name:  $
+#c $Id: AAFEssenceDescriptor.dod,v 1.22 2006/05/16 20:02:27 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -285,4 +285,4 @@ AD_COM_METH(.method-RemoveSubDescriptorAt)
 AD_COM_METH(.method-GetSubDescriptors)
 
 
-AD_COM_EXT_CLASS_END(IAAFEssenceDescriptor2)
+AD_COM_EXT_CLASS_END(AAFEssenceDescriptor2)
