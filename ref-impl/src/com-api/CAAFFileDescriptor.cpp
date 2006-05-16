@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFFileDescriptor.cpp,v 1.9 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CAAFFileDescriptor.cpp,v 1.10 2006/05/16 20:45:09 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,6 @@ CAAFFileDescriptor::CAAFFileDescriptor (IUnknown * pControllingUnknown, aafBool 
 CAAFFileDescriptor::~CAAFFileDescriptor ()
 {
 }
-
 
 HRESULT STDMETHODCALLTYPE
     CAAFFileDescriptor::SetLength (aafLength_t  length)
@@ -589,8 +588,7 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->SetLinkedSlotID
-       (LinkedSlotID);
+      hr = ptr->SetLinkedSlotID (LinkedSlotID);
     }
   catch (OMException& e)
     {
@@ -621,10 +619,9 @@ HRESULT STDMETHODCALLTYPE
       hr = AAFRESULT_UNEXPECTED_EXCEPTION;
     }
 
+
   return hr;
 }
-
-
 
 HRESULT STDMETHODCALLTYPE
     CAAFFileDescriptor::GetLinkedSlotID (aafUInt32 *  pLinkedSlotID)
@@ -641,8 +638,7 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->GetLinkedSlotID
-       (pLinkedSlotID);
+      hr = ptr->GetLinkedSlotID (pLinkedSlotID);
     }
   catch (OMException& e)
     {
@@ -672,6 +668,7 @@ HRESULT STDMETHODCALLTYPE
       //
       hr = AAFRESULT_UNEXPECTED_EXCEPTION;
     }
+
 
   return hr;
 }
@@ -700,6 +697,13 @@ HRESULT CAAFFileDescriptor::InternalQueryInterface
         return S_OK;
     }
 
+    if (EQUAL_UID(riid,IID_IAAFFileDescriptor2)) 
+    { 
+        *ppvObj = (IAAFFileDescriptor2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
     // Always delegate back to base implementation.
     return CAAFEssenceDescriptor::InternalQueryInterface(riid, ppvObj);
 }
@@ -708,4 +712,3 @@ HRESULT CAAFFileDescriptor::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFFileDescriptor)
-

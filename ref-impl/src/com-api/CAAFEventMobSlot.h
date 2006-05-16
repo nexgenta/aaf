@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEventMobSlot.h,v 1.6 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CAAFEventMobSlot.h,v 1.7 2006/05/16 20:45:09 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@
 
 class CAAFEventMobSlot
   : public IAAFEventMobSlot,
+    public IAAFEventMobSlot2,
     public CAAFMobSlot
 {
 protected:
@@ -59,7 +60,6 @@ protected:
   virtual ~CAAFEventMobSlot ();
 
 public:
-
 
   //***********************************************************
   //
@@ -114,10 +114,15 @@ public:
     // Edit rate property value 
     /*[in]*/ aafRational_t *  pEditRate);
 
+
+
+
+
   //***********************************************************
+  // METHOD NAME: GetEventSlotOrigin()
   //
-  // GetEventSlotOrigin()
-  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEventMobSlot2 | GetEventSlotOrigin |
   // This method will return the EventSlotOrigin of this mob slot.
   /// 
   /// Succeeds if all of the following are true:
@@ -135,16 +140,19 @@ public:
   ///
   /// AAFRESULT_NULL_PARAM
   ///   - pEventSlotOrigin arg is NULL.
-  //
-  STDMETHOD (GetEventSlotOrigin) (
-    // EventSlotOrigin property value 
-    /*[out,retval]*/ aafPosition_t *  pEventSlotOrigin);
-
+  // @end
+  // 
+  STDMETHOD (GetEventSlotOrigin)
+   (
+    // @parm [out,retval] aafPosition_t * | pEventSlotOrigin | EventSlotOrigin property value
+    aafPosition_t *  pEventSlotOrigin
+  );
 
   //***********************************************************
+  // METHOD NAME: SetEventSlotOrigin()
   //
-  // SetEventSlotOrigin()
-  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFEventMobSlot2 | SetEventSlotOrigin |
   // This method will set the EventSlotOrigin of this mob slot.
   /// 
   /// This method will return the following codes.  If more than one of
@@ -156,11 +164,13 @@ public:
   ///
   /// AAFRESULT_NOT_INITIALIZED
   ///   - This object has not yet had Initialize() called on it.
-  //
-  STDMETHOD (SetEventSlotOrigin) (
-    // EventSlotOrigin property value 
-    /*[in]*/ aafPosition_t  eventSlotOrigin);
-
+  // @end
+  // 
+  STDMETHOD (SetEventSlotOrigin)
+   (
+    // @parm [in] aafPosition_t | eventSlotOrigin | EventSlotOrigin property value
+    aafPosition_t  eventSlotOrigin
+  );
 
 
 
@@ -184,5 +194,4 @@ public:
 };
 
 #endif // ! __CAAFEventMobSlot_h__
-
 
