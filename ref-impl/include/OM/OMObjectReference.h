@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReference.h,v 1.29 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMObjectReference.h,v 1.30 2006/05/23 16:00:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -75,6 +75,7 @@ public:
     // @cmember Restore this <c OMObjectReference>.
   virtual void restore(void) = 0;
 
+    // tjb - deprecated
     // @cmember Get the value of this <c OMObjectReference>.
     //          The value is a pointer to the referenced <c OMStorable>.
   virtual OMStorable* getValue(void) const = 0;
@@ -91,7 +92,7 @@ protected:
   // @access Protected members.
 
     // @cmember The containing property.
-  OMProperty* _property;
+  OMProperty* _property; // tjb - deprecated
 
     // @cmember A pointer to the actual object.
   OMStorable* _pointer;
@@ -259,8 +260,8 @@ private:
   OMStrongReferenceSet* set(void) const;
 
   OMUniqueObjectIdentification _identification;
-  OMPropertyTag _targetTag;
-  OMStrongReferenceSet* _targetSet;
+  OMPropertyTag _targetTag;         // tjb - deprecated
+  OMStrongReferenceSet* _targetSet; // tjb - deprecated
 
 };
 
