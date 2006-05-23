@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.8 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.9 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -672,7 +672,8 @@ void OMSSStoredObject::save(const OMWeakReference& singleton)
 {
   TRACE("OMSSStoredObject::save");
 
-  OMWeakObjectReference& reference = singleton.reference();
+  OMWeakObjectReference<OMUniqueObjectIdentification>& reference =
+                                                         singleton.reference();
 
   OMPropertyId propertyId = singleton.propertyId();
   OMStoredForm storedForm = singleton.storedForm();
@@ -1268,9 +1269,12 @@ void OMSSStoredObject::restore(OMWeakReference& singleton,
   ASSERT("Consistent key property ids",
                                    keyPropertyId == singleton.keyPropertyId());
 
-  OMWeakObjectReference& reference = singleton.reference();
+  OMWeakObjectReference<OMUniqueObjectIdentification>& reference =
+                                                         singleton.reference();
   singleton.setTargetTag(tag);
-  reference = OMWeakObjectReference(&singleton, id, tag);
+  reference = OMWeakObjectReference<OMUniqueObjectIdentification>(&singleton,
+                                                                  id,
+                                                                  tag);
   reference.restore();
 }
 

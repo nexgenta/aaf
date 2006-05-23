@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationDef.h,v 1.23 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFOperationDef.h,v 1.24 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -241,7 +241,7 @@ public:
 		 ImplAAFParameterDef ** ppParameterDef);
 
 private:
-	OMWeakReferenceProperty<ImplAAFDataDef>			_dataDef;
+	OMWeakReferenceProperty<OMUniqueObjectIdentification, ImplAAFDataDef>			_dataDef;
 	OMFixedSizeProperty<aafBool>					_isTimeWarp;
 	OMWeakReferenceVectorProperty<ImplAAFOperationDef>	_degradeTo;
 	OMFixedSizeProperty<aafUID_t>                   _category;

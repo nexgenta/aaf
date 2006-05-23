@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMContainerElement.h,v 1.35 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMContainerElement.h,v 1.36 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -340,7 +340,7 @@ private:
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMWeakReferenceVectorElement : public
-                                    OMContainerElement<OMWeakObjectReference> {
+     OMContainerElement<OMWeakObjectReference<OMUniqueObjectIdentification> > {
 public:
   // @access Public members.
 
@@ -382,7 +382,7 @@ public:
   //   @base public | <c OMContainerElement>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMWeakReferenceSetElement : public
-                                    OMContainerElement<OMWeakObjectReference> {
+     OMContainerElement<OMWeakObjectReference<OMUniqueObjectIdentification> > {
 public:
   // @access Public members.
 

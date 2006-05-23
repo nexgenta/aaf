@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.30 2005/02/24 18:11:17 heydowns Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.31 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -306,7 +306,7 @@ public:
 
 
 private:
-   OMWeakReferenceProperty<ImplAAFTypeDef> _ElementType;
+   OMWeakReferenceProperty<OMUniqueObjectIdentification, ImplAAFTypeDef> _ElementType;
 
   // names of elements in this record; stored as single wchar_t array
   // with embedded nulls

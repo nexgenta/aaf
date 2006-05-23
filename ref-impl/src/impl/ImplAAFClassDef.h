@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.39 2005/08/19 23:55:06 tbingham Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.40 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -392,7 +392,7 @@ private:
       ImplAAFPropertyDef ** ppPropDef);
 
   // OMWeakReferenceProperty<ImplAAFClassDef> _ParentClass;
-  OMWeakReferenceProperty<ImplAAFClassDef>         _ParentClass;
+  OMWeakReferenceProperty<OMUniqueObjectIdentification, ImplAAFClassDef>         _ParentClass;
 
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFPropertyDef> _Properties;
 

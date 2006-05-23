@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakReference.h,v 1.8 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakReference.h,v 1.9 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -28,6 +28,7 @@
 
 #include "OMRefProperty.h"
 
+template <typename Key>
 class OMWeakObjectReference;
 
   // @class Persistent weak reference (pointer to shared object)
@@ -45,7 +46,9 @@ public:
     // @cmember Destructor.
   ~OMWeakReference(void);
 
-  virtual OMWeakObjectReference& reference(void) const = 0;
+    // tjb - deprecated
+  virtual OMWeakObjectReference<OMUniqueObjectIdentification>&
+                                                     reference(void) const = 0;
 
   virtual OMPropertyId keyPropertyId(void) const = 0;
 
