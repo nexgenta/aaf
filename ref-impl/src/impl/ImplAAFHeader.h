@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.h,v 1.53 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHeader.h,v 1.54 2006/05/24 17:57:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -457,6 +457,9 @@ private:
   OMFixedSizeProperty<aafUID_t>                    _operationalPattern;
   OMSetProperty<aafUID_t>                          _essenceContainers;
   OMSetProperty<aafUID_t>                          _descriptiveSchemes;
+#if 0 // tjb - not yet
+  OMWeakReferenceProperty<OMMaterialIdentification, ImplAAFMob*> _primaryMob;
+#endif
 };
 
 //
