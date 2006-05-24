@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRawStorage.cpp,v 1.4 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFRawStorage.cpp,v 1.5 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 
 #include "OMRawStorage.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -160,8 +160,8 @@ void ImplAAFRawStorage::Initialize
   (OMRawStorage * prs,
    aafFileAccess_t access)
 {
-  assert (! _rep);
-  assert(prs);
+  ASSERTU (! _rep);
+  ASSERTU(prs);
   _rep = prs;
   _access = access;
 }

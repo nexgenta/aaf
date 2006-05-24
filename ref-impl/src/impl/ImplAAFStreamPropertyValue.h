@@ -2,7 +2,7 @@
 #define __ImplAAFStreamPropertyValue_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStreamPropertyValue.h,v 1.6 2005/09/06 12:43:24 montrowe Exp $ $Name:  $
+// $Id: ImplAAFStreamPropertyValue.h,v 1.7 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -254,7 +254,6 @@ private:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

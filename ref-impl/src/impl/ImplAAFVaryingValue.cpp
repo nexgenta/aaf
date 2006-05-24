@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFVaryingValue.cpp,v 1.38 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFVaryingValue.cpp,v 1.39 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@
 #include "ImplAAFPluginManager.h"
 #include "AAFPlugin.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include "aafErr.h"
 #include "AAFStoredObjectIDs.h"
@@ -198,7 +198,7 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFControlPoint *pPoint;
   _controlPoints.getValueAt(pPoint,index);
 
-  assert(pPoint);
+  ASSERTU(pPoint);
   pPoint->AcquireReference();
   (*ppControlPoint)=pPoint;
 

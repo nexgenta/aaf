@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefArray.h,v 1.15 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefArray.h,v 1.16 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -196,7 +196,6 @@ protected:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

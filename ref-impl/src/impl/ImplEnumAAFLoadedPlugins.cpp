@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplEnumAAFLoadedPlugins.cpp,v 1.16 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
+// $Id: ImplEnumAAFLoadedPlugins.cpp,v 1.17 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,6 @@
 #include "ImplEnumAAFLoadedPlugins.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include "aafTable.h"
 #include "ImplAAFPluginManager.h"

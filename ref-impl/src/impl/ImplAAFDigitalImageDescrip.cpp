@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.27 2004/10/29 11:59:15 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.28 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,6 @@
 #include "AAFDefUIDs.h"
 #include "AAFCodecDefs.h"
 
-#include <assert.h>
 #include <string.h>
 
 ImplAAFDigitalImageDescriptor::ImplAAFDigitalImageDescriptor ()

@@ -2,7 +2,7 @@
 #define __ImplAAFFile_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.h,v 1.46 2005/10/18 16:15:36 rodrigc Exp $ $Name:  $
+// $Id: ImplAAFFile.h,v 1.47 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -176,7 +176,6 @@ private:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

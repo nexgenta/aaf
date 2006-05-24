@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPhysicalDescriptor.cpp,v 1.3 2004/12/09 18:13:27 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPhysicalDescriptor.cpp,v 1.4 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include "AAFResult.h"
 
 

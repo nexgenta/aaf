@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.63 2005/02/07 18:51:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.64 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "AAFResult.h"
 #include "AAFUtils.h"
 
@@ -294,7 +294,7 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFComponent *pComponent;
   _components.getValueAt(pComponent,index);
 
-  assert(pComponent);
+  ASSERTU(pComponent);
   pComponent->AcquireReference();
   (*ppComponent)=pComponent;
 
@@ -791,7 +791,7 @@ AAFRESULT
 		//
 		ImplAAFComponent	*pOldComponent = NULL;
 		_components.getValueAt( pOldComponent, index );
-		assert(pOldComponent);
+		ASSERTU(pOldComponent);
 		if( pOldComponent != NULL && pOldComponent == pComponent )
 			return AAFRESULT_SUCCESS;
 
@@ -1074,7 +1074,7 @@ AAFRESULT ImplAAFSequence::UpdateSequenceLength( ImplAAFEvent* pEvent )
 
 		// Sanity check.  This should never fail if
 		// event ordering rules are correctly enforced.
-		assert( posNext + lengthNext >= posFirst );
+		ASSERTU( posNext + lengthNext >= posFirst );
 
 		if ( posNext + lengthNext - posFirst > seqLength ) {
 			seqLength = posNext + lengthNext - posFirst;

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDescriptiveMarker.cpp,v 1.2 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveMarker.cpp,v 1.3 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@
 
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include <string.h>
 
 ImplAAFDescriptiveMarker::ImplAAFDescriptiveMarker ()

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTimecodeStream12M.cpp,v 1.17 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTimecodeStream12M.cpp,v 1.18 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,7 +88,6 @@ const unsigned int TC_ARRAY_SIZE = 10;
 #include "ImplAAFTimecodeStream12M.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "AAFUtils.h"

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCodecDef.cpp,v 1.34 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCodecDef.cpp,v 1.35 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,6 @@
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFDictionary.h"
 
-#include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "AAFUtils.h"

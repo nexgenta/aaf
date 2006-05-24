@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefExtEnum.h,v 1.23 2005/02/24 18:11:17 heydowns Exp $ $Name:  $
+// $Id: ImplAAFTypeDefExtEnum.h,v 1.24 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -280,7 +280,6 @@ public:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFKLVData.cpp,v 1.10 2004/09/10 17:13:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFKLVData.cpp,v 1.11 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFBuiltinDefs.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include "AAFResult.h"
 #include "aafErr.h"
@@ -86,7 +86,7 @@ AAFRESULT STDMETHODCALLTYPE
     pDef->ReleaseReference(); // This object is owned by the dictionary!
 
     _cachedRenameTypeDef = dynamic_cast<ImplAAFTypeDefRename*>(pDef);
-		assert(_cachedRenameTypeDef);
+		ASSERTU(_cachedRenameTypeDef);
     if (NULL == _cachedRenameTypeDef)
       RAISE(AAFRESULT_INVALID_OBJ);
 

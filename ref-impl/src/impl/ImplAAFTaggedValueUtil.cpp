@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTaggedValueUtil.cpp,v 1.2 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTaggedValueUtil.cpp,v 1.3 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 #include "AAFResult.h"
 
 #include <wchar.h>
-#include <assert.h>
+#include "OMAssertions.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFTaggedValues;
 
@@ -57,7 +57,7 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
     // Get a type def for the tagged value.  GetBuiltinDefs passes an
     // unowned pointer.  Don't release it (hence, a bare pointer).
     ImplAAFTypeDef* pTaggedValType = spDict->GetBuiltinDefs()->tdString();
-    assert( pTaggedValType );
+    ASSERTU( pTaggedValType );
 
 
     // The TaggedValueDef returned by GetBuildinDefs is not reference
@@ -73,7 +73,7 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
 
     // Create the tagged value.
     CHECK( pTaggedValDef->CreateInstance( reinterpret_cast<ImplAAFObject**>(&pTaggedVal) ) );
-    assert( pTaggedVal );
+    ASSERTU( pTaggedVal );
 
     // Init the tagged value.
     CHECK( pTaggedVal->Initialize( pName,

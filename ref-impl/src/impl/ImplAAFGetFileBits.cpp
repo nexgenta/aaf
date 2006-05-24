@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFGetFileBits.cpp,v 1.3 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFGetFileBits.cpp,v 1.4 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "ImplAAFGetFileBits.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -41,8 +41,8 @@ ImplAAFGetFileBits::~ImplAAFGetFileBits ()
 void ImplAAFGetFileBits::Initialize
         (OMRawStorage * prs)
 {
-  assert (prs);
-  assert (!_rep);
+  ASSERTU (prs);
+  ASSERTU (!_rep);
   _rep = prs;
 }
 
@@ -64,7 +64,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   aafUInt32 bytesRead;
   _rep->readAt (position, buf, bufSize, bytesRead);
-  assert (bytesRead == bufSize);
+  ASSERTU (bytesRead == bufSize);
 
   return AAFRESULT_SUCCESS;
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMultipleDescriptor.cpp,v 1.1 2005/06/10 21:12:41 montrowe Exp $ $Name:  $
+// $Id: ImplAAFMultipleDescriptor.cpp,v 1.2 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,7 @@
 #include "ImplAAFMultipleDescriptor.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "ImplAAFObjectCreation.h"
@@ -203,7 +203,7 @@ AAFRESULT
 		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
 	_Descriptors.getValueAt(*ppDescriptor, index);
-  assert(*ppDescriptor); // Descriptor should never be NULL.
+  ASSERTU(*ppDescriptor); // Descriptor should never be NULL.
 	(*ppDescriptor)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;

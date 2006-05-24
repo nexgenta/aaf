@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSelector.cpp,v 1.27 2005/02/07 18:51:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSelector.cpp,v 1.28 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@
 #include "ImplAAFSelector.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include "AAFResult.h"
 #include "AAFUtils.h"
@@ -402,7 +402,7 @@ AAFRESULT ImplAAFSelector::ChangeContainedReferences(aafMobID_constref from,
 
 void ImplAAFSelector::Accept(AAFComponentVisitor& visitor)
 {
-	assert(_selected);
+	ASSERTU(_selected);
 	_selected->Accept(visitor);
 
 	aafInt32 count = 0;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.cpp,v 1.24 2004/11/17 18:09:33 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDataDef.cpp,v 1.25 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,7 @@
 #include "ImplAAFDataDef.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include "AAFDataDefs.h"
 #include "AAFUtils.h"
@@ -330,11 +330,11 @@ ImplAAFDictionary * ImplAAFDataDef::GetDict()
   if (! _pCachedDict)
 	{
 	  AAFRESULT hr = GetDictionary (&_pCachedDict);
-	  assert (AAFRESULT_SUCCEEDED (hr));
+	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  // _pCachedDict is *NOT* reference counted here, so release the
 	  // newly-added reference.
 	  _pCachedDict->ReleaseReference();
 	}
-  assert (_pCachedDict);
+  ASSERTU (_pCachedDict);
   return _pCachedDict;
 }

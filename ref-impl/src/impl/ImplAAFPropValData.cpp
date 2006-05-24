@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropValData.cpp,v 1.10 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPropValData.cpp,v 1.11 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@
 #include "ImplAAFPropValData.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -60,7 +60,7 @@ ImplAAFPropValData::~ImplAAFPropValData ()
 AAFRESULT ImplAAFPropValData::Initialize (
       ImplAAFTypeDef * pTD)
 {
-  assert (! pvtGetType ());
+  ASSERTU (! pvtGetType ());
   return SetType (pTD);
 }
 
@@ -72,8 +72,8 @@ AAFRESULT ImplAAFPropValData::AllocateFromPropVal (
 	  aafMemPtr_t * ppBits)
 {
   if (! pNewOwner) return AAFRESULT_NULL_PARAM;
-  assert (pNewOwner->_pBits);
-  assert ((byteOffset + size) <= pNewOwner->_bitsSize);
+  ASSERTU (pNewOwner->_pBits);
+  ASSERTU ((byteOffset + size) <= pNewOwner->_bitsSize);
 
   if (_ownerPropVal)
 	{
@@ -160,13 +160,13 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPropValData::WriteTo(
   aafUInt32 bitsSize;
   HRESULT hr = GetBits (&bits);
   if (AAFRESULT_FAILED (hr)) return hr;
-//  assert (bits);
+//  ASSERTU (bits);
 
   hr = GetBitsSize (&bitsSize);
   if (AAFRESULT_FAILED (hr)) return hr;
 
   // OMSimpleProperty * pSimpleProp = dynamic_cast <OMSimpleProperty*>(pOmProp);
-  // assert (pSimpleProp);
+  // ASSERTU (pSimpleProp);
   // pSimpleProp->setBits (bits, bitsSize);
   
   if (bits) 

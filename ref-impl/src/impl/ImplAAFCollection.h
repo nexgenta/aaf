@@ -2,7 +2,7 @@
 #define __ImplAAFCollection_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCollection.h,v 1.9 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCollection.h,v 1.10 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -156,7 +156,7 @@ ImplAAFCollectionData<T>::ImplAAFCollectionData<T>
   : _pData (pData),
 	_numElems (numElems)
 {
-  assert (pData);
+  ASSERTU (pData);
 }
 
 
@@ -211,7 +211,7 @@ ImplAAFCollectionOMVector<T, PropElemType>::ImplAAFCollectionOMVector<T, PropEle
 )
   : _pProp (pProp)
 {
-  assert (pProp);
+  ASSERTU (pProp);
 }
 
 

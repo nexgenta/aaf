@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCompositionMob.cpp,v 1.31 2004/09/16 15:05:46 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFCompositionMob.cpp,v 1.32 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include "AAFResult.h"
 
 ImplAAFCompositionMob::ImplAAFCompositionMob ():

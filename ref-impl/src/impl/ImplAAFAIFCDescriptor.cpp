@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFAIFCDescriptor.cpp,v 1.9 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFAIFCDescriptor.cpp,v 1.10 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include <string.h>
 
 

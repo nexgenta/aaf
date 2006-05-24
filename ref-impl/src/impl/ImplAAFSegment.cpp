@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSegment.cpp,v 1.31 2005/02/07 18:51:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSegment.cpp,v 1.32 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,6 @@
 #include "ImplAAFSegment.h"
 #endif
 
-#include <assert.h>
 #include "aafErr.h"
 #include "AAFResult.h"
 

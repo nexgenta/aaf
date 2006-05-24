@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFWeakRefArrayValue.cpp,v 1.7 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFWeakRefArrayValue.cpp,v 1.8 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@
 
 #include "OMProperty.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -125,15 +125,15 @@ ImplAAFTypeDefObjectRef * ImplAAFWeakRefArrayValue::GetElementType(void) const /
   ImplAAFTypeDefSP pType, pElementType;
   
   result = GetType(&pType);
-  assert(AAFRESULT_SUCCEEDED(result));
+  ASSERTU(AAFRESULT_SUCCEEDED(result));
   if (AAFRESULT_SUCCEEDED(result))
   {
     pContainerType = dynamic_cast<ImplAAFTypeDefArray *>((ImplAAFTypeDef *)pType); // extract obj from smartptr
-    assert(NULL != pContainerType);
+    ASSERTU(NULL != pContainerType);
     if (NULL != pContainerType)
     {
       result = pContainerType->GetType(&pElementType);
-      assert(AAFRESULT_SUCCEEDED(result));
+      ASSERTU(AAFRESULT_SUCCEEDED(result));
       if (AAFRESULT_SUCCEEDED(result))
       {
         pContainerElementType = dynamic_cast<ImplAAFTypeDefWeakObjRef *>((ImplAAFTypeDef *)pElementType); // extract obj from smartptr
@@ -141,7 +141,7 @@ ImplAAFTypeDefObjectRef * ImplAAFWeakRefArrayValue::GetElementType(void) const /
     }
   }
   
-  assert(pContainerElementType);
+  ASSERTU(pContainerElementType);
   return pContainerElementType;
 }
 
@@ -150,11 +150,11 @@ ImplAAFTypeDefObjectRef * ImplAAFWeakRefArrayValue::GetElementType(void) const /
 // to a container.
 AAFRESULT ImplAAFWeakRefArrayValue::ValidateNewObject(ImplAAFStorable *pNewObject) const
 {
-  assert (isInitialized());
+  ASSERTU (isInitialized());
   if (!isInitialized())
     return AAFRESULT_NOT_INITIALIZED;
 
-  assert(NULL != pNewObject);
+  ASSERTU(NULL != pNewObject);
   if (!pNewObject->attached())
   {
     return AAFRESULT_OBJECT_NOT_ATTACHED;

@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFWeakRefSetValue.h,v 1.4 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFWeakRefSetValue.h,v 1.5 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,7 +81,6 @@ public:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

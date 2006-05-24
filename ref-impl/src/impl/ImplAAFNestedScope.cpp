@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNestedScope.cpp,v 1.33 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFNestedScope.cpp,v 1.34 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@
 #include "ImplAAFNestedScope.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include "AAFResult.h"
 #include "aafErr.h"
@@ -174,7 +174,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   _slots.getValueAt(*ppSegment,index);
 
-  assert(*ppSegment);
+  ASSERTU(*ppSegment);
   (*ppSegment)->AcquireReference();
 
   return AAFRESULT_SUCCESS;

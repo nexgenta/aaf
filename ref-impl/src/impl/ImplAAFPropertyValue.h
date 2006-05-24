@@ -2,7 +2,7 @@
 #define __ImplAAFPropertyValue_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyValue.h,v 1.18 2005/09/06 12:43:24 montrowe Exp $ $Name:  $
+// $Id: ImplAAFPropertyValue.h,v 1.19 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,7 +113,6 @@ private:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

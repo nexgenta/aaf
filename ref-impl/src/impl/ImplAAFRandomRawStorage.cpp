@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRandomRawStorage.cpp,v 1.4 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFRandomRawStorage.cpp,v 1.5 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 
 #include "OMRawStorage.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -61,7 +61,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // Creation if ImplAAFRandomRawStorages in ImplAAFModule.cpp
   // guarantees that this storage is positionable.
-  assert (GetOMStorage()->isPositionable ());
+  ASSERTU (GetOMStorage()->isPositionable ());
 
   GetOMStorage()->readAt (position, buf, bufSize, *pNumRead);
   return AAFRESULT_SUCCESS;
@@ -89,7 +89,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // Creation if ImplAAFRandomRawStorages in ImplAAFModule.cpp
   // guarantees that this storage is positionable.
-  assert (GetOMStorage()->isPositionable ());
+  ASSERTU (GetOMStorage()->isPositionable ());
 
   if (GetOMStorage()->extent() < (position + bufSize))
 	{
@@ -115,9 +115,9 @@ AAFRESULT STDMETHODCALLTYPE
   
   // Creation if ImplAAFRandomRawStorages in ImplAAFModule.cpp
   // guarantees that this storage is positionable.
-  assert (GetOMStorage()->isPositionable ());
+  ASSERTU (GetOMStorage()->isPositionable ());
 
-  assert (pSize);
+  ASSERTU (pSize);
   *pSize = GetOMStorage()->size();
   return AAFRESULT_SUCCESS;
 }
@@ -151,7 +151,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   // Creation if ImplAAFRandomRawStorages in ImplAAFModule.cpp
   // guarantees that this storage is positionable.
-  assert (GetOMStorage()->isPositionable ());
+  ASSERTU (GetOMStorage()->isPositionable ());
 
   *pResult = GetOMStorage()->extent ();
   return AAFRESULT_SUCCESS;

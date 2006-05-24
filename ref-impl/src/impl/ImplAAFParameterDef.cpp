@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFParameterDef.cpp,v 1.25 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFParameterDef.cpp,v 1.26 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 
 #include "ImplAAFDictionary.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include <wchar.h>
 #include "aafErr.h"
@@ -88,7 +88,7 @@ AAFRESULT STDMETHODCALLTYPE
   ImplAAFTypeDef *pTypeDef = _typeDef;
 
   *ppTypeDef = pTypeDef;
-  assert (*ppTypeDef);
+  ASSERTU (*ppTypeDef);
   (*ppTypeDef)->AcquireReference ();
   return AAFRESULT_SUCCESS;
 }

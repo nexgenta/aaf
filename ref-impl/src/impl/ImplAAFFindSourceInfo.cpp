@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFindSourceInfo.cpp,v 1.22 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFFindSourceInfo.cpp,v 1.23 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,6 @@
 #include "ImplAAFFindSourceInfo.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 #include "ImplAAFMob.h"

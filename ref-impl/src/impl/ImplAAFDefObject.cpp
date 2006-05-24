@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDefObject.cpp,v 1.34 2004/10/22 13:44:36 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDefObject.cpp,v 1.35 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,6 @@
 #include "ImplAAFDictionary.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include <wchar.h>
 #include "ImplAAFObjectCreation.h"

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFParameter.cpp,v 1.18 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFParameter.cpp,v 1.19 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,6 @@
 #include "ImplAAFParameter.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include "AAFResult.h"
 #include "aafErr.h"

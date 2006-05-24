@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEdgecode.cpp,v 1.20 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEdgecode.cpp,v 1.21 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,6 @@
 #include "ImplAAFBuiltinDefs.h"
 #include "ImplAAFDictionary.h"
 
-#include <assert.h>
 #include <string.h>
 
 #include "AAFTypes.h"

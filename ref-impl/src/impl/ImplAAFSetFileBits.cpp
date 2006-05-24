@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSetFileBits.cpp,v 1.4 2004/10/25 13:16:43 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSetFileBits.cpp,v 1.5 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "ImplAAFSetFileBits.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 
@@ -41,8 +41,8 @@ ImplAAFSetFileBits::~ImplAAFSetFileBits ()
 void ImplAAFSetFileBits::Initialize
         (OMRawStorage * prs)
 {
-  assert (prs);
-  assert (!_rep);
+  ASSERTU (prs);
+  ASSERTU (!_rep);
   _rep = prs;
 }
 

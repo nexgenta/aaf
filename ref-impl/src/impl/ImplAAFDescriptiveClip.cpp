@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: ImplAAFDescriptiveClip.cpp,v 1.1 2006/03/24 18:23:37 jlow Exp $ $Name:  $
+// $Id: ImplAAFDescriptiveClip.cpp,v 1.2 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,6 @@
 
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include <string.h>
 
 

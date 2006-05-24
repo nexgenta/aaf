@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMobSlot.cpp,v 1.46 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMobSlot.cpp,v 1.47 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,7 +46,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <wchar.h>
 #include "AAFResult.h"
 #include "aafErr.h"

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginDef.cpp,v 1.40 2005/03/17 18:02:32 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFPluginDef.cpp,v 1.41 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@
 #include "ImplAAFPluginDef.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 #include <wchar.h>
 #include "aafErr.h"
@@ -804,7 +804,7 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFLocator *pLocator;
 	_locators.getValueAt(pLocator,index);
 
-	assert(pLocator);
+	ASSERTU(pLocator);
 	pLocator->AcquireReference();
 	(*ppLocator)=pLocator;
 

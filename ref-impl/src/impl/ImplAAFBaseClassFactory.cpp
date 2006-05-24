@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFBaseClassFactory.cpp,v 1.63 2004/10/25 13:13:17 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFBaseClassFactory.cpp,v 1.64 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,9 +33,6 @@
 #include "OMClassFactory.h"
 
 #include "ImplAAFObjectCreation.h"
-
-
-#include <assert.h>
 
 
 //

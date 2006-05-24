@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTransition.cpp,v 1.30 2005/02/07 18:51:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTransition.cpp,v 1.31 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 #include "AAFTypes.h"
@@ -59,7 +59,6 @@
 #include "ImplAAFTransition.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 
 
@@ -208,7 +207,7 @@ AAFRESULT ImplAAFTransition::ChangeContainedReferences(aafMobID_constref from,
 
 void ImplAAFTransition::Accept(AAFComponentVisitor& visitor)
 {
-	assert(_operationGroup);
+	ASSERTU(_operationGroup);
 	_operationGroup->Accept(visitor);
 
 	// TODO

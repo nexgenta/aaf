@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCommentMarker.cpp,v 1.16 2004/02/27 14:26:47 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCommentMarker.cpp,v 1.17 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,6 @@
 #include "AAFClassIDs.h"
 
 
-#include <assert.h>
 #include <string.h>
 
 

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFRoot.cpp,v 1.5 2006/02/15 23:02:42 jlow Exp $ $Name:  $
+// $Id: ImplAAFRoot.cpp,v 1.6 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@
 // Include the declaration for the reference counting container callback function.
 #include "ImplAAFObjectCreation.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 
 
 ImplAAFRoot::ImplAAFRoot ()
@@ -78,16 +78,16 @@ aafUInt32 ImplAAFRoot::ReferenceCount() const
 
 void ImplAAFRoot::InitContainer (void * pContainer)
 {
-  assert (! _pContainer);
+  ASSERTU (! _pContainer);
   _pContainer = pContainer;
-  assert (_pContainer);
+  ASSERTU (_pContainer);
 }
 
 
 
 void * ImplAAFRoot::GetContainer ()
 {
-  assert (_pContainer);
+  ASSERTU (_pContainer);
   return _pContainer;
 }
 
@@ -101,7 +101,7 @@ bool ImplAAFRoot::isInitialized () const
 void ImplAAFRoot::setInitialized ()
 {
   _isInitialized = true;
-  assert (isInitialized());
+  ASSERTU (isInitialized());
 }
 
 

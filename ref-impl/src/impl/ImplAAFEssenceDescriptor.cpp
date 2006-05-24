@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceDescriptor.cpp,v 1.37 2006/03/24 18:23:37 jlow Exp $ $Name:  $
+// $Id: ImplAAFEssenceDescriptor.cpp,v 1.38 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,7 @@
 #include "ImplAAFEssenceDescriptor.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "AAFResult.h"
 #include "aafErr.h"
 #include "ImplAAFObjectCreation.h"
@@ -174,7 +174,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_BADINDEX;
 	
 	_locators.getValueAt(*ppLocator, index);
-	assert(*ppLocator);
+	ASSERTU(*ppLocator);
 	(*ppLocator)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -327,7 +327,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_BADINDEX;
 	
 	_subdescriptors.getValueAt(*ppSubDescriptor, index);
-	assert(*ppSubDescriptor);
+	ASSERTU(*ppSubDescriptor);
 	(*ppSubDescriptor)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -418,7 +418,7 @@ AAFRESULT
 		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
 	_locators.getValueAt(*ppLocator, index);
-  assert(*ppLocator); // locator should never be NULL.
+  ASSERTU(*ppLocator); // locator should never be NULL.
 	(*ppLocator)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;
@@ -434,7 +434,7 @@ AAFRESULT
 		return AAFRESULT_NO_MORE_OBJECTS; // AAFRESULT_BADINDEX ???
 
 	_subdescriptors.getValueAt(*ppSubDescriptor, index);
-  assert(*ppSubDescriptor); // locator should never be NULL.
+  ASSERTU(*ppSubDescriptor); // locator should never be NULL.
 	(*ppSubDescriptor)->AcquireReference();
 
 	return AAFRESULT_SUCCESS;

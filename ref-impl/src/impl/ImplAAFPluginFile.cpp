@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginFile.cpp,v 1.11 2004/10/26 13:39:31 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginFile.cpp,v 1.12 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include <assert.h>
 #include <string.h>
 
 #if defined( OS_WINDOWS )

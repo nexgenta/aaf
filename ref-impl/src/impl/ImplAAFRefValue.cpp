@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRefValue.cpp,v 1.5 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFRefValue.cpp,v 1.6 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,7 @@
 #include "OMRefProperty.h" // Include header for base class for singleton references.
 #include "OMPropertyDefinition.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 #ifndef USE_IMPLSTORABLE
@@ -79,7 +79,7 @@
   }
 #endif  
   // A strong reference MUST be either an ImplAAFObject or an ImplAAFMetaDefintion!!!
-  assert (NULL != result);
+  ASSERTU (NULL != result);
   return result;
 }
 
@@ -106,7 +106,7 @@
 #endif  
   
   // A strong reference MUST be either an ImplAAFObject or an ImplAAFMetaDefintion!!!
-  assert (NULL != result);
+  ASSERTU (NULL != result);
   return result;
 }
 

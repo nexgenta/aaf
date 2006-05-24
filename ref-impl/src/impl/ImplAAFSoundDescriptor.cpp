@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSoundDescriptor.cpp,v 1.3 2004/10/27 16:54:00 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFSoundDescriptor.cpp,v 1.4 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,7 +23,7 @@
 //=---------------------------------------------------------------------=
 
 
-#include <assert.h>
+#include "OMAssertions.h"
 
 #include "ImplAAFSoundDescriptor.h"
 #include "AAFPropertyIDs.h"
@@ -82,7 +82,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFSoundDescriptor::Initialize()
 	// class, this Initialize() method is provided.
 	// It doesn't do anything beyond that done in the constructor.
 
-    assert( !isInitialized() );
+    ASSERTU( !isInitialized() );
 
 
     // Initialize required properties

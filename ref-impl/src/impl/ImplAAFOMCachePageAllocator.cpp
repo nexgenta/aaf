@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOMCachePageAllocator.cpp,v 1.1 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: ImplAAFOMCachePageAllocator.cpp,v 1.2 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 
 #include "AAF.h"
 #include "AAFResult.h"
-#include <assert.h>
+#include "OMAssertions.h"
 
 #include <new>
 
@@ -39,13 +39,13 @@ ImplAAFOMCachePageAllocator::ImplAAFOMCachePageAllocator(
 : OMCachePageAllocator(pageCount, pageSize),
   _pAllocator(pAllocator)
 {
-  assert(_pAllocator != 0);
+  ASSERTU(_pAllocator != 0);
   _pAllocator->AddRef();
 }
 
 ImplAAFOMCachePageAllocator::~ImplAAFOMCachePageAllocator()
 {
-  assert(_pAllocator != 0);
+  ASSERTU(_pAllocator != 0);
   _pAllocator->Release();
   _pAllocator = 0;
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.62 2005/11/03 19:13:32 rodrigc Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.63 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplAAFEssenceAccess.h"
-#include <assert.h>
+#include "OMAssertions.h"
 #include "AAFResult.h"
 #include "AAFUtils.h"
 
@@ -989,7 +989,7 @@ AAFRESULT STDMETHODCALLTYPE
     // Return a IAAFEssenceMultiAccess interface to the new EssenceAccess
     // object.
 	  iUnk = static_cast<IUnknown *> (access->GetContainer());
-    assert(NULL != iUnk);
+    ASSERTU(NULL != iUnk);
 	  CHECK(iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)&pMultiAccess));
 	  if(destination != NULL)
 		{
@@ -1107,7 +1107,7 @@ ImplAAFMasterMob::ExtendMultiEssence(aafUID_t codecID,
     // Return a IAAFEssenceMultiAccess interface to the new EssenceAccess
     // object.
 	  iUnk = static_cast<IUnknown *> (access->GetContainer());
-    assert(NULL != iUnk);
+    ASSERTU(NULL != iUnk);
 	  CHECK(iUnk->QueryInterface(IID_IAAFEssenceMultiAccess, (void **)&pMultiAccess));
 	  if(destination != NULL)
 		{

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceAccess.cpp,v 1.94 2005/02/07 18:51:00 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFEssenceAccess.cpp,v 1.95 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,7 @@
 #include "ImplAAFSmartPointer.h"
 typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 #ifndef __AAFPrivate_h__
@@ -3092,7 +3092,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(iResultFormat->QueryInterface (IID_IAAFRoot, (void **)&iObj));
 		iResultFormat->Release();
 		iResultFormat = NULL;
-		assert (iObj);
+		ASSERTU (iObj);
 		CHECK(iObj->GetImplRep((void **)&arg));
 		*opsResult = static_cast<ImplAAFEssenceFormat*>(arg);
 	}
@@ -3138,7 +3138,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(iResultFormat->QueryInterface (IID_IAAFRoot, (void **)&iObj));
 		iResultFormat->Release();
 		iResultFormat = NULL;
-		assert (iObj);
+		ASSERTU (iObj);
 		CHECK(iObj->GetImplRep((void **)&arg));
 		*opsResult = static_cast<ImplAAFEssenceFormat*>(arg);
 	}

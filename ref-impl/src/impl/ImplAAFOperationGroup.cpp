@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFOperationGroup.cpp,v 1.61 2005/03/17 18:02:32 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFOperationGroup.cpp,v 1.62 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,7 +65,7 @@
 #include "ImplAAFDictionary.h"
 #include "ImplEnumAAFParameters.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <string.h>
 
 #include "AAFTypes.h"
@@ -178,7 +178,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_OBJECT_NOT_FOUND;
 
   *OperationDef = pOpDef;
-  assert (*OperationDef);
+  ASSERTU (*OperationDef);
   (*OperationDef)->AcquireReference ();
 
   return AAFRESULT_SUCCESS;
@@ -463,7 +463,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if (_parameters.find((*reinterpret_cast<const OMObjectIdentification *>(&argID)),
                              *ppParameter))
 	{
-		assert(NULL != *ppParameter);
+		ASSERTU(NULL != *ppParameter);
 		(*ppParameter)->AcquireReference();
 	}
 	else

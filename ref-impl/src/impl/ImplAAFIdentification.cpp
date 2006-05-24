@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFIdentification.cpp,v 1.50 2005/02/25 15:55:11 heydowns Exp $ $Name:  $
+// $Id: ImplAAFIdentification.cpp,v 1.51 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include <wchar.h>
 
 

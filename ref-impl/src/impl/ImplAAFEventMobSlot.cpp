@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEventMobSlot.cpp,v 1.22 2006/03/24 18:23:37 jlow Exp $ $Name:  $
+// $Id: ImplAAFEventMobSlot.cpp,v 1.23 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,6 @@
 #include "aafErr.h"
 #include "AAFUtils.h"
 
-#include <assert.h>
 #include <string.h>
 
 #include "ImplAAFSmartPointer.h"

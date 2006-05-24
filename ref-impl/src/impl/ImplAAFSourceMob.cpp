@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceMob.cpp,v 1.67 2005/02/07 18:51:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceMob.cpp,v 1.68 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@
 
 #include "ImplAAFDictionary.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "ImplAAFEssenceDescriptor.h"
 #include "ImplAAFSourceClip.h"
 #include "aafErr.h"

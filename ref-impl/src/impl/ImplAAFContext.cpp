@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFContext.cpp,v 1.35 2005/08/31 19:14:01 montrowe Exp $ $Name:  $
+// $Id: ImplAAFContext.cpp,v 1.36 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,7 +36,7 @@
 
 #include "AAFResult.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "ImplAAFPluginManager.h"
 
 #include "OMObjectManager.h"
@@ -57,7 +57,7 @@ extern "C" const aafClassID_t CLSID_AAFPluginManager;
   if (! _singleton)
   {
     _singleton = new ImplAAFContext;
-    assert(_singleton);
+    ASSERTU(_singleton);
     if (_singleton)
       _singleton->InitPluginManager(); 
   }
@@ -73,7 +73,7 @@ extern "C" const aafClassID_t CLSID_AAFPluginManager;
 ImplAAFContext::ImplAAFContext ()
 {
   // There Can Be Only One!
-  assert(NULL == _singleton);
+  ASSERTU(NULL == _singleton);
 
   _plugins = NULL;
   _progressCallback = 0;
@@ -103,7 +103,7 @@ void ImplAAFContext::InitPluginManager (void)
   if(_plugins == NULL)
   {
     _plugins = (ImplAAFPluginManager *)CreateImpl(CLSID_AAFPluginManager);
-    assert(NULL != _plugins);
+    ASSERTU(NULL != _plugins);
     if (_plugins)
       _plugins->Init();
   }

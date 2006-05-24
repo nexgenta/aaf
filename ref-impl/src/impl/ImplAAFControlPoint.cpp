@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFControlPoint.cpp,v 1.26 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFControlPoint.cpp,v 1.27 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,6 @@
 #include "ImplAAFHeader.h"
 #include "ImplAAFTypeDefIndirect.h"
 
-#include <assert.h>
 #include <string.h>
 #include "aafErr.h"
 

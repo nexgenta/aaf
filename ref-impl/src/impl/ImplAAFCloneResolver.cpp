@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCloneResolver.cpp,v 1.5 2004/09/10 17:13:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFCloneResolver.cpp,v 1.6 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 
 //=---------------------------------------------------------------------=
 
@@ -120,7 +120,7 @@ void ImplAAFCloneResolver::CloneClassDef( const OMClassId& id,
     _AAFCLONE_CHECK_HRESULT( AAFRESULT_BAD_TYPE );
   }
 
-  assert( sizeof(aafUID_t) == sizeof(id) );
+  ASSERTU( sizeof(aafUID_t) == sizeof(id) );
 
   ImplAAFSmartPointer<ImplAAFClassDef> spClassDef;
   _AAFCLONE_CHECK_HRESULT( pSrcDict->LookupClassDef( reinterpret_cast<const aafUID_t&>(id), &spClassDef) );

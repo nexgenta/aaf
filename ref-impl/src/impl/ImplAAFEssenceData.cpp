@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.cpp,v 1.29 2005/01/11 09:26:17 jfpanisset Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.cpp,v 1.30 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,6 @@
 #include "ImplAAFFileDescriptor.h"
 #endif
 
-#include <assert.h>
 #include <string.h>
 #include "AAFResult.h"
 

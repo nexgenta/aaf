@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPulldown.cpp,v 1.25 2005/02/08 10:38:16 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPulldown.cpp,v 1.26 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 #include "ImplAAFPulldown.h"
 #endif
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include <stdlib.h>
 #include <string.h>
 #include "aafErr.h"
@@ -529,7 +529,7 @@ AAFRESULT ImplAAFPulldown::ChangeContainedReferences(aafMobID_constref from,
 
 void ImplAAFPulldown::Accept(AAFComponentVisitor& visitor)
 {
-	assert(_inputSegment);
+	ASSERTU(_inputSegment);
 
 	_inputSegment->Accept(visitor);
 

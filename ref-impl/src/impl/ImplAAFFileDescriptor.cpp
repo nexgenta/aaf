@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFileDescriptor.cpp,v 1.32 2006/03/24 18:23:36 jlow Exp $ $Name:  $
+// $Id: ImplAAFFileDescriptor.cpp,v 1.33 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
+#include "OMAssertions.h"
 #include "AAFResult.h"
 
 // Declare these two functions to avoid including the whole ImplAAFDictionary.h
@@ -110,7 +110,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_PROP_NOT_PRESENT;	
 
 	*ppDef = _codecDef;
-	assert (*ppDef);
+	ASSERTU (*ppDef);
 
   if (*ppDef)
 	 (*ppDef)->AcquireReference ();
@@ -159,7 +159,7 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_PROP_NOT_PRESENT;	
 	
 	*ppDef = _containerFmt;
-	assert (*ppDef);
+	ASSERTU (*ppDef);
 	 (*ppDef)->AcquireReference ();
 	return AAFRESULT_SUCCESS;
 }

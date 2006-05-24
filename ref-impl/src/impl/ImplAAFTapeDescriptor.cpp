@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTapeDescriptor.cpp,v 1.28 2004/09/10 17:13:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTapeDescriptor.cpp,v 1.29 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include <wchar.h>
 #include "AAFResult.h"
 

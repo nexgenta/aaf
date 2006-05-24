@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceClip.cpp,v 1.49 2005/02/07 18:51:07 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFSourceClip.cpp,v 1.50 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 
-#include <assert.h>
 #include "AAFResult.h"
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
