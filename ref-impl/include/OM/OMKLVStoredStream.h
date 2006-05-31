@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.27 2005/08/24 16:05:29 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.28 2006/05/31 17:41:56 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -48,7 +48,7 @@ public:
 
     // @cmember Read <p size> bytes from this <c OMKLVStoredStream>
     //          into the buffer at address <p data>.
-  virtual void read(void* data, size_t size) const;
+  virtual void read(void* data, OMUInt32 size) const;
 
     // @cmember Attempt to read <p bytes> bytes from this
     //          <c OMKLVStoredStream> into the buffer at address <p data>.
@@ -59,7 +59,7 @@ public:
 
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMKLVStoredStream>.
-  virtual void write(void* data, size_t size);
+  virtual void write(void* data, OMUInt32 size);
 
     // @cmember Attempt to write <p bytes> bytes from the buffer at
     //          address <p data> to this <c OMKLVStoredStream>. The actual
