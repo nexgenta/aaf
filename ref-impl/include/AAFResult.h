@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.69 2006/01/12 18:49:06 rodrigc Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.70 2006/06/02 22:40:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -127,7 +127,7 @@
 #define AAFRESULT_DATA_NONCONTIG            MAKE_AAFHRESULT(0x0091)
 #define AAFRESULT_OPLIST_OVERFLOW           MAKE_AAFHRESULT(0x0092)
 #define AAFRESULT_STREAM_CLOSED             MAKE_AAFHRESULT(0x0093)
-#define AAF_RESULT_USE_MULTI_CREATE         MAKE_AAFHRESULT(0x0094)
+#define AAFRESULT_USE_MULTI_CREATE          MAKE_AAFHRESULT(0x0094)
 #define AAFRESULT_MEDIA_OPENMODE            MAKE_AAFHRESULT(0x0095)
 #define AAFRESULT_MEDIA_CANNOT_CLOSE        MAKE_AAFHRESULT(0x0096)
 #define AAFRESULT_CODEC_INVALID             MAKE_AAFHRESULT(0x0097)
@@ -346,5 +346,7 @@
 
 #define AAFRESULT_MAXCODE                   MAKE_AAFHRESULT(0x0401)
 
+/* For compatibility */
+#define AAF_RESULT_USE_MULTI_CREATE AAFRESULT_USE_MULTI_CREATE
 
 #endif // ! __AAFResult_h__
