@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.70 2006/06/02 22:40:51 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.71 2006/06/02 22:56:25 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,10 @@
 #define _FACILITY_AAF 0x12
 #define MAKE_AAFHRESULT( code ) \
     ((HRESULT) (((aafUInt32)(SEVERITY_ERROR)<<31) | ((aafUInt32)(_FACILITY_AAF)<<16) | ((aafUInt32)(code))) )
+
+/* Success codes */
+#define AAFRESULT_SUCCESS                                   0
+#define HRESULT_SUCCESS                                     0
 
 /* SESSION/FILE Error Codes */
 #define AAFRESULT_BAD_SESSION                MAKE_AAFHRESULT(0x0010)
@@ -318,9 +322,8 @@
 #define AAFRESULT_TEST_FAILED               MAKE_AAFHRESULT(0x01F4)
 #define AAFRESULT_TEST_PARTIAL_SUCCESS      MAKE_AAFHRESULT(0x01F5)
 #define AAFRESULT_NOT_IMPLEMENTED                           ((HRESULT)0x80004001L)
-#define AAFRESULT_SUCCESS                                   0
 #define HRESULT_NOT_IMPLEMENTED                             ((HRESULT)0x80004001L)
-#define HRESULT_SUCCESS                                     0
+
 
 /* Property access error codes */
 #define AAFRESULT_BAD_SIZE                       MAKE_AAFHRESULT(0x0200)
