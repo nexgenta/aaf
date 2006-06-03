@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.74 2006/06/03 03:13:04 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.75 2006/06/03 04:21:34 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -310,7 +310,7 @@
 #define AAFRESULT_INTERNAL_DIVIDE           MAKE_AAFHRESULT(0x01C9)
 #define AAFRESULT_ABSTRACT_CLASS            MAKE_AAFHRESULT(0x01CA)
 #define AAFRESULT_WRONG_SIZE                MAKE_AAFHRESULT(0x01CB)
-#define AAFRESULT_INCONSISTANCY             MAKE_AAFHRESULT(0x01CC)
+#define AAFRESULT_INCONSISTENCY             MAKE_AAFHRESULT(0x01CC)
 
 /* Reference implementation assertion violation (programming error) */
 #define AAFRESULT_ASSERTION_VIOLATION       MAKE_AAFHRESULT(0x01D0)
@@ -346,6 +346,7 @@
 
 /* For compatibility */
 #define AAF_RESULT_USE_MULTI_CREATE AAFRESULT_USE_MULTI_CREATE
+#define AAFRESULT_INCONSISTANCY                 AAFRESULT_INCONSISTENCY
 
 /* Non-AAF codes */
 #define HRESULT_NOT_IMPLEMENTED                  ((HRESULT)0x80004001L)
