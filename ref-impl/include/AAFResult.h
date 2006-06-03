@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.73 2006/06/03 02:40:55 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.74 2006/06/03 03:13:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -343,8 +343,6 @@
 #define AAFRESULT_DLL_SYMBOL_NOT_FOUND           MAKE_AAFHRESULT(0x0401)
     /* Expected symbol not exported from DLL. Need newer DLL. */
 
-
-#define AAFRESULT_MAXCODE                   MAKE_AAFHRESULT(0x0401)
 
 /* For compatibility */
 #define AAF_RESULT_USE_MULTI_CREATE AAFRESULT_USE_MULTI_CREATE

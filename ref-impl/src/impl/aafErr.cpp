@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafErr.cpp,v 1.12 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: aafErr.cpp,v 1.13 2006/06/03 03:13:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@ static char    *localErrorStrings[300];
 char *aafGetErrorString(
 		aafErr_t code)
 {
-	if (code < AAFRESULT_MAXCODE && code >= 0 && localErrorStrings[0] != '\0')
+	if (code < 300 && code >= 0 && localErrorStrings[0] != '\0')
 		return (localErrorStrings[code]);
 	else
 		return ("AAF_ERR: Unknown error code");

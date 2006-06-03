@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxHrMap.cpp,v 1.11 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: AxHrMap.cpp,v 1.12 2006/06/03 03:13:03 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -194,7 +194,6 @@ AxHrMap::AxHrMap()
 	MAP_ADD( AAFRESULT_JPEGPCM );
 	MAP_ADD( AAFRESULT_JPEGPROBLEM );
 	MAP_ADD( AAFRESULT_LEADING_TRAN );
-	MAP_ADD( AAFRESULT_MAXCODE );
 	MAP_ADD( AAFRESULT_MEDIASTREAM_NOTALLOWED );
 	MAP_ADD( AAFRESULT_MEDIA_CANNOT_CLOSE );
 	MAP_ADD( AAFRESULT_MEDIA_NOT_FOUND );
