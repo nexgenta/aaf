@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: typeDefUid.cpp,v 1.14 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: typeDefUid.cpp,v 1.15 2006/06/05 22:50:55 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -114,7 +114,7 @@ const char* prefix = "kAAFTypeID_";
 #define AAF_REFERENCE_TYPE(type, target)      AAF_TYPE(target##type)
 #define AAF_REFERENCE_TYPE_NAME(type, target) AAF_TYPE(target##type)
 
-struct {
+struct typesTag {
   char* name;
   uid identifier;
 } types [] = {
