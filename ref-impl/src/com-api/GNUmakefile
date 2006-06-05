@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.20 2005/04/02 21:13:19 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.21 2006/06/05 20:09:23 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -91,9 +91,6 @@ $(DYN_LIBTARGET) : $(CXXOBJS) $(CXXOBJS2) \
 				$(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)/libimpl$(LIB) \
 				$(AAFBUILDDIR)/OM/$(AAFTARGETDIR)/libom$(LIB) $(STORAGE_LIBS)
 
-ifeq ($(AAFPLATFORM),PPCDarwin)
-	ranlib -s $(STORAGE_LIBS)
-endif
 	$(LD_DYN_LIB) $(CXXOBJS) $(CXXOBJS2) -o $@ \
 	$(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)/libimpl$(LIB) \
 	$(AAFBUILDDIR)/OM/$(AAFTARGETDIR)/libom$(LIB) \
