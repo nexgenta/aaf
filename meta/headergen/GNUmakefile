@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.17 2005/06/14 20:26:28 montrowe Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.18 2006/06/05 22:51:34 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 # the License for the specific language governing rights and limitations
 # under the License.
 #
-# The Original Code of this file is Copyright 1998-2005, Licensor of the
+# The Original Code of this file is Copyright 1998-2006, Licensor of the
 # AAF Association.
 #
 # The Initial Developer of the Original Code of this file and the
@@ -27,7 +27,7 @@ GEN_H_DIR=./include
 EXE=
 OBJ=.o
 COMPILE=c++
-COMPILEFLAGS=-I.. -I../../ref-impl/include/ref-api -I../../ref-impl/include
+COMPILEFLAGS=-Wall -Werror -I.. -I../../ref-impl/include/ref-api -I../../ref-impl/include
 LINK=c++
 RM=rm -f
 CP= cp -p
