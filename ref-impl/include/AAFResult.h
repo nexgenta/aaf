@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.77 2006/06/05 19:54:22 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.78 2006/06/05 21:26:32 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -344,7 +344,7 @@
 
 
 /* For compatibility */
-#define AAF_RESULT_USE_MULTI_CREATE AAFRESULT_USE_MULTI_CREATE
+#define AAF_RESULT_USE_MULTI_CREATE               AAFRESULT_USE_MULTI_CREATE
 #define AAFRESULT_INCONSISTANCY                   AAFRESULT_INCONSISTENCY
 
 /* Non-AAF codes */
