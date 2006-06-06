@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.11 2006/06/06 21:48:22 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.12 2006/06/06 21:59:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -108,7 +108,7 @@ static void doFile(const char* moduleName)
 
   cout << "#define MAKE_AAFHRESULT( code ) \\";
   cout << endl;
-  cout << "    ((HRESULT) (((aafUInt32)(SEVERITY_ERROR)<<31) | \\";
+  cout << "    ((HRESULT) (((aafUInt32)(1)             <<31) | \\";
   cout << endl;
   cout << "                ((aafUInt32)(_FACILITY_AAF) <<16) | \\";
   cout << endl;
