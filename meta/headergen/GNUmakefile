@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.19 2006/06/06 03:03:47 tbingham Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.20 2006/06/06 04:10:13 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -115,7 +115,7 @@ genDefInstances$(OBJ) : genDefInstances.cpp headerGenUtils.h ../AAFMetaDictionar
 result$(EXE) : headerGenUtils$(OBJ) result$(OBJ)
 	$(LINK) $^ -o $@
 
-result$(OBJ) : result.cpp headerGenUtils.h ../AAFMetaDictionary.h
+result$(OBJ) : result.cpp headerGenUtils.h ../../ref-impl/include/AAFMetaResult.h
 	$(COMPILE) $(COMPILEFLAGS) -c $< -o $@
 
 
