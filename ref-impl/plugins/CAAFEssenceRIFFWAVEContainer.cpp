@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.3 2005/03/18 18:18:54 phil_tudor Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEContainer.cpp,v 1.4 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -371,7 +371,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	plugin_trace("CAAFEssenceRIFFWAVEContainer::CreateEssenceStreamWriteOnly()\n");
 
-  return HRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 

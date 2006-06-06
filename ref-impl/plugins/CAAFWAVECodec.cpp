@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.67 2005/03/21 13:59:14 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.68 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -335,7 +335,7 @@ HRESULT STDMETHODCALLTYPE
   if (! pDataDefID)
 	return AAFRESULT_NOT_IMPLEMENTED;
 
-  return HRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 //!!!Need a way to convert between CLSID and aafUID_t
@@ -459,7 +459,7 @@ HRESULT STDMETHODCALLTYPE
 		wchar_t *   /*pName*/,
         aafUInt32  * /*bytesWritten*/)
 {
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 		

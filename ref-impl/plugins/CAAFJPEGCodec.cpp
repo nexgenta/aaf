@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.56 2006/03/11 21:23:12 terabrit Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.57 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -667,7 +667,7 @@ HRESULT STDMETHODCALLTYPE
 	if (NULL == pFlavour)
 		return AAFRESULT_NULL_PARAM;
 
-  return HRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 HRESULT STDMETHODCALLTYPE
@@ -878,7 +878,7 @@ HRESULT STDMETHODCALLTYPE
 		  NULL == pName   || NULL == bytesWritten)
 		return AAFRESULT_NULL_PARAM;
 
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 		

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.11 2005/09/27 09:36:00 philipn Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.12 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -527,7 +527,7 @@ HRESULT STDMETHODCALLTYPE
   if (! pDataDefID)
 	return AAFRESULT_NOT_IMPLEMENTED;
 
-  return HRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 //!!!Need a way to convert between CLSID and aafUID_t
@@ -645,7 +645,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	plugin_trace("CAAFPCMCodec::ValidateEssence()\n");
 
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 

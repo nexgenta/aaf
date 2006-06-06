@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.16 2005/03/31 13:32:57 phil_tudor Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.17 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -339,7 +339,7 @@ CAAFAIFCCodec::GetIndexedDataDefinition (aafUInt32  /*index*/,
 	if (! pDataDefID)
 		return AAFRESULT_NOT_IMPLEMENTED;
 	
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 //!!!Need a way to convert between CLSID and aafUID_t
@@ -463,7 +463,7 @@ CAAFAIFCCodec::ValidateEssence (IAAFSourceMob * /*fileMob*/,
 								wchar_t *   /*pName*/,
 								aafUInt32  * /*bytesWritten*/)
 {
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 

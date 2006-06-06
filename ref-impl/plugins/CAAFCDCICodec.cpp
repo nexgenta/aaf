@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.25 2005/08/30 22:26:17 rodrigc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.26 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -674,7 +674,7 @@ HRESULT STDMETHODCALLTYPE
 	if (NULL == pFlavour)
 		return AAFRESULT_NULL_PARAM;
 
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
@@ -817,7 +817,7 @@ HRESULT STDMETHODCALLTYPE
 		formatPAL = false;
 	}
 	else
-		return HRESULT_NOT_IMPLEMENTED;
+		return AAFRESULT_NOT_IMPLEMENTED;
 
 	SetCodecState();
 
@@ -1003,7 +1003,7 @@ HRESULT STDMETHODCALLTYPE
 		  NULL == pName   || NULL == bytesWritten)
 		return AAFRESULT_NULL_PARAM;
 
-	return HRESULT_NOT_IMPLEMENTED;
+	return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 

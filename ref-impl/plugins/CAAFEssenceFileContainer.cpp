@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceFileContainer.cpp,v 1.28 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceFileContainer.cpp,v 1.29 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -339,7 +339,7 @@ HRESULT STDMETHODCALLTYPE
         aafMobID_constptr /* pMobID */,
         IAAFEssenceStream ** /* ppEssenceStream */)
 {
-  return HRESULT_NOT_IMPLEMENTED;
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 
