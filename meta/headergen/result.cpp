@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.9 2006/06/06 15:00:38 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.10 2006/06/06 16:00:39 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,6 +67,13 @@ void genCode(const char* name, unsigned long int val, const char* desc)
   cout << endl;
 }
 
+void success(const char* name, unsigned long int val)
+{
+  cout << "#define ";
+  printName(name, 52, cout);
+  cout << val << endl;
+}
+
 void alias(const char* fullOldName, const char* name)
 {
   cout << "#define " << fullOldName;
@@ -91,6 +98,7 @@ static void doFile(const char* moduleName)
 
 #define AAF_ERROR_SECTION(s) section(s);
 #define AAF_DEFINE_ERROR(name, val, desc) genCode(#name, val, desc);
+#define AAF_DEFINE_SUCCESS(name, code) success("AAFRESULT_"#name, code);
 #define AAF_DEFINE_ERROR_ALIAS(fullOldName, name) alias(#fullOldName, #name);
 #include "AAFMetaResult.h"
 
