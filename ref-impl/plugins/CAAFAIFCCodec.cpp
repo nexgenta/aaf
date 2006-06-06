@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.17 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.18 2006/06/06 17:14:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1038,7 +1038,7 @@ CAAFAIFCCodec::CompleteWrite (IAAFSourceMob *fileMob)
 	}
 	XEND;
 	
-	return HRESULT_SUCCESS;
+	return AAFRESULT_SUCCESS;
 }		
 
 
@@ -1078,7 +1078,7 @@ CAAFAIFCCodec::ReadRawData (aafUInt32 nSamples,
 	XEXCEPT
 		XEND
 		
-		return HRESULT_SUCCESS;
+		return AAFRESULT_SUCCESS;
 }
 
 
@@ -1415,7 +1415,7 @@ CAAFAIFCCodec::MultiOpen (IAAFSourceMob *unk,
 
 AAFRESULT CAAFAIFCCodec::SetCompressionEnabled (aafCompressEnable_t /*compEnable*/)
 {
-	return HRESULT_SUCCESS;
+	return AAFRESULT_SUCCESS;
 }
 
 /************************

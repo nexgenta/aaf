@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.68 2006/06/06 04:18:11 tbingham Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.69 2006/06/06 17:14:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1039,7 +1039,7 @@ HRESULT STDMETHODCALLTYPE
 	}
 	XEND;
 
-	return HRESULT_SUCCESS;
+	return AAFRESULT_SUCCESS;
 }		
 
 
@@ -1080,7 +1080,7 @@ HRESULT STDMETHODCALLTYPE
 	XEXCEPT
 	XEND
 
-	return HRESULT_SUCCESS;
+	return AAFRESULT_SUCCESS;
 }
 
 
@@ -1402,7 +1402,7 @@ HRESULT STDMETHODCALLTYPE
 
 AAFRESULT CAAFWaveCodec::SetCompressionEnabled (aafCompressEnable_t /*compEnable*/)
 {
-  return HRESULT_SUCCESS;
+  return AAFRESULT_SUCCESS;
 }
 
 /************************
