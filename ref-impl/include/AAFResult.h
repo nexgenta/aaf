@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.78 2006/06/05 21:26:32 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.79 2006/06/06 16:13:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,6 @@
 
 /* Success codes */
 #define AAFRESULT_SUCCESS                                   0
-#define HRESULT_SUCCESS                                     0
 
 /* SESSION/FILE Error Codes */
 #define AAFRESULT_BAD_SESSION                     MAKE_AAFHRESULT(0x0010)
@@ -346,6 +345,7 @@
 /* For compatibility */
 #define AAF_RESULT_USE_MULTI_CREATE               AAFRESULT_USE_MULTI_CREATE
 #define AAFRESULT_INCONSISTANCY                   AAFRESULT_INCONSISTENCY
+#define HRESULT_SUCCESS                           AAFRESULT_SUCCESS
 
 /* Non-AAF codes */
 #define HRESULT_NOT_IMPLEMENTED                   ((HRESULT)0x80004001L)
