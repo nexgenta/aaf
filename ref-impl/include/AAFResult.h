@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFResult.h,v 1.80 2006/06/06 17:41:46 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.81 2006/06/06 21:18:23 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 #define MAKE_AAFHRESULT( code ) \
     ((HRESULT) (((aafUInt32)(SEVERITY_ERROR)<<31) | ((aafUInt32)(_FACILITY_AAF)<<16) | ((aafUInt32)(code))) )
 
-/* Legacy non-AAF codes */
+/* Non-AAF codes */
 #define AAFRESULT_NOT_IMPLEMENTED                 ((HRESULT)0x80004001L)
 
 /* Success codes */
