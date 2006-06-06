@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.7 2006/06/06 03:15:20 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.8 2006/06/06 03:32:47 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,7 +62,7 @@ void genCode(const char* name, unsigned long int val, const char* desc)
   } else {
     cout << " ";
   }
-  cout << "0x" << hex << val + 0x80000000 + 0x120000;
+  cout << "((HRESULT)0x" << hex << val + 0x80000000 + 0x120000 <<")";
   cout << endl;
 }
 
