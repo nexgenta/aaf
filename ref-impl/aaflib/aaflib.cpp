@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.39 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.40 2006/06/07 16:07:29 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 #include "aaflib.h"
 
 #include "AAFResult.h"
+#include "AAFSDKBuild.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -157,6 +158,30 @@ static HRESULT LoadIfNecessary(AAFDLL **ppAAFDLL)
   
   *ppAAFDLL = pAAFDLL;
   return hr;
+}
+
+
+//***********************************************************
+//
+// AAFGetStaticLibraryVersion()
+//
+// Provides the version of this static library.
+//
+static const aafProductVersion_t impl_version = {
+  AAF_MAJOR_VERSION,
+  AAF_MINOR_VERSION,
+  AAF_MAINT_RELEASE,
+  AAF_PATCH_LEVEL,
+  AAF_RELEASE_STAGE
+};
+STDAPI AAFGetStaticLibraryVersion
+  (aafProductVersion_t *  pVersion)
+{
+  if (pVersion == NULL)
+    return AAFRESULT_NULL_PARAM;
+  
+  *pVersion = impl_version;
+  return S_OK;
 }
 
 //***********************************************************

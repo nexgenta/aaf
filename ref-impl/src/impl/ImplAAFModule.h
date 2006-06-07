@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.18 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.19 2006/06/07 16:07:30 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -504,6 +504,18 @@ ImplAAFGetLibraryVersion
   (aafProductVersion_t *  pVersion);
 
 extern const aafProductVersion_t AAFReferenceImplementationVersion;
+
+// The real AAFGetStaticLibraryVersion is implemented in aaflib.
+// This function is here for two reasons:
+// 1.  The dodo machinery requires it
+// 2.  If someone were to link directly to the AAF DLL (rather than load
+//        via aaflib's functionality), then they have the corresponding 
+//        function.
+// Thus, this function is implemented with the second case in mind.  
+// Since there is no separate static library to version against, this function
+// returns the same as calling ImplAAFGetLibraryVersion.
+STDAPI ImplAAFGetStaticLibraryVersion
+  (aafProductVersion_t *  pVersion);
 
 STDAPI ImplAAFGetLibraryPathNameBufLen
   (aafUInt32 *  pBufSize);

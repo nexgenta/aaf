@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFModule.dod,v 1.29 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+#c $Id: AAFModule.dod,v 1.30 2006/06/07 16:07:29 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -879,6 +879,33 @@ AD_XFUNCTION1(AAFGetLibraryVersion,
 			  The library version,
 			Return the version of the AAF library currently
   /// running on this machine\, which implements these interfaces.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pVersion pointer is valid.
+  /// 
+  /// If this method fails nothing is written to *pVersion.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pVersion is null.)
+
+AD_XFUNCTION1(AAFGetStaticLibraryVersion,
+			[out\, retval],
+			  objPass,
+			  aafProductVersion_t *,
+			  pVersion,
+			  The static library version,
+			Return the version of the static \(aaflib\) library
+  /// linked against the calling appplication. This version may be the same as
+  /// or different from the version of the \(dynamically linked\) AAF Library
+  /// containing the implementation of the various interfaces.  The version
+  /// of the AAF Library may be obtained by calling AAFGetLibraryVersion\(\).
   /// 
   /// Succeeds if all of the following are true:
   /// - the pVersion pointer is valid.
