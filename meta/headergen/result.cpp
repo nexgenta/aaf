@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.16 2006/06/07 16:18:05 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.17 2006/06/07 16:20:13 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,11 @@ void section(const char* s)
   cout << endl;
 }
 
+void printCode(unsigned long int code, ostream& s) 
+{
+  s << "((HRESULT)0x" << hex << code + 0x80000000 + 0x120000 <<")";
+}
+
 void genCode(const char* name, unsigned long int val, const char* desc)
 {
   if (strlen(desc) != 0) {
@@ -54,7 +59,7 @@ void genCode(const char* name, unsigned long int val, const char* desc)
   }
   cout << "#define ";
   printName(name, 42, cout);
-  cout << "((HRESULT)0x" << hex << val + 0x80000000 + 0x120000 <<")";
+  printCode(val, cout);
   cout << endl;
 }
 
