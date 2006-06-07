@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.15 2006/06/07 16:13:51 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.16 2006/06/07 16:18:05 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,18 +67,10 @@ void success(const char* name, unsigned long int val)
 
 void alias(const char* fullOldName, const char* name)
 {
-  cout << "#define " << fullOldName;
-  size_t len = strlen(fullOldName);
-  const size_t codeAlign = 32 + strlen("AAFRESULT_");
-  if (len < codeAlign) {
-    size_t spaces = codeAlign - len;
-    for (size_t i = 0; i < spaces; i++) {
-      cout << " ";
-    }
-  } else {
-    cout << " ";
-  }
-  cout << "AAFRESULT_" << name << endl;
+  cout << "#define ";
+  printName(fullOldName, 42, cout);
+  printName(name, 0, cout);
+  cout << endl;
 }
 
 void printBoilerPlate(ostream& s)
@@ -122,8 +114,10 @@ static void doFile(const char* moduleName)
 #define AAF_ERROR_SECTION(s) section(s);
 #define AAF_DEFINE_ERROR(name, val, desc) \
         genCode("AAFRESULT_"#name, val, desc);
-#define AAF_DEFINE_SUCCESS(name, code) success("AAFRESULT_"#name, code);
-#define AAF_DEFINE_ERROR_ALIAS(fullOldName, name) alias(#fullOldName, #name);
+#define AAF_DEFINE_SUCCESS(name, code) \
+        success("AAFRESULT_"#name, code);
+#define AAF_DEFINE_ERROR_ALIAS(fullOldName, name) \
+        alias(#fullOldName, "AAFRESULT_"#name);
 #include "AAFMetaResult.h"
 
   printEndGuard(moduleName, cout);
