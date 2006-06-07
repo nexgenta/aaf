@@ -1084,7 +1084,7 @@ void __RPC_USER MIDL_user_free( void * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.20 2006/05/16 21:49:24 heydowns Exp $ $Name:  $
+// $Id: AAF.h,v 1.21 2006/06/07 19:26:59 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47054,6 +47054,8 @@ STDAPI AAFSetProgressCallback (IAAFProgress*  pProgress);
 STDAPI AAFGetFileEncodings (IEnumAAFFileEncodings ** ppFileEncodings);
 
 STDAPI AAFGetLibraryVersion (aafProductVersion_t *  pVersion);
+
+STDAPI AAFGetStaticLibraryVersion (aafProductVersion_t *  pVersion);
 
 STDAPI AAFGetLibraryPathNameBufLen (aafUInt32 *  pBufSize);
 
