@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.17 2006/06/07 16:20:13 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.18 2006/06/07 16:24:00 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@ void section(const char* s)
 
 void printCode(unsigned long int code, ostream& s) 
 {
+  s.setf(ios::uppercase);
   s << "((HRESULT)0x" << hex << code + 0x80000000 + 0x120000 <<")";
 }
 
