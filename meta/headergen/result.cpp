@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.12 2006/06/06 21:59:20 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.13 2006/06/07 16:06:45 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -119,7 +119,8 @@ static void doFile(const char* moduleName)
 
   cout << "/* Non-AAF codes */";
   cout << endl;
-  cout << "#define AAFRESULT_NOT_IMPLEMENTED                 ((HRESULT)0x80004001L)";
+  cout << "#define AAFRESULT_NOT_IMPLEMENTED                 ";
+  cout << "((HRESULT)0x80004001L)";
   cout << endl;
 
 #define AAF_ERROR_SECTION(s) section(s);
