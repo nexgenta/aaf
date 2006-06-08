@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.40 2006/06/07 16:07:29 heydowns Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.41 2006/06/08 14:55:05 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -915,7 +915,20 @@ STDAPI AAFGetLibraryPathName
   return hr;
 }
 
+STDAPI AAFResultToTextBufLen (
+    AAFRESULT  /* result */,
+    aafUInt32 *   /* pResultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
+STDAPI AAFResultToText (
+    AAFRESULT  /* result */,
+    aafCharacter *  /* pResultText */,
+    aafUInt32  /* resultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
 //***********************************************************
 //

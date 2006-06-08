@@ -2,7 +2,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAF.idl,v 1.34 2006/06/07 16:07:29 heydowns Exp $ $Name:  $")
+cpp_quote("// $Id: AAF.idl,v 1.35 2006/06/08 14:55:05 tbingham Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -50117,6 +50117,83 @@ cpp_quote("")
 cpp_quote("STDAPI AAFGetLibraryPathName (")
 cpp_quote("          aafCharacter *  pLibraryPathName,")
 cpp_quote("          aafUInt32  bufSize);")
+cpp_quote("")
+
+  //***********************************************************
+  //
+  // AAFResultToTextBufLen()
+  //
+  /// Returns the size of the buffer, in bytes, required for the AAFResultToText() function.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pResultTextSize pointer is valid.
+  /// - the result is an AAFRESULT.
+  /// - the result is a recognized AAFRESULT.
+  ///
+  /// If this method fails nothing will be written to *pResultTextSize.
+  ///
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pResultTextSize arg is NULL.
+  ///
+  /// AAFRESULT_RESULT_NOT_AAF
+  ///   - result is not an AAFRESULT.
+  ///
+  /// AAFRESULT_RESULT_NOT_RECOGNIZED
+  ///   - result is not a recognized AAFRESULT.
+  ///
+  /// @param result [in] The result
+  /// @param pResultTextSize [out] The size of the required buffer, in bytes.
+  /// 
+cpp_quote("STDAPI AAFResultToTextBufLen (")
+cpp_quote("          AAFRESULT  result,")
+cpp_quote("          aafUInt32 *   pResultTextSize);")
+cpp_quote("")
+
+
+  //***********************************************************
+  //
+  // AAFResultToText()
+  //
+  /// /// Returns the text representation of an AAFRESULT.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pResultText pointer is valid.
+  /// - the result is an AAFRESULT.
+  /// - the result is a recognized AAFRESULT.
+  /// - the buffer is large enough to hold the result text.
+  ///
+  /// If this method fails nothing will be written to resultText.
+  ///
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pResultText arg is NULL.
+  ///
+  /// AAFRESULT_RESULT_NOT_AAF
+  ///   - result is not an AAFRESULT.
+  ///
+  /// AAFRESULT_RESULT_NOT_RECOGNIZED
+  ///   - result is not a recognized AAFRESULT.
+  ///
+  /// AAFRESULT_SMALLBUF
+  ///   - pResultText is too small to hold the result text.
+  /// 
+  /// @param result [in] The result
+  /// @param pResultText [out, string, size_is(resultTextSize)] The text representation of the result
+  /// @param resultTextSize [in] The size, in bytes, of pResultText
+  /// 
+cpp_quote("STDAPI AAFResultToText (")
+cpp_quote("          AAFRESULT  result,")
+cpp_quote("          aafCharacter *  pResultText,")
+cpp_quote("          aafUInt32  resultTextSize);")
 cpp_quote("")
 
 

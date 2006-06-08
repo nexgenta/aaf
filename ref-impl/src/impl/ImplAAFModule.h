@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.19 2006/06/07 16:07:30 heydowns Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.20 2006/06/08 14:55:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -523,3 +523,12 @@ STDAPI ImplAAFGetLibraryPathNameBufLen
 STDAPI ImplAAFGetLibraryPathName
    (aafCharacter *  pLibraryPathName,
     aafUInt32  bufSize);
+
+STDAPI ImplAAFResultToTextBufLen (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+STDAPI ImplAAFResultToText (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);

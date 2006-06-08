@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.35 2006/06/07 16:07:29 heydowns Exp $ $Name:  $
+// $Id: AAF.h,v 1.36 2006/06/08 14:55:10 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50337,6 +50337,81 @@ DECLARE_INTERFACE_(IAAFTypeDefVariableArrayEx, IUnknown)
   STDAPI AAFGetLibraryPathName (
     aafCharacter *  pLibraryPathName,
     aafUInt32  bufSize);
+
+  //***********************************************************
+  //
+  // AAFResultToTextBufLen()
+  //
+  /// Returns the size of the buffer, in bytes, required for the AAFResultToText() function.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pResultTextSize pointer is valid.
+  /// - the result is an AAFRESULT.
+  /// - the result is a recognized AAFRESULT.
+  ///
+  /// If this method fails nothing will be written to *pResultTextSize.
+  ///
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pResultTextSize arg is NULL.
+  ///
+  /// AAFRESULT_RESULT_NOT_AAF
+  ///   - result is not an AAFRESULT.
+  ///
+  /// AAFRESULT_RESULT_NOT_RECOGNIZED
+  ///   - result is not a recognized AAFRESULT.
+  /// 
+  /// @param result [in] The result
+  /// @param pResultTextSize [out] The size of the required buffer, in bytes.
+  /// 
+  STDAPI AAFResultToTextBufLen (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+
+  //***********************************************************
+  //
+  // AAFResultToText()
+  //
+  /// /// Returns the text representation of an AAFRESULT.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pResultText pointer is valid.
+  /// - the result is an AAFRESULT.
+  /// - the result is a recognized AAFRESULT.
+  /// - the buffer is large enough to hold the result text.
+  ///
+  /// If this method fails nothing will be written to resultText.
+  ///
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pResultText arg is NULL.
+  ///
+  /// AAFRESULT_RESULT_NOT_AAF
+  ///   - result is not an AAFRESULT.
+  ///
+  /// AAFRESULT_RESULT_NOT_RECOGNIZED
+  ///   - result is not a recognized AAFRESULT.
+  ///
+  /// AAFRESULT_SMALLBUF
+  ///   - pResultText is too small to hold the result text.
+  /// 
+  /// @param result [in] The result
+  /// @param pResultText [out, string, size_is(resultTextSize)] The text representation of the result
+  /// @param resultTextSize [in] The size, in bytes, of pResultText
+  /// 
+  STDAPI AAFResultToText (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);
 
 
 #endif // __AAF_h__

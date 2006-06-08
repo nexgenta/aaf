@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.38 2006/06/07 16:07:30 heydowns Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.39 2006/06/08 14:55:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1512,4 +1512,19 @@ STDAPI ImplAAFGetLibraryPathName
 
   convertStringToWideString(pLibraryPathName, path, bufSize / sizeof(aafCharacter));
   return AAFRESULT_SUCCESS;
+}
+
+STDAPI ImplAAFResultToTextBufLen (
+    AAFRESULT  /* result */,
+    aafUInt32 *   /* pResultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+STDAPI ImplAAFResultToText (
+    AAFRESULT  /* result */,
+    aafCharacter *  /* pResultText */,
+    aafUInt32  /* resultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
