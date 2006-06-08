@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.39 2006/06/08 14:55:14 tbingham Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.40 2006/06/08 17:51:30 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1471,7 +1471,7 @@ STDAPI
 ImplAAFGetStaticLibraryVersion
   (aafProductVersion_t *  pVersion)
 {
-  return ImplAAFGetLibraryVersion(pVersion);
+  return AAFRESULT_NOT_IMPLEMENTED;
 }
 
 extern "C" const char * AAFGetLibraryPath();

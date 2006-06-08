@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.h,v 1.20 2006/06/08 14:55:14 tbingham Exp $ $Name:  $
+// $Id: ImplAAFModule.h,v 1.21 2006/06/08 17:51:31 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -512,8 +512,8 @@ extern const aafProductVersion_t AAFReferenceImplementationVersion;
 //        via aaflib's functionality), then they have the corresponding 
 //        function.
 // Thus, this function is implemented with the second case in mind.  
-// Since there is no separate static library to version against, this function
-// returns the same as calling ImplAAFGetLibraryVersion.
+// However, this function has no meaning in that context, thus NOT_IMPLEMENTED
+// is always returned.
 STDAPI ImplAAFGetStaticLibraryVersion
   (aafProductVersion_t *  pVersion);
 
