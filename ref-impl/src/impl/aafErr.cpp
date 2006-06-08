@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafErr.cpp,v 1.13 2006/06/03 03:13:04 tbingham Exp $ $Name:  $
+// $Id: aafErr.cpp,v 1.14 2006/06/08 20:31:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,9 +24,22 @@
 
 
 #include <string.h>
-
 #include "aafErr.h"
-//#include "omPvt.h"
+
+AAFRESULT ResultToTextBufLen (
+    AAFRESULT  /* result */,
+    aafUInt32 *   /* pResultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
+
+AAFRESULT ResultToText (
+    AAFRESULT  /* result */,
+    aafCharacter *  /* pResultText */,
+    aafUInt32  /* resultTextSize */)
+{
+  return AAFRESULT_NOT_IMPLEMENTED;
+}
 
 static char    *localErrorStrings[300];
 /* A 75-column ruler

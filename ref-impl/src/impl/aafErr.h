@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafErr.h,v 1.11 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: aafErr.h,v 1.12 2006/06/08 20:31:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,16 @@ typedef AAFRESULT aafErr_t;
  * Externally visible routines
  *
  *************************************************************/
+
+AAFRESULT ResultToTextBufLen (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+AAFRESULT ResultToText (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);
+
 char    *aafGetErrorString(aafErr_t code);
 char		*aafGetExpandedErrorString(AAFFile * file,
 											aafErr_t code,

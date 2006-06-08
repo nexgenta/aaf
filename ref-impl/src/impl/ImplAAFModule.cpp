@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.40 2006/06/08 17:51:30 heydowns Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.41 2006/06/08 20:31:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -64,6 +64,7 @@
 
 #include "ImplAAFSmartPointer.h"
 #include "AAFUtils.h"
+#include "aafErr.h"
 
 typedef ImplAAFSmartPointer<ImplAAFFile> ImplAAFFileSP;
 
@@ -1515,16 +1516,22 @@ STDAPI ImplAAFGetLibraryPathName
 }
 
 STDAPI ImplAAFResultToTextBufLen (
-    AAFRESULT  /* result */,
-    aafUInt32 *   /* pResultTextSize */)
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (pResultTextSize == 0)
+    return  AAFRESULT_NULL_PARAM;
+
+  return ResultToTextBufLen(result, pResultTextSize);
 }
 
 STDAPI ImplAAFResultToText (
-    AAFRESULT  /* result */,
-    aafCharacter *  /* pResultText */,
-    aafUInt32  /* resultTextSize */)
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (pResultText == 0)
+    return  AAFRESULT_NULL_PARAM;
+
+  return ResultToText(result, pResultText, resultTextSize);
 }

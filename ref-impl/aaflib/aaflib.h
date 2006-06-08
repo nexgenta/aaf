@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.h,v 1.20 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: aaflib.h,v 1.21 2006/06/08 20:31:35 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -148,6 +148,15 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETLIBRARYPATHNAMEBUFLEN)(
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETLIBRARYPATHNAME)(
     aafCharacter *  pLibraryPathName,
     aafUInt32  bufSize);
+
+typedef STDAPICALLTYPE HRESULT (* LPAAFRESULTTOTEXTBUFLEN) (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+typedef STDAPICALLTYPE HRESULT (* LPAAFRESULTTOTEXT) (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);
 
 #else
 //
@@ -414,6 +423,15 @@ public:
     aafCharacter *  pLibraryPathName,
     aafUInt32  bufSize);
 
+  HRESULT ResultToTextBufLen (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+  HRESULT ResultToText (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);
+
 protected:
   //
   // The single instance of the dll wrapper.
@@ -450,6 +468,8 @@ protected:
   LPFNAAFGETLIBRARYVERSION         _pfnGetLibraryVersion;
   LPFNAAFGETLIBRARYPATHNAMEBUFLEN  _pfnGetLibraryPathNameBufLen;
   LPFNAAFGETLIBRARYPATHNAME        _pfnGetLibraryPathName;
+  LPAAFRESULTTOTEXTBUFLEN          _pfnResultToTextBufLen;
+  LPAAFRESULTTOTEXT                _pfnResultToText;
 };
 
 #endif /* __aaflib_h__ */
