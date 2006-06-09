@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFMetaResult.h,v 1.14 2006/06/09 23:19:25 tbingham Exp $ $Name:  $
+// $Id: AAFMetaResult.h,v 1.15 2006/06/09 23:25:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -350,6 +350,12 @@ AAF_DEFINE_ERROR(DLL_LOAD_FAILED,                0x0400,
     "Either the DLL or a dependent DLL could not be found and loaded")
 AAF_DEFINE_ERROR(DLL_SYMBOL_NOT_FOUND,           0x0401,
     "Expected symbol not exported from DLL. Need newer DLL")
+
+AAF_ERROR_SECTION("Result code -> text error codes")
+AAF_DEFINE_ERROR(RESULT_NOT_AAF,                 0x0500,
+    "The specified result code is not an AAF result code")
+AAF_DEFINE_ERROR(RESULT_NOT_RECOGNIZED,          0x0501,
+    "The specified AAF result code is not recognized")
 
 AAF_ERROR_SECTION("For compatibility")
 AAF_DEFINE_ERROR_ALIAS(AAF_RESULT_USE_MULTI_CREATE, USE_MULTI_CREATE)

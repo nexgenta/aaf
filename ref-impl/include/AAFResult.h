@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.85 2006/06/09 23:19:25 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.86 2006/06/09 23:25:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -351,6 +351,12 @@
 #define AAFRESULT_DLL_LOAD_FAILED                 ((HRESULT)0x80120400)
         /* Expected symbol not exported from DLL. Need newer DLL */
 #define AAFRESULT_DLL_SYMBOL_NOT_FOUND            ((HRESULT)0x80120401)
+
+/* Result code -> text error codes */
+        /* The specified result code is not an AAF result code */
+#define AAFRESULT_RESULT_NOT_AAF                  ((HRESULT)0x80120500)
+        /* The specified AAF result code is not recognized */
+#define AAFRESULT_RESULT_NOT_RECOGNIZED           ((HRESULT)0x80120501)
 
 /* For compatibility */
 #define AAF_RESULT_USE_MULTI_CREATE               AAFRESULT_USE_MULTI_CREATE
