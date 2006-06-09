@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.h,v 1.21 2006/06/08 20:31:35 tbingham Exp $ $Name:  $
+// $Id: aaflib.h,v 1.22 2006/06/09 01:38:06 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -269,6 +269,15 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETLIBRARYPATHNAMEBUFLEN)(
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETLIBRARYPATHNAME)(
     aafCharacter *  pLibraryPathName,
     aafUInt32  bufSize);
+
+typedef HRESULT (STDAPICALLTYPE * LPAAFRESULTTOTEXTBUFLEN) (
+    AAFRESULT  result,
+    aafUInt32 *   pResultTextSize);
+
+typedef HRESULT (STDAPICALLTYPE * LPAAFRESULTTOTEXT) (
+    AAFRESULT  result,
+    aafCharacter *  pResultText,
+    aafUInt32  resultTextSize);
 
 #endif
 
