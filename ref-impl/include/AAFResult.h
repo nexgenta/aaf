@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.84 2006/06/07 21:24:43 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.85 2006/06/09 23:19:25 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -76,6 +76,8 @@
 #define AAFRESULT_NOT_REVERTABLE                  ((HRESULT)0x8012002E)
 #define AAFRESULT_MEDIA_NOT_REVERTABLE            ((HRESULT)0x8012002F)
 #define AAFRESULT_OPERATION_NOT_PERMITTED         ((HRESULT)0x80120030)
+
+/* Errors returned from raw storage interfaces */
 #define AAFRESULT_READ_FAILURE                    ((HRESULT)0x80120031)
 #define AAFRESULT_WRITE_FAILURE                   ((HRESULT)0x80120032)
 #define AAFRESULT_SYNCHRONIZE_FAILURE             ((HRESULT)0x80120033)
@@ -85,6 +87,8 @@
 #define AAFRESULT_GETSIZE_FAILURE                 ((HRESULT)0x80120037)
 #define AAFRESULT_GETEXTENT_FAILURE               ((HRESULT)0x80120038)
 #define AAFRESULT_SETEXTENT_FAILURE               ((HRESULT)0x80120039)
+
+/* Read-while-modify errors */
 #define AAFRESULT_FILE_BEING_MODIFIED             ((HRESULT)0x8012003A)
 
 /* MEDIA Error Codes */
