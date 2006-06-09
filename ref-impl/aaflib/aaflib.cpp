@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.cpp,v 1.42 2006/06/08 20:31:35 tbingham Exp $ $Name:  $
+// $Id: aaflib.cpp,v 1.43 2006/06/09 21:56:42 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1500,8 +1500,6 @@ HRESULT AAFDLL::ResultToTextBufLen (
     AAFRESULT  result,
     aafUInt32 *   pResultTextSize)
 {
-  printf("AAFDLL::ResultToTextBufLen\n");
-
   // This function did not exist earlier toolkits.
   if (NULL == _pfnResultToTextBufLen)
     return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
@@ -1515,8 +1513,6 @@ HRESULT AAFDLL::ResultToText (
     aafCharacter *  pResultText,
     aafUInt32  resultTextSize)
 {
-  printf("AAFDLL::ResultToText\n");
-
   // This function did not exist earlier toolkits.
   if (NULL == _pfnResultToText)
     return AAFRESULT_DLL_SYMBOL_NOT_FOUND;
