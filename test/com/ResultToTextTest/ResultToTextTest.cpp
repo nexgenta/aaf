@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResultToTextTest.cpp,v 1.2 2006/06/09 22:52:32 tbingham Exp $ $Name:  $
+// $Id: ResultToTextTest.cpp,v 1.3 2006/06/09 23:02:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -363,7 +363,29 @@ void positiveTests()
   testCode(AAFRESULT_DLL_SYMBOL_NOT_FOUND);
 }
 
+void negativeTests()
+{
+  AAFRESULT x = AAFRESULT_BADOPEN;
+  HRESULT y;
+  y = AAFResultToTextBufLen(x, 0);
+  if (y != AAFRESULT_NULL_PARAM) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+  y = AAFResultToText(x, 0, 99);
+  if (y != AAFRESULT_NULL_PARAM) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+  wchar_t tooSmall[1];
+  aafUInt32 len = sizeof(tooSmall) * sizeof(wchar_t);
+  y = AAFResultToText(x, tooSmall, len);
+  if (y != AAFRESULT_SMALLBUF) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+}
+
 int main()
 {
   positiveTests();
+
+  negativeTests();
 }
