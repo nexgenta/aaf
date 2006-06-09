@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResultToTextTest.cpp,v 1.1 2006/06/09 22:39:11 tbingham Exp $ $Name:  $
+// $Id: ResultToTextTest.cpp,v 1.2 2006/06/09 22:52:32 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,13 @@ void testCode(AAFRESULT code)
 {
    aafUInt32 len;
    HRESULT  hr;
+
+   std::wcout.setf(std::ios::showbase);
+   std::wcout << std::hex
+              << std::setw(8)
+	      << std::setfill(L'0')
+              << code << L" -> ";
+
    hr = AAFResultToTextBufLen(code, &len);
    if (AAFRESULT_SUCCEEDED(hr)) {
      aafCharacter* buffer = (aafCharacter*)new char[len];
@@ -41,13 +48,7 @@ void testCode(AAFRESULT code)
        if (bufferSize != len) {
          std::wcout << "Buffer size mismatch." << std::endl;
        }
-       std::wcout.setf(std::ios::showbase);
-       std::wcout << std::hex
-                  << std::setw(8)
-	          << std::setfill(L'0')
-                  << code << L" -> "
-                  << buffer
-                  << std::endl;
+       std::wcout << buffer << std::endl;
      } else {
        std::wcout << L"AAFResultToText() failed." << std::endl;
      }
