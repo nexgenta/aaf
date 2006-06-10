@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafErr.h,v 1.12 2006/06/08 20:31:36 tbingham Exp $ $Name:  $
+// $Id: aafErr.h,v 1.13 2006/06/10 17:25:01 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,7 +57,6 @@ char		*aafGetExpandedErrorString(AAFFile * file,
 											aafErr_t code,
 											aafInt16 buflen,
 											char *buffer);
-void     aafErrorInit(void);
 void     aafRegErr(aafErr_t msgcode);
 void     aafReregErrDebug(aafErr_t ec, 
 								 char *filename, 
