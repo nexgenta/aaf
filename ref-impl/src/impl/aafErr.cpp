@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafErr.cpp,v 1.15 2006/06/10 00:32:28 tbingham Exp $ $Name:  $
+// $Id: aafErr.cpp,v 1.16 2006/06/10 06:07:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,7 @@ struct errorTableTag {
   wchar_t* _desc;
 } errorTable[] = {
 #define AAF_DEFINE_ERROR(name, val, desc) \
-  {val, L"AAFRESULT_"#name, L ## desc},
+  {val, L ## "AAFRESULT_" L ## #name, L ## desc},
 #include "AAFMetaResult.h"
 };
 
