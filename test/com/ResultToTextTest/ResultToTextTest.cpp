@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResultToTextTest.cpp,v 1.5 2006/06/09 23:35:55 tbingham Exp $ $Name:  $
+// $Id: ResultToTextTest.cpp,v 1.6 2006/06/10 00:27:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -387,6 +387,17 @@ void negativeTests()
   aafUInt32 len = sizeof(tooSmall) * sizeof(wchar_t);
   y = AAFResultToText(x, tooSmall, len);
   if (y != AAFRESULT_SMALLBUF) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+  /* AAFRESULT_NOT_IMPLEMENTED is not an AAF error code - it's a
+     redefinition of E_NOTIMPL from facility ITF */
+  y = AAFResultToTextBufLen(AAFRESULT_NOT_IMPLEMENTED, &len);
+  if (y != AAFRESULT_RESULT_NOT_AAF) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+  /* 0x8012ffff is unallocated */
+  y = AAFResultToTextBufLen(0x8012ffff, &len);
+  if (y != AAFRESULT_RESULT_NOT_RECOGNIZED) {
     std::wcout << "*** Fail." << std::endl;
   }
 }
