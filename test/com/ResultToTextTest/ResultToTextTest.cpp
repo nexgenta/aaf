@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResultToTextTest.cpp,v 1.6 2006/06/10 00:27:20 tbingham Exp $ $Name:  $
+// $Id: ResultToTextTest.cpp,v 1.7 2006/06/12 18:43:30 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -398,6 +398,12 @@ void negativeTests()
   /* 0x8012ffff is unallocated */
   y = AAFResultToTextBufLen(0x8012ffff, &len);
   if (y != AAFRESULT_RESULT_NOT_RECOGNIZED) {
+    std::wcout << "*** Fail." << std::endl;
+  }
+  /* AAFRESULT_SUCCESS is not an AAF error code - it's a
+     redefinition of S_OK */
+  y = AAFResultToTextBufLen(AAFRESULT_SUCCESS, &len);
+  if (y != AAFRESULT_RESULT_NOT_AAF) {
     std::wcout << "*** Fail." << std::endl;
   }
 }
