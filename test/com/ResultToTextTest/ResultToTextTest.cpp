@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResultToTextTest.cpp,v 1.7 2006/06/12 18:43:30 tbingham Exp $ $Name:  $
+// $Id: ResultToTextTest.cpp,v 1.8 2006/06/12 20:32:15 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -342,6 +342,7 @@ void positiveTests()
   /* INTERNAL Error Codes - programming errors */
   testCode(AAFRESULT_ASSERTION_VIOLATION);
   testCode(AAFRESULT_UNEXPECTED_EXCEPTION);
+  testCode(AAFRESULT_UNHANDLED_EXCEPTION);
 
   /* Testing Error Codes */
   testCode(AAFRESULT_TEST_FAILED);

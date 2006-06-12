@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFMetaResult.h,v 1.17 2006/06/12 20:15:56 tbingham Exp $ $Name:  $
+// $Id: AAFMetaResult.h,v 1.18 2006/06/12 20:32:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -350,6 +350,8 @@ AAF_DEFINE_ERROR(ASSERTION_VIOLATION,            0x01D0,
     "Reference implementation assertion violation (programming error).")
 AAF_DEFINE_ERROR(UNEXPECTED_EXCEPTION,           0x01D1,
     "Reference implementation unexpected C++ exception (programming error)")
+AAF_DEFINE_ERROR(UNHANDLED_EXCEPTION,            0x01D2,
+    "Reference implementation unhandled exception (programming error)")
 
 AAF_ERROR_SECTION("Testing Error Codes")
 AAF_DEFINE_ERROR(TEST_FAILED,                    0x01F4, "")

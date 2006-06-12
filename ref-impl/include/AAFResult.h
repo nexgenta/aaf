@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.87 2006/06/12 20:15:56 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.88 2006/06/12 20:32:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -351,6 +351,8 @@
 #define AAFRESULT_ASSERTION_VIOLATION             ((HRESULT)0x801201D0)
         /* Reference implementation unexpected C++ exception (programming error) */
 #define AAFRESULT_UNEXPECTED_EXCEPTION            ((HRESULT)0x801201D1)
+        /* Reference implementation unhandled exception (programming error) */
+#define AAFRESULT_UNHANDLED_EXCEPTION             ((HRESULT)0x801201D2)
 
 /* Testing Error Codes */
 #define AAFRESULT_TEST_FAILED                     ((HRESULT)0x801201F4)
