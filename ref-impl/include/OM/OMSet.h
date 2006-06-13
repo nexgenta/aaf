@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSet.h,v 1.14 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMSet.h,v 1.15 2006/06/13 19:56:22 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -26,10 +26,9 @@
 #ifndef OMSET_H
 #define OMSET_H
 
+#include "OMDataTypes.h"
 #include "OMContainer.h"
 #include "OMRedBlackTree.h"
-
-#include <stddef.h>
 
 template <typename Key, typename Element>
 class OMSetIterator;
@@ -76,7 +75,7 @@ public:
     // @cmember The number of elements in this <c OMSet>.
     //          <mf OMSet::count> returns the actual number
     //          of elements in the <c OMSet>.
-  size_t count(void) const;
+  OMUInt32 count(void) const;
 
     // @cmember Append the given <p Element> <p value> to
     //          this <c OMSet>.
