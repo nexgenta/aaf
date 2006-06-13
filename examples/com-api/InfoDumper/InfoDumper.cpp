@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.31 2006/05/05 19:14:29 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.32 2006/06/13 18:23:03 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -239,7 +239,7 @@ static void printTimeStamp (const aafTimeStamp_t & ts,
 		<< monthNameBuf << " "
 		<< (int) ts.date.day << ", "
 		<< (int) ts.date.year <<	" ";
-	char buf [12];
+	char buf [64];
 	sprintf (buf, "%d:%02d:%02d.%02d",
 		ts.time.hour,
 		ts.time.minute,
