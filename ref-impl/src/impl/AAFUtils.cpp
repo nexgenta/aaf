@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.60 2005/03/13 16:30:02 jptrainor Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.61 2006/06/14 18:25:11 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -398,7 +398,8 @@ AAFRESULT aafMobIDNew(
     //
     // Get the time in seconds since the standard root date
     //
-    major = time(0);
+    time_t now = time(0);
+    major = static_cast<aafUInt32>(now);
 
 
     //

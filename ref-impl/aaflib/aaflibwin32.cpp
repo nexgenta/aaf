@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibwin32.cpp,v 1.10 2005/02/03 22:13:43 heydowns Exp $ $Name:  $
+// $Id: aaflibwin32.cpp,v 1.11 2006/06/14 18:27:15 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,7 +116,7 @@ static bool AAFIsValidFile(const char* name)
 
 	char fileExt[4];
 	int i;
-	char *pExt = strrchr(name, '.');
+	const char *pExt = strrchr(name, '.');
 
 	if (pExt && 4 == strlen(pExt))
 	{
