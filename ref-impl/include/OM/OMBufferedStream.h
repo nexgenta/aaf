@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMBufferedStream.h,v 1.5 2005/10/13 16:45:13 rodrigc Exp $ $Name:  $
+// $Id: OMBufferedStream.h,v 1.6 2006/06/14 20:16:58 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -39,7 +39,7 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMBufferedStream(size_t bufferSize);
+  OMBufferedStream(OMUInt32 bufferSize);
 
     // @cmember Destructor.
   virtual ~OMBufferedStream(void);
@@ -105,4 +105,4 @@ private:
 
 #endif // !OM_NO_STRUCTURED_STORAGE
 
-#endif // !OMBUFFEREDISTREAM_H
+#endif // !OMBUFFEREDSTREAM_H
