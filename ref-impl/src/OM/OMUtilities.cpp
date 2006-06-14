@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.64 2005/08/19 20:54:30 tbingham Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.65 2006/06/14 20:01:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -332,12 +332,15 @@ size_t countWideCharacter(const wchar_t* string, wchar_t character)
 void copyCToPString(unsigned char* pString, size_t size, const char* string)
 {
   size_t maxLength = size - 1;
+  if (maxLength > 255) {
+    maxLength = 255;
+  }
   size_t length = strlen(string);
   if (length > maxLength) {
     length = maxLength;
   }
   memcpy(&pString[1], string, length);
-  pString[0] = length;
+  pString[0] = static_cast<unsigned char>(length);
 }
 
 void copyPToCString(char* string, size_t size, const unsigned char* pString)
