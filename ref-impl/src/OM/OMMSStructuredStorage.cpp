@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.19 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.20 2006/06/14 20:40:25 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -451,7 +451,7 @@ struct MinSS4KFile   {
 		// is 4 under solaris but MS lib does not work under Solaris
 		//now initialise root entry
 		wcscpy(Entry[0]._ab,(L"Root Entry"));
-		Entry[0]._cb=(wcslen(Entry[0]._ab)+1)*2;
+		Entry[0]._cb=(WORD)(wcslen(Entry[0]._ab)+1)*2;
 		Entry[0]._mse=5;
 		Entry[0]._sectStart=ENDOFCHAIN;
 	}
