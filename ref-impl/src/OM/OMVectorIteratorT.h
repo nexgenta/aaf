@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMVectorIteratorT.h,v 1.12 2004/09/10 17:13:11 stuart_hc Exp $ $Name:  $
+// $Id: OMVectorIteratorT.h,v 1.13 2006/06/14 20:58:04 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -141,7 +141,7 @@ bool OMVectorIterator<Element>::after(void) const
   //   @rdesc The number of <p Elements>s
   //   @this const
 template <typename Element>
-size_t OMVectorIterator<Element>::count(void) const
+OMUInt32 OMVectorIterator<Element>::count(void) const
 {
   TRACE("OMVectorIterator<Element>::count");
 
@@ -299,13 +299,13 @@ Element OMVectorIterator<Element>::setValue(Element newElement)
   //   @rdesc The index of the current position.
   //   @this const
 template <typename Element>
-size_t OMVectorIterator<Element>::index(void) const
+OMUInt32 OMVectorIterator<Element>::index(void) const
 {
   TRACE("OMVectorIterator<Element>::index");
 
   PRECONDITION("Valid iterator", this->valid());
 
-  size_t result = _index;
+  OMUInt32 result = _index;
 
   POSTCONDITION("Valid index", _index < _vector->count());
 
