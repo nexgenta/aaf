@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMemoryRawStorage.h,v 1.23 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMMemoryRawStorage.h,v 1.24 2006/06/14 20:48:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -29,8 +29,6 @@
 #include "OMRawStorage.h"
 #include "OMFile.h"
 #include "OMVector.h"
-
-#include <stdio.h>
 
   // @class Class supporting access to the raw bytes of memory
   //        files supported by the Object Manager.
@@ -167,19 +165,19 @@ private:
   OMMemoryRawStorage(void);
 
     // @cmember Write a page or partial page.
-  virtual void write(size_t page,
-                     size_t offset,
-                     size_t byteCount,
+  virtual void write(OMUInt32 page,
+                     OMUInt32 offset,
+                     OMUInt32 byteCount,
                      const OMByte* source);
 
     // @cmember Read a page or partial page.
-  virtual void read(size_t page,
-                    size_t offset,
-                    size_t byteCount,
+  virtual void read(OMUInt32 page,
+                    OMUInt32 offset,
+                    OMUInt32 byteCount,
                     OMByte* destination) const;
 
   OMVector<OMByte*> _pageVector;
-  size_t _pageSize;
+  OMUInt32 _pageSize;
   OMUInt64 _size;
   OMUInt64 _position;
 };
