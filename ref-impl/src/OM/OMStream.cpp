@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.15 2005/09/02 21:57:47 tbingham Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.16 2006/06/14 20:10:37 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -137,7 +137,7 @@ void OMStream::read(OMByte* bytes,
   size_t actualByteCount = fread(bytes, 1, byteCount, _file);
   ASSERT("Successful read", ferror(_file) == 0);
 
-  bytesRead = actualByteCount;
+  bytesRead = static_cast<OMUInt32>(actualByteCount);
 }
 
 void OMStream::write(const OMByte* bytes,
@@ -151,7 +151,7 @@ void OMStream::write(const OMByte* bytes,
   size_t actualByteCount = fwrite(bytes, 1, byteCount, _file);
   ASSERT("Successful write", ferror(_file) == 0);
 
-  bytesWritten = actualByteCount;
+  bytesWritten = static_cast<OMUInt32>(actualByteCount);
 }
 
 OMUInt64 OMStream::size(void) const
