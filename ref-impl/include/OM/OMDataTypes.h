@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.47 2006/06/08 17:07:06 tbingham Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.48 2006/06/14 19:55:49 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,8 @@
 // This allows new platforms to be added without disturbing the code
 // for existing platforms.
 //
-#if defined(OM_COMPILER_MSC_INTEL_WINDOWS)
+#if defined(OM_COMPILER_MSC_INTEL_WINDOWS) || \
+    defined(OM_COMPILER_MSC_X64_WINDOWS)
 typedef signed char            OMInt8;
 typedef short int              OMInt16;
 typedef long int               OMInt32;
