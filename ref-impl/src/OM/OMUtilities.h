@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.h,v 1.45 2005/08/19 20:54:30 tbingham Exp $ $Name:  $
+// $Id: OMUtilities.h,v 1.46 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -265,7 +265,7 @@ void checkTypes(void);
 
 bool validPropertyPath(const OMPropertyId* path);
 
-size_t lengthOfPropertyPath(const OMPropertyId* path);
+OMUInt32 lengthOfPropertyPath(const OMPropertyId* path);
 
 OMPropertyId* savePropertyPath(const OMPropertyId* path);
 

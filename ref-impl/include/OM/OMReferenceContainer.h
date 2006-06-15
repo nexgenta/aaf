@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMReferenceContainer.h,v 1.6 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMReferenceContainer.h,v 1.7 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@
 class OMObject;
 class OMReferenceContainerIterator;
 
-#include <stddef.h>
+#include "OMDataTypes.h"
 
   // @class Abstract base class for object reference containers
   //        supported by the Object Manager.
@@ -45,7 +45,7 @@ public:
   virtual bool containsObject(const OMObject* object) const = 0;
 
     // @cmember The number of <p OMObject>s in this <c OMReferenceContainer>.
-  virtual size_t count(void) const = 0;
+  virtual OMUInt32 count(void) const = 0;
 
     // @cmember Remove <p object> from this <c OMReferenceContainer>.
   virtual void removeObject(const OMObject* object) = 0;

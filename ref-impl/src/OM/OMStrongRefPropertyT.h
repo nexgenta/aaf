@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongRefPropertyT.h,v 1.38 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStrongRefPropertyT.h,v 1.39 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -257,7 +257,8 @@ void OMStrongReferenceProperty<ReferencedObject>::detach(void)
   //   @parm The external (persisted) size of the
   //         <c OMStrongReferenceProperty>.
 template <typename ReferencedObject>
-void OMStrongReferenceProperty<ReferencedObject>::restore(size_t externalSize)
+void OMStrongReferenceProperty<ReferencedObject>::restore(
+                                                   OMPropertySize externalSize)
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::restore");
 
@@ -324,12 +325,12 @@ void OMStrongReferenceProperty<ReferencedObject>::removeProperty(void)
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm size_t | size | The size of the buffer.
+  //   @parm OMUInt32 | size | The size of the buffer.
   //   @this const
 template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::getBits(
-                                                      OMByte* bits,
-                                                      size_t ANAME(size)) const
+                                                    OMByte* bits,
+                                                    OMUInt32 ANAME(size)) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
   OBSOLETE("methods on class OMReferenceProperty");
@@ -351,10 +352,10 @@ void OMStrongReferenceProperty<ReferencedObject>::getBits(
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          object. This type must be a descendant of <c OMStorable>.
   //   @parm The address of the buffer into which the raw bits are copied.
-  //   @parm size_t | size | The size of the buffer.
+  //   @parm OMUInt32 | size | The size of the buffer.
 template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::setBits(const OMByte* bits,
-                                                          size_t ANAME(size))
+                                                          OMUInt32 ANAME(size))
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::getBits");
   OBSOLETE("methods on class OMReferenceProperty");

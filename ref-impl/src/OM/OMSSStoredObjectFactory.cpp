@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObjectFactory.cpp,v 1.3 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
+// $Id: OMSSStoredObjectFactory.cpp,v 1.4 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -188,7 +188,7 @@ OMStoredObject*
 OMSSStoredObjectFactory::createWrite(const wchar_t* /* fileName */,
                                       const OMByteOrder /* byteOrder */)
 {
-  TRACE("OMSSStoredObjectFactory::creatWrite");
+  TRACE("OMSSStoredObjectFactory::createWrite");
   ASSERT("Unimplemented code not reached", false);
   return 0;
 }
@@ -220,7 +220,7 @@ OMSSStoredObjectFactory::isRecognized(const wchar_t* fileName)
         status = fread(s, sizeof(sig), 1, f);
         if (status == 1) {
           if (hostByteOrder() != littleEndian) {
-            size_t size = sizeof(OMUniqueObjectIdentification);
+            OMUInt32 size = static_cast<OMUInt32>(sizeof(sig));
             OMUniqueObjectIdentificationType::instance()->reorder(s, size);
           }
           // If we created this file we wrote a signature
@@ -259,7 +259,7 @@ OMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
       rawStorage->readAt(8, s, sizeof(sig), count);
       if (count == sizeof(sig)) {
         if (hostByteOrder() != littleEndian) {
-          size_t size = sizeof(OMUniqueObjectIdentification);
+          OMUInt32 size = static_cast<OMUInt32>(sizeof(sig));
           OMUniqueObjectIdentificationType::instance()->reorder(s, size);
         }
         // If we created this file we wrote a signature 
@@ -355,7 +355,7 @@ void OMSSStoredObjectFactory::writeSignature(
   OMUniqueObjectIdentification sig = signature;
   if (hostByteOrder() != littleEndian) {
     OMByte* s = reinterpret_cast<OMByte*>(&sig);
-    size_t size = sizeof(OMUniqueObjectIdentification);
+    OMUInt32 size = static_cast<OMUInt32>(sizeof(sig));
     OMUniqueObjectIdentificationType::instance()->reorder(s, size);
   }
 
@@ -382,7 +382,7 @@ void OMSSStoredObjectFactory::writeSignature(
 
   if (hostByteOrder() != littleEndian) {
     OMByte* s = reinterpret_cast<OMByte*>(&sig);
-    size_t size = sizeof(OMUniqueObjectIdentification);
+    OMUInt32 size = static_cast<OMUInt32>(sizeof(sig));
     OMUniqueObjectIdentificationType::instance()->reorder(s, size);
   }
 

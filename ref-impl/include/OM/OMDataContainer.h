@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataContainer.h,v 1.2 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMDataContainer.h,v 1.3 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -25,7 +25,7 @@
 #ifndef OMDATACONTAINER_H
 #define OMDATACONTAINER_H
 
-#include <stddef.h>
+#include "OMDataTypes.h"
 
 class OMDataContainerIterator;
 
@@ -34,7 +34,7 @@ class OMDataContainerIterator;
 class OMDataContainer {
 public:
 
-  virtual size_t count(void) const = 0;
+  virtual OMUInt32 count(void) const = 0;
 
   virtual void clear(void) = 0;
 

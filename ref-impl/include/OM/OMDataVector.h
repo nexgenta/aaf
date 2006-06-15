@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataVector.h,v 1.2 2004/09/10 17:13:00 stuart_hc Exp $ $Name:  $
+// $Id: OMDataVector.h,v 1.3 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,8 +31,6 @@
 
 #include "OMDataTypes.h"
 
-#include <stddef.h>
-
   // @class Abstract base class for persistent properties representing
   //        vectors of data supported by the Object Manager.
   //   @base public | <c OMProperty>
@@ -55,13 +53,13 @@ public:
 
     // @cmember Restore this <c OMDataVector>, the external (persisted)
     //          size of the <c OMDataVector> is <p externalSize>.
-  virtual void restore(size_t externalSize);
+  virtual void restore(OMPropertySize externalSize);
 
-  virtual size_t count(void) const = 0;
+  virtual OMUInt32 count(void) const = 0;
 
   virtual void appendValue(void* value) = 0;
 
-  virtual size_t elementSize(void) const = 0;
+  virtual OMUInt32 elementSize(void) const = 0;
 
 private:
 
