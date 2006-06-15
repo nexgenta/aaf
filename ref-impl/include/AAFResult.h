@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.89 2006/06/15 20:03:31 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.90 2006/06/15 20:06:43 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,7 @@
 #define AAFRESULT_BADCONTAINER                    ((HRESULT)0x80120014)
 #define AAFRESULT_FILEREV_NOT_SUPP                ((HRESULT)0x80120015)
 #define AAFRESULT_FILEREV_DIFF                    ((HRESULT)0x80120016)
+        /* Failed to open the file */
 #define AAFRESULT_OPEN_FAILURE                    ((HRESULT)0x80120017)
 #define AAFRESULT_BADCLOSE                        ((HRESULT)0x80120018)
 #define AAFRESULT_BAD_FHDL                        ((HRESULT)0x80120019)

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFMetaResult.h,v 1.19 2006/06/15 20:03:31 tbingham Exp $ $Name:  $
+// $Id: AAFMetaResult.h,v 1.20 2006/06/15 20:06:43 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,8 @@ AAF_DEFINE_ERROR(BADSESSIONCLOSE,                0x0013, "")
 AAF_DEFINE_ERROR(BADCONTAINER,                   0x0014, "")
 AAF_DEFINE_ERROR(FILEREV_NOT_SUPP,               0x0015, "")
 AAF_DEFINE_ERROR(FILEREV_DIFF,                   0x0016, "")
-AAF_DEFINE_ERROR(OPEN_FAILURE,                   0x0017, "")
+AAF_DEFINE_ERROR(OPEN_FAILURE,                   0x0017,
+    "Failed to open the file")
 AAF_DEFINE_ERROR(BADCLOSE,                       0x0018, "")
 AAF_DEFINE_ERROR(BAD_FHDL,                       0x0019, "")
 AAF_DEFINE_ERROR(BADHEAD,                        0x001A, "")
