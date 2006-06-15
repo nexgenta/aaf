@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFInProcServer.h,v 1.12 2004/10/25 13:25:31 stuart_hc Exp $ $Name:  $
+// $Id: CAAFInProcServer.h,v 1.13 2006/06/15 19:53:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -37,8 +37,6 @@
 #ifndef __CAAFClassFactory_h__
 #include "CAAFClassFactory.h"
 #endif
-
-#include <stddef.h> // for size_t
 
 typedef struct tagAAFComObjectInfo
 {
@@ -111,7 +109,7 @@ protected:
 
 	// Private key data for object info array
 	AAFComObjectInfo_t **_ppObjectInfoKey;
-	size_t _objectCount;
+	ULONG _objectCount;
 };
 
 

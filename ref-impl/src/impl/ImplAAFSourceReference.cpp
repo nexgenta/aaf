@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceReference.cpp,v 1.28 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
+// $Id: ImplAAFSourceReference.cpp,v 1.29 2006/06/15 19:52:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -119,11 +119,12 @@ AAFRESULT STDMETHODCALLTYPE
   if( NULL == pChannelIDs ) {
     return AAFRESULT_NULL_PARAM;
   }
-  if( (numberElements * sizeof(aafUInt32)) > OMPROPERTYSIZE_MAX ) {
+  aafUInt32 size = numberElements * sizeof(aafUInt32);
+  if( size > OMPROPERTYSIZE_MAX ) {
     return AAFRESULT_BAD_SIZE;
   }
 
-  _channelIDs.setValue(pChannelIDs, numberElements * sizeof(*pChannelIDs));
+  _channelIDs.setValue(pChannelIDs, static_cast<OMPropertySize>(size));
   
   return AAFRESULT_SUCCESS;
 }
@@ -180,11 +181,12 @@ AAFRESULT STDMETHODCALLTYPE
   if( NULL == pMonoSourceSlotIDs ) {
     return AAFRESULT_NULL_PARAM;
   }
-  if( (numberElements * sizeof(aafUInt32)) > OMPROPERTYSIZE_MAX ) {
+  aafUInt32 size = numberElements * sizeof(aafUInt32);
+  if( size > OMPROPERTYSIZE_MAX ) {
     return AAFRESULT_BAD_SIZE;
   }
 
-  _monoSourceSlotIDs.setValue(pMonoSourceSlotIDs, numberElements * sizeof(*pMonoSourceSlotIDs));
+  _monoSourceSlotIDs.setValue(pMonoSourceSlotIDs, static_cast<OMPropertySize>(size));
   
   return AAFRESULT_SUCCESS;
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.41 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.cpp,v 1.42 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -408,9 +408,11 @@ aafBool ImplAAFTypeDefStrongObjRef::IsFixedSize (void) const
 }
 
 
-size_t ImplAAFTypeDefStrongObjRef::PropValSize (void) const
+OMUInt32 ImplAAFTypeDefStrongObjRef::PropValSize (void) const
 {
-  return sizeof (ImplAAFObject*);
+  size_t sz = sizeof (ImplAAFObject*);
+  ASSERTU(sz <= OMUINT32_MAX);
+  return static_cast<OMUInt32>(sz);
 }
 
 
@@ -420,9 +422,11 @@ aafBool ImplAAFTypeDefStrongObjRef::IsRegistered (void) const
 }
 
 
-size_t ImplAAFTypeDefStrongObjRef::NativeSize (void) const
+OMUInt32 ImplAAFTypeDefStrongObjRef::NativeSize (void) const
 {
-  return sizeof (ImplAAFObject*);
+  size_t sz = sizeof (ImplAAFObject*);
+  ASSERTU(sz <= OMUINT32_MAX);
+  return static_cast<OMUInt32>(sz);
 }
 
 

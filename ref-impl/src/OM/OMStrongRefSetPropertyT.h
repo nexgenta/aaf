@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongRefSetPropertyT.h,v 1.74 2005/05/25 17:44:48 stuart_hc Exp $ $Name:  $
+// $Id: OMStrongRefSetPropertyT.h,v 1.75 2006/06/15 19:53:21 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -131,7 +131,8 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 template <typename UniqueIdentification, typename ReferencedObject>
 void
 OMStrongReferenceSetProperty<UniqueIdentification,
-                             ReferencedObject>::restore(size_t externalSize)
+                             ReferencedObject>::restore(
+                                                   OMPropertySize externalSize)
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::restore");
@@ -167,7 +168,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   //        <c OMStrongReferenceSetProperty>.
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-size_t
+OMUInt32
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::count(void) const
 {
@@ -197,7 +198,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
 
   // Set the set to contain the new object
   //
-  const size_t localKey = nextLocalKey();
+  const OMUInt32 localKey = nextLocalKey();
   wchar_t* name = elementName(localKey);
   UniqueIdentification key = object->identification();
   ASSERT("Valid identification", isValidIdentification(key));
@@ -560,7 +561,7 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   //          <c OMStrongReferenceSetProperty> in bytes.
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-size_t
+OMUInt32
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::bitsSize(void) const
 {
@@ -584,8 +585,8 @@ template <typename UniqueIdentification, typename ReferencedObject>
 void
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::getBits(
-                                                      OMByte* bits,
-                                                      size_t ANAME(size)) const
+                                                    OMByte* bits,
+                                                    OMUInt32 ANAME(size)) const
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::getBits");
@@ -618,7 +619,7 @@ template <typename UniqueIdentification, typename ReferencedObject>
 void
 OMStrongReferenceSetProperty<UniqueIdentification,
                              ReferencedObject>::setBits(const OMByte* bits,
-                                                        size_t size)
+                                                        OMUInt32 size)
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::setBits");

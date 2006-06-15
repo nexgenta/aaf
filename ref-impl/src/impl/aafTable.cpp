@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafTable.cpp,v 1.22 2004/11/23 17:29:56 stuart_hc Exp $ $Name:  $
+// $Id: aafTable.cpp,v 1.23 2006/06/15 19:52:48 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -1042,7 +1042,7 @@ static aafInt32 StrMap( void *temp1)
 	if (temp1 == NULL)
 		return(0);
 		
-	keyLen = strlen(key)+1;
+	keyLen = (aafInt16)strlen(key)+1;
 	for(n = 0, hashVal = 0; n < keyLen; n++, key++)
 		hashVal = (hashVal << 1) + toupper(*key);
 		
@@ -1123,7 +1123,7 @@ aafErr_t TableAddString(
 {
   	aafInt16		keyLen;
 				
-	keyLen = strlen(key)+1;
+	keyLen = (aafInt16)strlen(key)+1;
 	return(TableAddValuePtr(table, key, keyLen, value, dup));
 }
 
@@ -1150,7 +1150,7 @@ aafErr_t TableAddStringBlock(
 {
   aafInt16		keyLen;
 				
-  keyLen = strlen(key)+1;
+  keyLen = (aafInt16)strlen(key)+1;
   return(TableAddValueBlock(table, key, keyLen, value, valueLen, dup));
 }
 	

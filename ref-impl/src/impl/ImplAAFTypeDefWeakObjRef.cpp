@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.41 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.42 2006/06/15 19:53:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -707,9 +707,11 @@ aafBool ImplAAFTypeDefWeakObjRef::IsFixedSize (void) const
 }
 
 
-size_t ImplAAFTypeDefWeakObjRef::PropValSize (void) const
+OMUInt32 ImplAAFTypeDefWeakObjRef::PropValSize (void) const
 {
-  return sizeof (ImplAAFStorable*);
+  size_t sz = sizeof (ImplAAFStorable*);
+  ASSERTU(sz <= OMUINT32_MAX);
+  return static_cast<OMUInt32>(sz);
 }
 
 
@@ -719,9 +721,11 @@ aafBool ImplAAFTypeDefWeakObjRef::IsRegistered (void) const
 }
 
 
-size_t ImplAAFTypeDefWeakObjRef::NativeSize (void) const
+OMUInt32 ImplAAFTypeDefWeakObjRef::NativeSize (void) const
 {
-  return sizeof (ImplAAFStorable*);
+  size_t sz = sizeof (ImplAAFStorable*);
+  ASSERTU(sz <= OMUINT32_MAX);
+  return static_cast<OMUInt32>(sz);
 }
 
 
@@ -733,7 +737,7 @@ OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMProperty
   
 #if defined(USE_SIMPLEPROPERTY)
 
-  size_t elemSize = PropValSize ();
+  OMUInt32 elemSize = PropValSize ();
   OMProperty * result = new OMSimpleProperty (pid, name, elemSize);
   
 #else // #if defined(USE_SIMPLEPROPERTY)

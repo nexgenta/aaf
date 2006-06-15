@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibwin32.cpp,v 1.11 2006/06/14 18:27:15 tbingham Exp $ $Name:  $
+// $Id: aaflibwin32.cpp,v 1.12 2006/06/15 19:53:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -139,7 +139,7 @@ AAFRDLIRESULT AAFFindLibrary(const char* name, LPFNAAFTESTFILEPROC testProc, voi
 	HANDLE hFindFile = INVALID_HANDLE_VALUE;
 	WIN32_FIND_DATAA findData;
 	
-	int nameLength = 0;
+	size_t nameLength = 0;
 	char findPath[(2 * MAX_PATH) + 2];
 	bool done = false;
 	bool isDirectory = false;

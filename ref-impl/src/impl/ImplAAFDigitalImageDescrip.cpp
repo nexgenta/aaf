@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.28 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFDigitalImageDescrip.cpp,v 1.29 2006/06/15 19:52:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -185,10 +185,12 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pVideoLineMap == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	if ((numberElements * sizeof(aafInt32)) > OMPROPERTYSIZE_MAX)
+	aafUInt32 ns = numberElements * sizeof(aafInt32);
+	if (ns > OMPROPERTYSIZE_MAX)
 		return(AAFRESULT_BAD_SIZE);
+	OMPropertySize newSize = static_cast<OMPropertySize>(ns);
 
-	_videoLineMap.setValue(pVideoLineMap, numberElements * sizeof(aafInt32));
+	_videoLineMap.setValue(pVideoLineMap, newSize);
 
 	return AAFRESULT_SUCCESS;
 }

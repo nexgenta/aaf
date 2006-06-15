@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.96 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.97 2006/06/15 19:52:50 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -14,7 +14,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -127,8 +127,8 @@ ImplAAFHeader::~ImplAAFHeader ()
 {
 	// Release all of the id pointers in the id list.
 	//
-	size_t count = _identificationList.count();
-	for (size_t i = 0; i < count; i++) {
+	aafUInt32 count = _identificationList.count();
+	for (aafUInt32 i = 0; i < count; i++) {
 		ImplAAFIdentification *pIdent = _identificationList.clearValueAt(i);
 
 		if (pIdent) {
@@ -442,7 +442,7 @@ AAFRESULT STDMETHODCALLTYPE
 	}
 
   AAFRESULT result;
-  size_t count = _identificationList.count();
+  aafUInt32 count = _identificationList.count();
 
   if (count > 0) {
     // For count entries the valid positions are 0 .. count - 1
@@ -507,7 +507,7 @@ ImplAAFHeader::CountIdentifications
 		return AAFRESULT_NULL_PARAM;
 	}
 
- 	size_t	count = _identificationList.count();
+ 	aafUInt32 count = _identificationList.count();
 	*pNumIdents = count;
 	return AAFRESULT_SUCCESS;
 }

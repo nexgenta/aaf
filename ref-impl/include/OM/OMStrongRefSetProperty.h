@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStrongRefSetProperty.h,v 1.44 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMStrongRefSetProperty.h,v 1.45 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -71,7 +71,7 @@ public:
     // @cmember Restore this <c OMStrongReferenceSetProperty>, the
     //          external (persisted) size of the
     //          <c OMStrongReferenceSetProperty> is <p externalSize>.
-  virtual void restore(size_t externalSize);
+  virtual void restore(OMPropertySize externalSize);
 
     // @cmember The number of objects contained within this
     //          <c OMStrongReferenceSetProperty> if any.
@@ -79,7 +79,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in this
     //          <c OMStrongReferenceSetProperty>.
-  size_t count(void) const;
+  OMUInt32 count(void) const;
 
     // @cmember Insert <p object> into this
     //          <c OMStrongReferenceSetProperty>.
@@ -148,19 +148,19 @@ public:
     // @cmember The size of the raw bits of this
     //          <c OMStrongReferenceSetProperty>. The size is given
     //          in bytes.
-  virtual size_t bitsSize(void) const;
+  virtual OMUInt32 bitsSize(void) const;
 
     // @cmember Get the raw bits of this
     //          <c OMStrongReferenceSetProperty>. The raw bits are
     //          copied to the buffer at address <p bits> which is
     //          <p size> bytes in size.
-  virtual void getBits(OMByte* bits, size_t size) const;
+  virtual void getBits(OMByte* bits, OMUInt32 size) const;
 
     // @cmember Set the raw bits of this
     //          <c OMStrongReferenceSetProperty>. The raw bits are
     //          copied from the buffer at address <p bits> which is
     //          <p size> bytes in size.
-  virtual void setBits(const OMByte* bits, size_t size);
+  virtual void setBits(const OMByte* bits, OMUInt32 size);
 
     // @cmember Insert <p object> into this
     //          <c OMStrongReferenceSetProperty>.

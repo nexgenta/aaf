@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginManager.cpp,v 1.44 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFPluginManager.cpp,v 1.45 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -596,8 +596,8 @@ AAFRESULT ImplAAFPluginManager::RegisterPluginDirectory(const char *directoryNam
 static char * NewStringFromAAFString(aafCharacter_constptr wName)
 {
   char * name = NULL;
-  int wNameLength = wcslen(wName);
-  int nameLength = wcsu8slen(wName);
+  size_t wNameLength = wcslen(wName);
+  size_t nameLength = wcsu8slen(wName);
   name = new char[nameLength+1];
   if (NULL != name)
   {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPlatform.h,v 1.20 2006/06/08 17:07:06 tbingham Exp $ $Name:  $
+// $Id: AAFPlatform.h,v 1.21 2006/06/15 19:53:19 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,6 +55,17 @@
 #define COMPILER_MSC
 #define PLATFORM_MSC_INTEL_WINDOWS
     
+/*
+ *  Compiler:   Microsoft Visual C++
+ *  Processor:  x64
+ *  OS:         Windows NT
+ */
+#elif   defined(_MSC_VER) && defined(_M_X64) && defined(_WIN32)
+#define CPU_X64
+#define OS_WINDOWS
+#define COMPILER_MSC
+#define PLATFORM_MSC_X64_WINDOWS
+
 /*
  *  Compiler:   GNU C++
  *  Processor:  MIPS
@@ -267,7 +278,9 @@
 /*
  *  MS Windows
  */
-#if defined( PLATFORM_MSC_INTEL_WINDOWS )
+#if defined( PLATFORM_MSC_INTEL_WINDOWS ) || \
+    defined( PLATFORM_MSC_X64_WINDOWS )
+
 typedef signed char			aafInt8;
 typedef signed short int	aafInt16;
 typedef signed long int		aafInt32;

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.26 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.27 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -104,9 +104,9 @@ public:
   // overrides from ImplAAFTypeDef
   //
   aafBool IsFixedSize (void) const;
-  size_t PropValSize (void) const;
+  OMUInt32 PropValSize (void) const;
   aafBool IsRegistered (void) const;
-  size_t NativeSize (void) const;
+  OMUInt32 NativeSize (void) const;
 
   virtual OMProperty * 
     pvtCreateOMProperty (OMPropertyId pid,

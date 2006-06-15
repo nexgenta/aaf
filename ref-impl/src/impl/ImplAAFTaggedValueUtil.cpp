@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTaggedValueUtil.cpp,v 1.3 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTaggedValueUtil.cpp,v 1.4 2006/06/15 19:52:52 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 //
@@ -76,9 +76,13 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
     ASSERTU( pTaggedVal );
 
     // Init the tagged value.
+    size_t cc = wcslen(pValue)+1;
+    ASSERTU(cc <= OMUINT32_MAX);
+    OMUInt32 characterCount = static_cast<OMUInt32>(cc);
+    OMUInt32 byteCount = characterCount * sizeof(aafCharacter);
     CHECK( pTaggedVal->Initialize( pName,
 				   pTaggedValType,
-				   (wcslen(pValue)+1)*sizeof(aafCharacter),
+				   byteCount,
 				   reinterpret_cast<aafDataBuffer_t>(const_cast<aafCharacter*>(pValue)) ) );
 
     taggedValVector.appendValue( pTaggedVal );
@@ -166,7 +170,7 @@ AAFRESULT ImplAAFTaggedValueUtil::RemoveEntry(
     return AAFRESULT_PROP_NOT_PRESENT;
   }
 
-  size_t index;
+  OMUInt32 index;
   if ( taggedValVector.findIndex (pEntry, index) ) {
     taggedValVector.removeAt(index);
     pEntry->ReleaseReference();

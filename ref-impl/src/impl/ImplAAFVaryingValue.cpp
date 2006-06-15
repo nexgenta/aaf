@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFVaryingValue.cpp,v 1.39 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
+// $Id: ImplAAFVaryingValue.cpp,v 1.40 2006/06/15 19:53:17 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -62,8 +62,8 @@ ImplAAFVaryingValue::ImplAAFVaryingValue ()
 ImplAAFVaryingValue::~ImplAAFVaryingValue ()
 {
 	// Release all of the locator pointers.
-	size_t count = _controlPoints.count();
-	for (size_t i = 0; i < count; i++)
+	OMUInt32 count = _controlPoints.count();
+	for (OMUInt32 i = 0; i < count; i++)
 	{
 		ImplAAFControlPoint *pControl = _controlPoints.clearValueAt(i);
 		if (pControl)

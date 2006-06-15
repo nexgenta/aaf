@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFObject.cpp,v 1.81 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFObject.cpp,v 1.82 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -515,8 +515,8 @@ ImplAAFObject::SavedProp::~SavedProp ()
 	dynamic_cast<OMStrongReferenceVectorProperty <ImplAAFObject>*>(_p);
   if (srv)
 	{
-	  size_t count = srv->count();
-	  for (size_t i = 0; i < count; i++)
+	  aafUInt32 count = srv->count();
+	  for (aafUInt32 i = 0; i < count; i++)
 		{
 		  ImplAAFObject* oldObj = srv->clearValueAt(i);
 		  if (oldObj)

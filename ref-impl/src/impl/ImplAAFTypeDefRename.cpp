@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.35 2006/05/24 18:01:53 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.36 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -213,23 +213,23 @@ ImplAAFTypeDefSP ImplAAFTypeDefRename::BaseType () const
 }
 
 void ImplAAFTypeDefRename::reorder(OMByte* externalBytes,
-								   size_t externalBytesSize) const
+								   OMUInt32 externalBytesSize) const
 {
   BaseType()->reorder (externalBytes, externalBytesSize);
 }
 
 
-size_t ImplAAFTypeDefRename::externalSize(const OMByte* internalBytes,
-										  size_t internalBytesSize) const
+OMUInt32 ImplAAFTypeDefRename::externalSize(const OMByte* internalBytes,
+										  OMUInt32 internalBytesSize) const
 {
   return BaseType()->externalSize (internalBytes, internalBytesSize);
 }
 
 
 void ImplAAFTypeDefRename::externalize(const OMByte* internalBytes,
-									   size_t internalBytesSize,
+									   OMUInt32 internalBytesSize,
 									   OMByte* externalBytes,
-									   size_t externalBytesSize,
+									   OMUInt32 externalBytesSize,
 									   OMByteOrder byteOrder) const
 {
   BaseType()->externalize (internalBytes,
@@ -240,17 +240,17 @@ void ImplAAFTypeDefRename::externalize(const OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefRename::internalSize(const OMByte* externalBytes,
-										  size_t externalBytesSize) const
+OMUInt32 ImplAAFTypeDefRename::internalSize(const OMByte* externalBytes,
+										  OMUInt32 externalBytesSize) const
 {
   return BaseType()->internalSize (externalBytes, externalBytesSize);
 }
 
 
 void ImplAAFTypeDefRename::internalize(const OMByte* externalBytes,
-									   size_t externalBytesSize,
+									   OMUInt32 externalBytesSize,
 									   OMByte* internalBytes,
-									   size_t internalBytesSize,
+									   OMUInt32 internalBytesSize,
 									   OMByteOrder byteOrder) const
 {
   BaseType()->internalize (externalBytes,
@@ -268,7 +268,7 @@ aafBool ImplAAFTypeDefRename::IsFixedSize() const
 }
 
 
-size_t ImplAAFTypeDefRename::PropValSize() const
+OMUInt32 ImplAAFTypeDefRename::PropValSize() const
 {
   return BaseType()->PropValSize ();
 }
@@ -280,7 +280,7 @@ aafBool ImplAAFTypeDefRename::IsRegistered() const
 }
 
 
-size_t ImplAAFTypeDefRename::NativeSize() const
+OMUInt32 ImplAAFTypeDefRename::NativeSize() const
 {
   return BaseType()->NativeSize ();
 }

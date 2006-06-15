@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefObjectRef.cpp,v 1.22 2004/02/27 14:26:49 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefObjectRef.cpp,v 1.23 2006/06/15 19:53:15 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -96,23 +96,23 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 void ImplAAFTypeDefObjectRef::reorder(OMByte* /*externalBytes*/,
-									  size_t /*externalBytesSize*/) const
+									  OMUInt32 /*externalBytesSize*/) const
 {
   // nothing to do for obj refs
 }
 
 
-size_t ImplAAFTypeDefObjectRef::externalSize(const OMByte* /*internalBytes*/,
-											 size_t /*internalBytesSize*/) const
+OMUInt32 ImplAAFTypeDefObjectRef::externalSize(const OMByte* /*internalBytes*/,
+											 OMUInt32 /*internalBytesSize*/) const
 {
   return PropValSize ();
 }
 
 
 void ImplAAFTypeDefObjectRef::externalize(const OMByte* internalBytes,
-										  size_t internalBytesSize,
+										  OMUInt32 internalBytesSize,
 										  OMByte* externalBytes,
-										  size_t ANAME(externalBytesSize),
+										  OMUInt32 ANAME(externalBytesSize),
 										  OMByteOrder NNAME(byteOrder)) const
 {
   TRACE("ImplAAFTypeDefObjectRef::externalize");
@@ -126,17 +126,17 @@ void ImplAAFTypeDefObjectRef::externalize(const OMByte* internalBytes,
 }
 
 
-size_t ImplAAFTypeDefObjectRef::internalSize(const OMByte* /*externalBytes*/,
-											 size_t /*externalBytesSize*/) const
+OMUInt32 ImplAAFTypeDefObjectRef::internalSize(const OMByte* /*externalBytes*/,
+											 OMUInt32 /*externalBytesSize*/) const
 {
   return NativeSize ();
 }
 
 
 void ImplAAFTypeDefObjectRef::internalize(const OMByte* externalBytes,
-										  size_t externalBytesSize,
+										  OMUInt32 externalBytesSize,
 										  OMByte* internalBytes,
-										  size_t ANAME(internalBytesSize),
+										  OMUInt32 ANAME(internalBytesSize),
 										  OMByteOrder NNAME(byteOrder)) const
 {
   TRACE("ImplAAFTypeDefObjectRef::internalize");

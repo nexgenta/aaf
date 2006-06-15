@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.41 2006/06/08 20:31:36 tbingham Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.42 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1479,11 +1479,12 @@ extern "C" const char * AAFGetLibraryPath();
 
 // The size of a buffer, in bytes, needed to hold s when properly
 // terminated and converted to aafCharacters.
-static size_t bufferByteSize(const char* s)
+static aafUInt32 bufferByteSize(const char* s)
 {
   ASSERTU(s != 0);
-  size_t result = strlen(s) + 1; // characters needed
-  result = result * sizeof(aafCharacter); // bytes needed
+  size_t cc = strlen(s) + 1; // characters needed
+  aafUInt32 characterCount = static_cast<aafUInt32>(cc);
+  aafUInt32 result = characterCount * sizeof(aafCharacter); // bytes needed
   return result;
 }
 

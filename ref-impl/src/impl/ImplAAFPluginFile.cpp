@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginFile.cpp,v 1.12 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFPluginFile.cpp,v 1.13 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -69,7 +69,7 @@ HRESULT ImplAAFPluginFile::CreatePluginFile(
     return AAFRESULT_NULL_PARAM;
 
   // copy the given name. this will be owned by the plugin file object.
-  int len = strlen(name) + 1;
+  size_t len = strlen(name) + 1;
   char *name_copy = new char[len];
   if (!name_copy)
     result = AAFRESULT_NOMEMORY;

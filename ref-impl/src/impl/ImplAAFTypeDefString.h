@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.h,v 1.29 2006/05/24 18:01:54 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.h,v 1.30 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -160,24 +160,24 @@ public:
   //*************************************************************
 
   virtual void reorder(OMByte* externalBytes,
-                       size_t externalBytesSize) const;
+                       OMUInt32 externalBytesSize) const;
 
-  virtual size_t externalSize(const OMByte* internalBytes,
-							  size_t internalBytesSize) const;
+  virtual OMUInt32 externalSize(const OMByte* internalBytes,
+                                OMUInt32 internalBytesSize) const;
 
   virtual void externalize(const OMByte* internalBytes,
-                           size_t internalBytesSize,
+                           OMUInt32 internalBytesSize,
                            OMByte* externalBytes,
-                           size_t externalBytesSize,
+                           OMUInt32 externalBytesSize,
                            OMByteOrder byteOrder) const;
 
-  virtual size_t internalSize(const OMByte* externalBytes,
-							  size_t externalBytesSize) const;
+  virtual OMUInt32 internalSize(const OMByte* externalBytes,
+                                OMUInt32 externalBytesSize) const;
 
   virtual void internalize(const OMByte* externalBytes,
-                           size_t externalBytesSize,
+                           OMUInt32 externalBytesSize,
                            OMByte* internalBytes,
-                           size_t internalBytesSize,
+                           OMUInt32 internalBytesSize,
                            OMByteOrder byteOrder) const;
 
 
@@ -199,9 +199,9 @@ public:
   // overrides from ImplAAFTypeDef
   //
   aafBool IsFixedSize (void) const;
-  size_t PropValSize (void) const;
+  OMUInt32 PropValSize (void) const;
   aafBool IsRegistered (void) const;
-  size_t NativeSize (void) const;
+  OMUInt32 NativeSize (void) const;
 
   virtual OMProperty * 
     pvtCreateOMProperty (OMPropertyId pid,

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefsGen.h,v 1.17 2005/01/11 09:29:43 jfpanisset Exp $ $Name:  $
+// $Id: ImplAAFTypeDefsGen.h,v 1.18 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -16,7 +16,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -77,7 +77,7 @@ struct TypeEnumeration                     \
   aafUID_t                 typeID;         \
   const wchar_t *          typeName;       \
   const aafUID_t *         pElementTypeId; \
-  size_t                   size;           \
+  aafUInt32                size;           \
   TypeEnumerationMember ** members;        \
 };
 
@@ -168,7 +168,7 @@ struct TypeRecordMember             \
 {                                   \
   const aafUID_t *   pMemberTypeId; \
   wchar_t *          memberName;    \
-  size_t             memberOffset;  \
+  aafUInt32          memberOffset;  \
   eAAFTypeCategory_t typeCat;       \
 };                                  \
                                     \
@@ -176,7 +176,7 @@ struct TypeRecord                   \
 {                                   \
   aafUID_t   typeID;                \
   wchar_t *  typeName;              \
-  size_t     size;                  \
+  aafUInt32  size;                  \
   TypeRecordMember ** members;      \
 };
 
@@ -441,7 +441,7 @@ struct TypeWeakRef              \
   aafUID_t         typeId;      \
   const aafUID_t * pRefdTypeId; \
   int              isValid;     \
-  size_t           size;        \
+  aafUInt32        size;        \
   const TypeWeakRefMember * members; \
 };                              \
 

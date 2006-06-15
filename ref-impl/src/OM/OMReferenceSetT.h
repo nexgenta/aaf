@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMReferenceSetT.h,v 1.11 2005/05/25 17:44:47 stuart_hc Exp $ $Name:  $
+// $Id: OMReferenceSetT.h,v 1.12 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -50,7 +50,7 @@ OMReferenceSet<UniqueIdentification, ReferencedObject>::~OMReferenceSet(void)
   // @mfunc The number of <p ReferencedObject>s in this <c OMReferenceSet>.
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-size_t OMReferenceSet<UniqueIdentification,
+OMUInt32 OMReferenceSet<UniqueIdentification,
                       ReferencedObject>::count(void) const
 {
   TRACE("OMReferenceSet<UniqueIdentification, ReferencedObject>::count");

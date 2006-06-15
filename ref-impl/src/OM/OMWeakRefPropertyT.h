@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.61 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.62 2006/06/15 19:53:21 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -289,7 +289,8 @@ OMWeakReferenceProperty<Key, ReferencedObject>::objectCount(void) const
   //   @parm The external (persisted) size of the <c OMWeakReferenceProperty>.
 template <typename Key, typename ReferencedObject>
 void
-OMWeakReferenceProperty<Key, ReferencedObject>::restore(size_t externalSize)
+OMWeakReferenceProperty<Key, ReferencedObject>::restore(
+                                                   OMPropertySize externalSize)
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::restore");
 
@@ -330,8 +331,8 @@ bool OMWeakReferenceProperty<Key, ReferencedObject>::isVoid(void) const
   //   @this const
 template <typename Key, typename ReferencedObject>
 void OMWeakReferenceProperty<Key, ReferencedObject>::getBits(
-                                                      OMByte* bits,
-                                                      size_t ANAME(size)) const
+                                                    OMByte* bits,
+                                                    OMUInt32 ANAME(size)) const
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::getBits");
   OBSOLETE("methods on class OMReferenceProperty");
@@ -355,8 +356,9 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::getBits(
   //   @parm The address of the buffer into which the raw bits are copied.
   //   @parm The size of the buffer.
 template <typename Key, typename ReferencedObject>
-void OMWeakReferenceProperty<Key, ReferencedObject>::setBits(const OMByte* bits,
-                                                        size_t ANAME(size))
+void
+OMWeakReferenceProperty<Key, ReferencedObject>::setBits(const OMByte* bits,
+                                                        OMUInt32 ANAME(size))
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::getBits");
   OBSOLETE("methods on class OMReferenceProperty");

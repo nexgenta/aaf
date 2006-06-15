@@ -2,7 +2,7 @@
 #define __ImplAAFTypeDefStream_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.h,v 1.19 2005/09/06 12:43:24 montrowe Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.h,v 1.20 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -342,9 +342,9 @@ public:
   // ImplAAFTypeDef methods
   //
   virtual aafBool IsFixedSize (void) const;
-  virtual size_t PropValSize (void) const;
+  virtual OMUInt32 PropValSize (void) const;
   virtual aafBool IsRegistered (void) const;
-  virtual size_t NativeSize (void) const;
+  virtual OMUInt32 NativeSize (void) const;
 
   virtual OMProperty * 
     pvtCreateOMProperty (OMPropertyId pid,
