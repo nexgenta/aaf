@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataEssenceDescriptor.cpp,v 1.2 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFDataEssenceDescriptor.cpp,v 1.3 2006/06/16 21:34:44 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,11 @@ ImplAAFDataEssenceDescriptor::ImplAAFDataEssenceDescriptor ()
 ImplAAFDataEssenceDescriptor::~ImplAAFDataEssenceDescriptor ()
 {}
 
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFDataEssenceDescriptor::Initialize ()
+{
+  return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDataEssenceDescriptor::SetDataEssenceCoding (

@@ -6,7 +6,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: ImplAAFDataEssenceDescriptor.h,v 1.1 2006/03/24 18:23:37 jlow Exp $ $Name:  $
+// $Id: ImplAAFDataEssenceDescriptor.h,v 1.2 2006/06/16 21:34:45 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,9 @@ public:
 
 
   virtual ~ImplAAFDataEssenceDescriptor ();
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	Initialize ();
 
 public:
 
