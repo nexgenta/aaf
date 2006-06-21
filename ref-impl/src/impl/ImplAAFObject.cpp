@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFObject.cpp,v 1.82 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFObject.cpp,v 1.83 2006/06/21 15:12:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,6 +66,7 @@ typedef ImplAAFSmartPointer<ImplEnumAAFProperties> ImplEnumAAFPropertiesSP;
 #include "AAFPropertyIDs.h"
 #include "OMPropertyDefinition.h"
 #include "AAFUtils.h"
+#include "AAFObjectModel.h"
 
 
 
@@ -1256,6 +1257,10 @@ OMProperty * ImplAAFObject::InitOMProperty(ImplAAFPropertyDef * pPropertyDef, OM
       // from the property set defined by the impl code. The predefined
       // properties are supposed to be declared in the impl header
       // and initialized in the impl constructor. 
+#if 0
+      // Assert that we're not trying to dynamically add a built-in 
+      ASSERTU(AAFObjectModel::singleton()->findPropertyDefinition (reinterpret_cast<const aafUID_t *>(&pPropertyDef->identification()))->isNil());
+#endif
 
 	  // Defined property wasn't found in OM property set.
 	  // We'll have to install one.
