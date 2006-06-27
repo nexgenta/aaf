@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFFileDescriptor.h,v 1.7 2006/05/16 20:45:09 heydowns Exp $ $Name:  $
+// $Id: CAAFFileDescriptor.h,v 1.8 2006/06/27 20:19:34 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -256,7 +256,7 @@ public:
   // Sets the LinkedSlotID property.  
   ///
   ///
-  /// This property is optional.  The default value is 0.
+  /// This property is optional.
   ///
   /// If this method fails, the LinkedSlotID property will not
   /// be changed.
@@ -265,14 +265,11 @@ public:
   /// 
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  (This is the only code indicating success.)
-  ///
-  /// AAFRESULT_NOT_INITIALIZED
-  ///   - This object has not yet had Initialize() called on it.
   // @end
   // 
   STDMETHOD (SetLinkedSlotID)
    (
-    // @parm [in] aafUInt32 | LinkedSlotID | Integer value.
+    // @parm [in] aafUInt32 | LinkedSlotID | the linked slot id
     aafUInt32  LinkedSlotID
   );
 
@@ -294,16 +291,16 @@ public:
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  (This is the only code indicating success.)
   ///
-  /// AAFRESULT_NOT_INITIALIZED
-  ///   - This object has not yet had Initialize() called on it.
-  ///
   /// AAFRESULT_NULL_PARAM
   ///   - pLinkedSlotID arg is NULL.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - the LinkedSlotID property is not present.
   // @end
   // 
   STDMETHOD (GetLinkedSlotID)
    (
-    // @parm [out] aafUInt32 * | pLinkedSlotID | Address to store the integer value.
+    // @parm [out] aafUInt32 * | pLinkedSlotID | The linked slot id
     aafUInt32 *  pLinkedSlotID
   );
 
