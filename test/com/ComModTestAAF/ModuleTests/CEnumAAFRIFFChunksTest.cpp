@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFRIFFChunksTest.cpp,v 1.1 2006/03/24 18:27:54 jlow Exp $ $Name:  $
+// $Id: CEnumAAFRIFFChunksTest.cpp,v 1.2 2006/06/27 21:13:35 g_smith Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -172,9 +172,9 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 		checkResult(defs.cdRIFFChunk()->CreateInstance(IID_IAAFRIFFChunk, 
 							 (IUnknown **)&pRIFFChunk2));
 							 
-		checkResult(pBWFImportDesc->AppendUnknownBWFChunks(pRIFFChunk));
-		checkResult(pBWFImportDesc->AppendUnknownBWFChunks(pRIFFChunk2));
-		checkExpression(pBWFImportDesc->AppendUnknownBWFChunks(pRIFFChunk)==AAFRESULT_OBJECT_ALREADY_ATTACHED, AAFRESULT_TEST_FAILED);
+		checkResult(pBWFImportDesc->AppendUnknownBWFChunk(pRIFFChunk));
+		checkResult(pBWFImportDesc->AppendUnknownBWFChunk(pRIFFChunk2));
+		checkExpression(pBWFImportDesc->AppendUnknownBWFChunk(pRIFFChunk)==AAFRESULT_OBJECT_ALREADY_ATTACHED, AAFRESULT_TEST_FAILED);
 		checkResult(pBWFImportDesc->SetFileSecurityReport(TEST_FileSecurityReport));
 		checkResult(pBWFImportDesc->SetFileSecurityWave(TEST_FileSecurityWave));
 						 

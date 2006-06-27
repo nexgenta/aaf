@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRIFFChunkTest.cpp,v 1.2 2006/03/24 18:27:54 jlow Exp $ $Name:  $
+// $Id: CAAFRIFFChunkTest.cpp,v 1.3 2006/06/27 21:13:35 g_smith Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -165,7 +165,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName)
 
 		checkResult(defs.cdRIFFChunk()->CreateInstance(IID_IAAFRIFFChunk, 
 							 (IUnknown **)&pRIFFChunk));
-		checkResult(pBWFImportDesc->AppendUnknownBWFChunks(pRIFFChunk));
+		checkResult(pBWFImportDesc->AppendUnknownBWFChunk(pRIFFChunk));
 								 
 		checkResult( pBWFImportDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDesc));
 		checkResult(pSourceMob->SetEssenceDescriptor(pEssDesc));
