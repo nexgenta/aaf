@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFBWFImportDescriptor.dod,v 1.4 2006/06/27 19:29:52 heydowns Exp $ $Name:  $
+#c $Id: AAFBWFImportDescriptor.dod,v 1.5 2006/06/27 19:49:33 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -150,7 +150,7 @@ AD_XMETHOD1(GetFileSecurityWave,
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
   /// AAFRESULT_NULL_PARAM
-  ///   - pQltyFileSecurityWave is NULL.
+  ///   - pFileSecurityWave is NULL.
   ///
   /// AAFRESULT_PROP_NOT_PRESENT
   ///   - the property is not present.)
