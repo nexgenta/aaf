@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.38 2006/06/27 20:19:27 heydowns Exp $ $Name:  $
+// $Id: AAF.h,v 1.39 2006/06/27 20:32:21 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -5321,6 +5321,29 @@ DECLARE_INTERFACE_(IAAFDataEssenceDescriptor, IUnknown)
   /* *** IAAFDataEssenceDescriptor methods *** */
 
 
+
+  //***********************************************************
+  //
+  // Initialize()
+  //
+  /// Initializes a newly allocated, empty IAAFDataEssenceDescriptor-supporting
+  /// object.  This method must be called after allocation, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize() has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize() has already been called on this object.
+  STDMETHOD(Initialize) (THIS) PURE;
+
   //***********************************************************
   //
   // SetDataEssenceCoding()
@@ -5372,6 +5395,7 @@ DECLARE_INTERFACE_(IAAFDataEssenceDescriptor, IUnknown)
   END_INTERFACE
 };
 #endif // __IAAFDataEssenceDescriptor_INTERFACE_DEFINED__
+
 
 
 // IAAFDefObject
