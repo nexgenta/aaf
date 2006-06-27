@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFBWFImportDescriptor.dod,v 1.3 2006/06/27 19:04:06 heydowns Exp $ $Name:  $
+#c $Id: AAFBWFImportDescriptor.dod,v 1.4 2006/06/27 19:29:52 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -215,8 +215,7 @@ AD_XMETHOD1(PrependUnknownBWFChunk,
 			objIn,
 			AAFRIFFChunk,
 			pData,
-			RIFFChunk object to append,
-
+			RIFFChunk object to prepend,
 			Prepends a pre-existing RIFFChunk object to the
   /// beginning of this BWFImportDescriptor\'s list of UnknownBWFChunks.
   /// 
