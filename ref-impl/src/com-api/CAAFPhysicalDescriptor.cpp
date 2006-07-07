@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFPhysicalDescriptor.cpp,v 1.4 2005/06/09 12:11:19 montrowe Exp $ $Name:  $
+// $Id: CAAFPhysicalDescriptor.cpp,v 1.5 2006/07/07 15:16:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

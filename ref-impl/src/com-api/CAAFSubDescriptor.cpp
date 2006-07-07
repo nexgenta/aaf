@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFSubDescriptor.cpp,v 1.1 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CAAFSubDescriptor.cpp,v 1.2 2006/07/07 15:16:38 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

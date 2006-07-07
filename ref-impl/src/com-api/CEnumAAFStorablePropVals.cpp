@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFStorablePropVals.cpp,v 1.7 2005/06/09 12:11:21 montrowe Exp $ $Name:  $
+// $Id: CEnumAAFStorablePropVals.cpp,v 1.8 2006/07/07 15:16:41 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

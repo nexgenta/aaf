@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CEnumAAFClassDefs.cpp,v 1.8 2005/06/09 12:11:21 montrowe Exp $ $Name:  $
+// $Id: CEnumAAFClassDefs.cpp,v 1.9 2006/07/07 15:16:40 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,9 +102,9 @@ HRESULT STDMETHODCALLTYPE
       // turn it into a failure status code.
       //
       // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
       //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
     }
   catch (OMAssertionViolation &)
     {
@@ -188,9 +188,9 @@ HRESULT STDMETHODCALLTYPE
       // turn it into a failure status code.
       //
       // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
       //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
     }
   catch (OMAssertionViolation &)
     {
@@ -260,9 +260,9 @@ HRESULT STDMETHODCALLTYPE
       // turn it into a failure status code.
       //
       // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
       //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
     }
   catch (OMAssertionViolation &)
     {
@@ -309,9 +309,9 @@ HRESULT STDMETHODCALLTYPE
       // turn it into a failure status code.
       //
       // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
       //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
     }
   catch (OMAssertionViolation &)
     {
@@ -370,9 +370,9 @@ HRESULT STDMETHODCALLTYPE
       // turn it into a failure status code.
       //
       // If the OMException contains an HRESULT, it is returned to the
-      // client, if not, AAFRESULT_UNEXPECTED_EXCEPTION is returned.
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
       //
-      hr = OMExceptionToResult(e, AAFRESULT_UNEXPECTED_EXCEPTION);
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
     }
   catch (OMAssertionViolation &)
     {

@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDataEssenceDescriptor.h,v 1.2 2006/06/16 21:34:43 heydowns Exp $ $Name:  $
+// $Id: CAAFDataEssenceDescriptor.h,v 1.3 2006/07/07 15:16:35 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -63,6 +63,7 @@ public:
 
 
 
+
   //***********************************************************
   //
   // Initialize()
@@ -86,7 +87,6 @@ public:
   //
   STDMETHOD (Initialize)
      ();
-
 
 
   //***********************************************************
@@ -155,4 +155,5 @@ public:
 };
 
 #endif // ! __CAAFDataEssenceDescriptor_h__
+
 

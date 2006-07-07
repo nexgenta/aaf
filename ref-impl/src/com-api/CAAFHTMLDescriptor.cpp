@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFHTMLDescriptor.cpp,v 1.8 2005/06/09 12:11:18 montrowe Exp $ $Name:  $
+// $Id: CAAFHTMLDescriptor.cpp,v 1.9 2006/07/07 15:16:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
