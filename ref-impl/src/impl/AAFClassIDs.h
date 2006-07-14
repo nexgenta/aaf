@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.10 2006/03/24 18:23:37 jlow Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.11 2006/07/14 22:57:46 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -172,6 +172,7 @@ extern "C" const aafClassID_t CLSID_EnumAAFContainerDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFControlPoints;
 extern "C" const aafClassID_t CLSID_EnumAAFDataDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFEssenceData;
+extern "C" const aafClassID_t CLSID_EnumAAFFileDescriptors;
 extern "C" const aafClassID_t CLSID_EnumAAFFileEncodings;
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 extern "C" const aafClassID_t CLSID_EnumAAFInterpolationDefs;

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.11 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.12 2006/07/14 22:57:44 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -171,6 +171,7 @@ EXTERN_C const CLSID CLSID_EnumAAFContainerDefs;
 EXTERN_C const CLSID CLSID_EnumAAFControlPoints;
 EXTERN_C const CLSID CLSID_EnumAAFDataDefs;
 EXTERN_C const CLSID CLSID_EnumAAFEssenceData;
+EXTERN_C const CLSID CLSID_EnumAAFFileDescriptors;
 EXTERN_C const CLSID CLSID_EnumAAFFileEncodings;
 EXTERN_C const CLSID CLSID_EnumAAFIdentifications;
 EXTERN_C const CLSID CLSID_EnumAAFInterpolationDefs;

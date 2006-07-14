@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.161 2006/05/16 18:42:05 heydowns Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.162 2006/07/14 22:57:46 heydowns Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -183,6 +183,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFControlPoints \
 	EnumAAFDataDefs \
 	EnumAAFEssenceData \
+	EnumAAFFileDescriptors \
 	EnumAAFFileEncodings \
 	EnumAAFIdentifications \
 	EnumAAFInterpolationDefs \

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.11 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.12 2006/07/14 22:57:45 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -190,6 +190,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(EnumAAFControlPoints)
 	AAF_OBJECT_ENTRY(EnumAAFDataDefs)
 	AAF_OBJECT_ENTRY(EnumAAFEssenceData)
+	AAF_OBJECT_ENTRY(EnumAAFFileDescriptors)
 	AAF_OBJECT_ENTRY(EnumAAFFileEncodings)
 	AAF_OBJECT_ENTRY(EnumAAFIdentifications)
 	AAF_OBJECT_ENTRY(EnumAAFInterpolationDefs)
