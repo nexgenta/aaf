@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDescriptiveClip.dod,v 1.2 2006/07/14 18:49:06 heydowns Exp $ $Name:  $
+#c $Id: AAFDescriptiveClip.dod,v 1.3 2006/07/17 17:16:41 heydowns Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -129,7 +129,7 @@ AD_XMETHOD2(GetSourceTrackIDs,
 			aafUInt32,
 			maxSourceTrackIDCount,
 			The size of the given pSourceTrackIDs buffer,
-			[out\, size_is\(maxSourceTrackIDsCount\)],
+			[out\, size_is\(maxSourceTrackIDCount\)],
 			objPass,
 			aafUInt32 *,
 			pSourceTrackIDs,
@@ -166,7 +166,7 @@ AD_XMETHOD2(GetSourceTrackIDs,
 
 
 AD_XMETHOD2(IsSourceTrackIDPresent,
-			[in\, ref],
+			[in],
 			  objPass,
 			  aafUInt32,
 			  sourceTrackID,

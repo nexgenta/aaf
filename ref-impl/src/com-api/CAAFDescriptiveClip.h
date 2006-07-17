@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveClip.h,v 1.2 2006/07/14 18:49:07 heydowns Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.h,v 1.3 2006/07/17 17:16:44 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -168,7 +168,7 @@ public:
     /*[in]*/ aafUInt32  maxSourceTrackIDCount,
 
     // Array to hold the source track IDs
-    /*[out, size_is(maxSourceTrackIDsCount)]*/ aafUInt32 *  pSourceTrackIDs);
+    /*[out, size_is(maxSourceTrackIDCount)]*/ aafUInt32 *  pSourceTrackIDs);
 
 
   //***********************************************************
@@ -200,7 +200,7 @@ public:
   //
   STDMETHOD (IsSourceTrackIDPresent) (
     // Source track ID whose presence is to be queried
-    /*[in, ref]*/ aafUInt32  sourceTrackID,
+    /*[in]*/ aafUInt32  sourceTrackID,
 
     // True if sourceTrackID is present
     /*[out,retval]*/ aafBoolean_t*  pIsPresent);

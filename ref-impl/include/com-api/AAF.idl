@@ -2,7 +2,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAF.idl,v 1.40 2006/07/14 22:57:40 heydowns Exp $ $Name:  $")
+cpp_quote("// $Id: AAF.idl,v 1.41 2006/07/17 17:16:41 heydowns Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public")
 cpp_quote("// Source License Agreement (the \"License\"); You may not use this file")
@@ -5673,11 +5673,11 @@ interface IAAFDescriptiveClip : IUnknown
   ///   - the SourceTrackIDs property is not present.
   /// 
   /// @param maxSourceTrackIDCount [in] The size of the given pSourceTrackIDs buffer
-  /// @param pSourceTrackIDs [out, size_is(maxSourceTrackIDsCount)] Array to hold the source track IDs
+  /// @param pSourceTrackIDs [out, size_is(maxSourceTrackIDCount)] Array to hold the source track IDs
   ///
   HRESULT GetSourceTrackIDs (
     [in] aafUInt32  maxSourceTrackIDCount,
-    [out, size_is(maxSourceTrackIDsCount)] aafUInt32 *  pSourceTrackIDs);
+    [out, size_is(maxSourceTrackIDCount)] aafUInt32 *  pSourceTrackIDs);
 
 
   //***********************************************************
@@ -5707,11 +5707,11 @@ interface IAAFDescriptiveClip : IUnknown
   /// AAFRESULT_PROP_NOT_PRESENT
   ///   - the SourceTrackIDs property is not present.
   /// 
-  /// @param sourceTrackID [in, ref] Source track ID whose presence is to be queried
+  /// @param sourceTrackID [in] Source track ID whose presence is to be queried
   /// @param pIsPresent [out,retval] True if sourceTrackID is present
   ///
   HRESULT IsSourceTrackIDPresent (
-    [in, ref] aafUInt32  sourceTrackID,
+    [in] aafUInt32  sourceTrackID,
     [out,retval] aafBoolean_t*  pIsPresent);
 
 
