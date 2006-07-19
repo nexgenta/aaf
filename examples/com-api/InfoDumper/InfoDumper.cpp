@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.32 2006/06/13 18:23:03 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.33 2006/07/19 21:09:43 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2640,6 +2640,13 @@ static void dumpLibInfo(ostream & os)
 	}
 }
 
+void printHRESULT(HRESULT hr, ostream& s)
+{
+	s << hex
+	  << hr
+	  << endl;
+}
+
 //
 // Dumps the given file.  Returns true if successful; returns false if
 // an error was encountered.
@@ -2733,11 +2740,9 @@ static bool dumpFile (aafCharacter * pwFileName,
 	  }
 	  else
 	    {
-	      cerr << "Other error opening file " << name
-		   << " returning status 0x"
-		   << hex
-		   << hr
-		   << endl;
+	      cerr << "Other error opening file " << name << " ";
+	      printHRESULT(hr, cerr);
+	      cerr << endl;
 	      return false;
 	    }
 	}
