@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.90 2006/06/15 20:06:43 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.91 2006/07/19 21:41:55 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -348,7 +348,7 @@
 #define AAFRESULT_INCONSISTENCY                   ((HRESULT)0x801201CC)
 
 /* INTERNAL Error Codes - programming errors */
-        /* Reference implementation assertion violation (programming error). */
+        /* Reference implementation assertion violation (programming error) */
 #define AAFRESULT_ASSERTION_VIOLATION             ((HRESULT)0x801201D0)
         /* Reference implementation unexpected C++ exception (programming error) */
 #define AAFRESULT_UNEXPECTED_EXCEPTION            ((HRESULT)0x801201D1)
