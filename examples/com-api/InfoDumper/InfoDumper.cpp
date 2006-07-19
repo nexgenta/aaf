@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.33 2006/07/19 21:09:43 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.34 2006/07/19 22:00:24 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2640,11 +2640,30 @@ static void dumpLibInfo(ostream & os)
 	}
 }
 
-void printHRESULT(HRESULT hr, ostream& s)
+void printHRESULT(HRESULT code, wostream& s)
 {
-	s << hex
-	  << hr
-	  << endl;
+   aafUInt32 len;
+   HRESULT  hr;
+
+   s.setf(std::ios::showbase);
+   s << std::hex
+     << std::setw(8)
+     << std::setfill(L'0');
+
+   hr = AAFResultToTextBufLen(code, &len);
+   if (AAFRESULT_SUCCEEDED(hr)) {
+     aafCharacter* buffer = (aafCharacter*)new char[len];
+     hr = AAFResultToText(code, buffer, len);
+     if (AAFRESULT_SUCCEEDED(hr)) {
+       s << buffer
+         << L" ("
+         << code
+         << L").";
+    }
+     delete [] buffer;
+   } else {
+     s << code;
+   }
 }
 
 //
@@ -2740,9 +2759,9 @@ static bool dumpFile (aafCharacter * pwFileName,
 	  }
 	  else
 	    {
-	      cerr << "Other error opening file " << name << " ";
-	      printHRESULT(hr, cerr);
-	      cerr << endl;
+	      cerr << "Error opening file " << name << " " << endl;
+	      printHRESULT(hr, wcerr);
+	      wcerr << endl;
 	      return false;
 	    }
 	}
