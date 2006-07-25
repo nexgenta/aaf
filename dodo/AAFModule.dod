@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFModule.dod,v 1.31 2006/06/08 14:55:03 tbingham Exp $ $Name:  $
+#c $Id: AAFModule.dod,v 1.32 2006/07/25 23:06:33 tbingham Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -870,6 +870,22 @@ AD_XFUNCTION1(AAFGetFileEncodings,
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(ppFileEncodings\))
 
+AD_XFUNCTION1(AAFSetDiagnosticOutput,
+			[in],
+			  objPass,
+			  IAAFDiagnosticOutput*,
+			  pOutput,
+			  New diagnostic output.,
+			Make the specified diagnostic output stream the AAF Toolkit's diagnostic output stream.
+  /// By default the diagnostic output goes to stderr. The passed in pointer is AddRefed.
+  /// The pointer will be Released the next time AAFSetDiagnosticOutput is called or when
+  /// the AAF DLL is unloaded.
+  /// 
+  ///
+  /// This method will succeed if the following are true:
+  /// - The pOutput pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pStream\))
 
 AD_XFUNCTION1(AAFGetLibraryVersion,
 			[out\, retval],
