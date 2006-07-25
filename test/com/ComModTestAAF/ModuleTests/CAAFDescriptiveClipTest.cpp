@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: CAAFDescriptiveClipTest.cpp,v 1.1 2006/03/24 18:28:29 jlow Exp $ $Name:  $
+// $Id: CAAFDescriptiveClipTest.cpp,v 1.2 2006/07/25 19:15:27 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,7 @@
 using namespace std;
 
 
+#if 0
 aafUInt32 TestSourceTrackIDsVector[] = { 1, 3, 5, 7, 11 };
 const aafUInt32 TestSourceTrackIDsVectorSize = 5;
 
@@ -358,3 +359,10 @@ extern "C" HRESULT CAAFDescriptiveClip_test(testMode_t mode)
 	return hr;
 }
 
+#else
+extern "C" HRESULT CAAFDescriptiveClip_test(testMode_t mode)
+{	
+	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
+	return hr;
+}
+#endif
