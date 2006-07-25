@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.42 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.43 2006/07/25 23:26:29 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,6 +51,7 @@
 #include "ImplAAFRandomRawStorage.h"
 #include "ImplAAFOMRawStorage.h"
 #include "ImplEnumAAFFileEncodings.h"
+#include "ImplAAFClientDiagnostics.h"
 #include "ImplAAFCachePageAllocator.h"
 #include "ImplAAFOMCachePageAllocator.h"
 
@@ -1442,6 +1443,34 @@ ImplAAFGetFileEncodings
   {
     *ppFileEncodings = p_enum_encodings;
   }
+
+
+  return hr;
+}
+
+STDAPI
+ImplAAFSetDiagnosticOutput
+  (IAAFDiagnosticOutput* pOutput)
+{
+  if (pOutput == 0)
+  {
+    return AAFRESULT_NULL_PARAM;
+  }
+
+  CHECK_CLIENT_IMPLEMENTED_QI(pOutput, IID_IAAFDiagnosticOutput);
+
+  HRESULT   hr = AAFRESULT_SUCCESS;
+
+
+  ImplAAFClientDiagnostics* pDiagnosticStream =
+      new ImplAAFClientDiagnostics (pOutput);
+  ASSERTU (pDiagnosticStream);
+
+  // Set the pDiagnosticStream to be the toolkit's
+  // default diagnostic output stream.
+  // Note that omlog::setStream() takes over the ownership
+  // of the pDiagnosticStream pointer.
+  omlog.setStream (pDiagnosticStream);
 
 
   return hr;

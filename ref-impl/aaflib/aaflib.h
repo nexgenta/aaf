@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflib.h,v 1.22 2006/06/09 01:38:06 tbingham Exp $ $Name:  $
+// $Id: aaflib.h,v 1.23 2006/07/25 23:26:28 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,6 +139,9 @@ typedef STDAPICALLTYPE HRESULT (* LPFNAAFSETPROGRESSCALLBACK)(
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETFILEENCODINGS)(
     IEnumAAFFileEncodings ** ppFileEncodings);
 
+typedef STDAPICALLTYPE HRESULT (* LPFNAAFSETOUTPUTSTREAM)(
+    IAAFDiagnosticOutput * pStream);
+
 typedef STDAPICALLTYPE HRESULT (* LPFNAAFGETLIBRARYVERSION)(
     aafProductVersion_t *  pVersion);
 
@@ -259,6 +262,9 @@ typedef HRESULT (STDAPICALLTYPE * LPFNAAFSETPROGRESSCALLBACK)(
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETFILEENCODINGS)(
     IEnumAAFFileEncodings ** ppFileEncodings);
+
+typedef HRESULT (STDAPICALLTYPE * LPFNAAFSETOUTPUTSTREAM)(
+    IAAFDiagnosticOutput * pStream);
 
 typedef HRESULT (STDAPICALLTYPE * LPFNAAFGETLIBRARYVERSION)(
     aafProductVersion_t *  pVersion);
@@ -422,6 +428,9 @@ public:
   HRESULT GetFileEncodings (
     IEnumAAFFileEncodings ** ppFileEncodings);
 
+  HRESULT SetDiagnosticOutput (
+    IAAFDiagnosticOutput * pStreams);
+
   HRESULT GetLibraryVersion (
     aafProductVersion_t *  pVersion);
 
@@ -474,6 +483,7 @@ protected:
   LPFNAAFCREATEAAFFILEONRAWSTORAGE _pfnCreateAAFFileOnRawStorage;
   LPFNAAFSETPROGRESSCALLBACK       _pfnSetProgressCallback;
   LPFNAAFGETFILEENCODINGS          _pfnGetFileEncodings;
+  LPFNAAFSETOUTPUTSTREAM           _pfnSetDiagnosticOutput;
   LPFNAAFGETLIBRARYVERSION         _pfnGetLibraryVersion;
   LPFNAAFGETLIBRARYPATHNAMEBUFLEN  _pfnGetLibraryPathNameBufLen;
   LPFNAAFGETLIBRARYPATHNAME        _pfnGetLibraryPathName;
