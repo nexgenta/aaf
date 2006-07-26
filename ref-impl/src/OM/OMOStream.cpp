@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.24 2006/07/26 19:47:52 tbingham Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.25 2006/07/26 19:53:36 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -378,6 +378,41 @@ static void debugPrint(const char* string)
   wchar_t s[256];
   convertStringToWideString(s, string, sizeof(s)/sizeof(s[0]));
   OutputDebugString(s);
+}
+
+#elif defined(OM_OS_MACOSX)
+
+#include <CoreServices/CoreServices.h>
+
+static char buffer[256];
+static size_t current = 0;
+
+static void debugFlush(void)
+{
+  unsigned char p[256];
+  copyCToPString(p, current + 1, buffer);
+  DebugStr(p);
+  current = 0;
+}
+
+static void debugPrint(const char c)
+{
+  if (current == sizeof(buffer)) {
+    debugFlush();
+    buffer[current++] = c;
+  } else if (c == '\n') {
+    debugFlush();
+  } else {
+    buffer[current++] = c;
+  }
+}
+
+static void debugPrint(const char* string)
+{
+  size_t i = 0;
+  while (string[i] != 0) {
+    debugPrint(string[i++]);
+  }
 }
 
 #else
