@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.17 2006/07/25 23:26:29 tbingham Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.18 2006/07/26 14:12:08 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,6 +102,8 @@ OMOStream& endl(OMOStream& s)
  // @globalv Global <c OMDiagnosticStream> for Object Manager logging.
 OMDiagnosticStream omlog;
 
+OMStandardOutputStream omout;
+
 // @devnote If your platform doesn't have <iostream> you'll need to
 //          implement the following functions differently.
 
@@ -202,6 +204,22 @@ OMOStream& OMOStream::put(void* p)
 OMOStream& OMOStream::putLine(void)
 {
   cerr << endl;
+  return *this;
+}
+
+OMStandardOutputStream::OMStandardOutputStream(void)
+{
+}
+
+OMOStream& OMStandardOutputStream::put(const char* string)
+{
+  cout << string;
+  return *this;
+}
+
+OMOStream& OMStandardOutputStream::putLine(void)
+{
+  cout << endl;
   return *this;
 }
 
