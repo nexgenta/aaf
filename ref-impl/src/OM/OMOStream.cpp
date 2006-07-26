@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.18 2006/07/26 14:12:08 tbingham Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.19 2006/07/26 14:35:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -304,6 +304,27 @@ OMOStream& OMOStream::putLine(void)
 }
 
 #endif
+
+static void debugPrint(const char* string)
+{
+  cerr << string;
+}
+
+OMDebuggerDiagnosticStream::OMDebuggerDiagnosticStream(void)
+{
+}
+
+OMOStream& OMDebuggerDiagnosticStream::put(const char* string)
+{
+  debugPrint(string);
+  return *this;
+}
+
+OMOStream& OMDebuggerDiagnosticStream::putLine(void)
+{
+  debugPrint("\n");
+  return *this;
+}
 
 OMDiagnosticStream::OMDiagnosticStream(void)
 {

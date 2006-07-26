@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.h,v 1.11 2006/07/26 14:12:08 tbingham Exp $ $Name:  $
+// $Id: OMOStream.h,v 1.12 2006/07/26 14:35:14 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -111,6 +111,21 @@ class OMStandardOutputStream : public OMOStream {
 public:
 
   OMStandardOutputStream(void);
+
+protected:
+
+  virtual OMOStream& put(const char* string);
+
+  virtual OMOStream& putLine(void);
+
+};
+
+// Diagnostic stream which outputs to the debugger
+//
+class OMDebuggerDiagnosticStream : public OMOStream {
+public:
+
+  OMDebuggerDiagnosticStream(void);
 
 protected:
 
