@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.20 2006/07/26 18:22:56 tbingham Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.21 2006/07/26 19:14:10 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -131,6 +131,10 @@ OMOStream& OMOStream::operator << (OMOStream& (*manipulator)(OMOStream&))
   return(*manipulator)(*this);
 }
 
+OMOStream& OMOStream::operator << (const OMOStreamManipulator& m)
+{
+  return m._f(*this, m._i);
+}
 
 OMOStream& OMOStream::dec(void)
 {
