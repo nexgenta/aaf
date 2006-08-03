@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFResult.h,v 1.91 2006/07/19 21:41:55 tbingham Exp $ $Name:  $
+// $Id: AAFResult.h,v 1.92 2006/08/03 20:21:20 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -90,6 +90,7 @@
 #define AAFRESULT_SETEXTENT_FAILURE               ((HRESULT)0x80120039)
 
 /* Read-while-modify errors */
+        /* The file is being modified (the header partition is open and incomplete) */
 #define AAFRESULT_FILE_BEING_MODIFIED             ((HRESULT)0x8012003A)
 
 /* MEDIA Error Codes */
