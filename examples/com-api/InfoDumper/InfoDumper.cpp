@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.34 2006/07/19 22:00:24 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.35 2006/08/03 20:18:53 tbingham Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,8 @@ static const char *ostream_int64(aafInt64 value)
 #else
 #define ostream_int64
 #endif
+
+void printHRESULT(HRESULT code, wostream& s);
 
 // structure for dump flags
 typedef struct _dumpFlags 
@@ -201,7 +203,9 @@ static HRESULT printAAFString(
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -476,7 +480,9 @@ static HRESULT dumpPropertyDef(
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -543,7 +549,9 @@ static HRESULT dumpMetaDefCommon
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -675,7 +683,9 @@ static HRESULT dumpClassDef(
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -1141,7 +1151,9 @@ static HRESULT dumpTypeDef(
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -1202,7 +1214,9 @@ HRESULT dumpMetaDictionary(IAAFHeaderSP /*pHeader*/,
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
 	
@@ -1296,7 +1310,9 @@ HRESULT dumpHeaderObject(IAAFHeaderSP pHeader,
 	}
 	catch (HRESULT &caught)
 	  {
-	    os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	    wcerr << endl << L"***Caught hresult ";
+	    printHRESULT(caught, wcerr);
+	    wcerr << endl;
 	    returnHr = caught;
 	  }
 	
@@ -1391,7 +1407,8 @@ HRESULT dumpMobsAndCS(IAAFHeaderSP pHeader,
 	    }
 	catch (HRESULT &caught)
 	  {
-	    os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	    wcerr << endl << L"***Caught hresult ";
+	    printHRESULT(caught, wcerr);
 	    returnHr = caught;
 	  }
 	
@@ -1441,7 +1458,9 @@ HRESULT dumpEssence(IAAFHeaderSP pHeader,
 	}
 	catch (HRESULT &caught)
 	  {
-	    os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	    wcerr << endl << L"***Caught hresult ";
+	    printHRESULT(caught, wcerr);
+	    wcerr << endl;
 	    returnHr = caught;
 	  }
 	
@@ -1469,7 +1488,9 @@ HRESULT dumpSummary(IAAFHeaderSP pHeader,
 	}
 	catch (HRESULT &caught)
 	{
-		os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+		wcerr << endl << L"***Caught hresult ";
+		printHRESULT(caught, wcerr);
+		wcerr << endl;
 		returnHr = caught;
 	}
 	
@@ -1604,7 +1625,9 @@ HRESULT dumpObject(IAAFObjectSP pContainer,
 	}
 	catch (HRESULT &caught)
 	{
-		os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+		wcerr << endl << L"***Caught hresult ";
+		printHRESULT(caught, wcerr);
+		wcerr << endl;
 		returnHr = caught;
 	}
 	
@@ -2453,7 +2476,9 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
     }
   catch (HRESULT &caught)
     {
-      os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+      wcerr << endl << L"***Caught hresult ";
+      printHRESULT(caught, wcerr);
+      wcerr << endl;
       returnHr = caught;
     }
   
@@ -2597,7 +2622,9 @@ HRESULT dumpRawStreamPropertyValue
 	  }
 	catch (HRESULT &caught)
 	  {
-	    os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	    wcerr << endl << L"***Caught hresult ";
+	    printHRESULT(caught, wcerr);
+	    wcerr << endl;
 	    streamResult = caught;
 	  }
 	
@@ -2847,7 +2874,9 @@ static bool dumpFile (aafCharacter * pwFileName,
 
 	catch (HRESULT &caught)
 	  {
-	    os << endl << "***Caught hresult 0x" << hex << caught << "***" << endl;
+	    wcerr << endl << L"***Caught hresult ";
+	    printHRESULT(caught, wcerr);
+	    wcerr << endl;
 	    hr = caught;
 	  }
 
