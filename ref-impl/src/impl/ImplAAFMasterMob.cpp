@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.cpp,v 1.63 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.cpp,v 1.64 2006/08/31 02:55:59 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -831,6 +831,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 				seg = NULL;
 			} else {
 				CHECK(fileSeq->CountComponents(&numComponents));
+				endPos = 0;
 				if (numComponents >= 1) {
 					for (aafUInt32 i = 0 ; i < numComponents ; i++) {
 						CHECK(fileSeq->GetComponentAt(i, (ImplAAFComponent**)&fileClip));
