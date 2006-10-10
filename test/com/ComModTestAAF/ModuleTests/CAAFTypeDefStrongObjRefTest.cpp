@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStrongObjRefTest.cpp,v 1.30 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStrongObjRefTest.cpp,v 1.31 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -103,66 +103,6 @@ inline bool EqualGUID (aafUID_t * a,
   assert (a);
   assert (b);
   return memcmp (a, b, sizeof (aafUID_t)) ? false : true;
-}
-
-
-static HRESULT OpenAAFFile(aafWChar*			pFileName,
-						   aafMediaOpenMode_t	mode,
-						   IAAFFile**			ppFile,
-						   IAAFHeader**			ppHeader)
-{
-  aafProductIdentification_t	ProductInfo;
-  HRESULT						hr = AAFRESULT_SUCCESS;
-
-  aafProductVersion_t v;
-  v.major = 1;
-  v.minor = 0;
-  v.tertiary = 0;
-  v.patchLevel = 0;
-  v.type = kAAFVersionUnknown;
-  ProductInfo.companyName = L"AAF Developers Desk";
-  ProductInfo.productName = L"AAFDictionary Test";
-  ProductInfo.productVersion = &v;
-  ProductInfo.productVersionString = NULL;
-  ProductInfo.productID = UnitTestProductID;
-  ProductInfo.platform = NULL;
-
-  *ppFile = NULL;
-
-  switch (mode)
-	{
-	case kAAFMediaOpenReadOnly:
-	  hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
-	  break;
-
-	case kAAFMediaOpenAppend:
-	  hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
-	  break;
-
-	default:
-	  hr = AAFRESULT_TEST_FAILED;
-	  break;
-	}
-
-  if (FAILED(hr))
-	{
-	  if (*ppFile)
-		{
-		  (*ppFile)->Release();
-		  *ppFile = NULL;
-		}
-	  return hr;
-	}
-  
-  hr = (*ppFile)->GetHeader(ppHeader);
-  if (FAILED(hr))
-	{
-	  (*ppFile)->Release();
-	  *ppFile = NULL;
-	  return hr;
-	}
- 	
-  return hr;
 }
 
 
@@ -337,7 +277,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	{
 	  // Open the AAF file
 	  IAAFHeaderSP header;
-	  checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &file, &header));
+	  checkResult(AAFFileOpenExistingRead(pFileName, 0, &file));
+
+	  // Get the AAF file header.
+	  checkResult(file->GetHeader(&header));
+
 
 	  // Get the dictionary.
 	  IAAFDictionarySP dict;

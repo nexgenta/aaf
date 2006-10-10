@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFControlPointsTest.cpp,v 1.37 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFControlPointsTest.cpp,v 1.38 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,52 +75,6 @@ const aafUID_t kTestEffectID = { 0xD15E7611, 0xFE40, 0x11d2, { 0x80, 0xA5, 0x00,
 const aafUID_t kTestParmID = { 0xC7265931, 0xFE57, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 const aafRational_t kTestLevel1 = { 1, 1 };
 const aafRational_t kTestLevel2 = { 0, 1 };
-
-static HRESULT OpenAAFFile(aafWChar*			pFileName,
-						   aafMediaOpenMode_t	mode,
-						   IAAFFile**			ppFile,
-						   IAAFHeader**			ppHeader)
-{
-	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr = AAFRESULT_SUCCESS;
-
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFControlPoints Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.platform = NULL;
-
-	if(mode == kAAFMediaOpenAppend)
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
-	else
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
-
-	if (FAILED(hr))
-	{
-	  if ( *ppFile ) {
-	    (*ppFile)->Release();
-	    *ppFile = NULL;
-	  }
-	  return hr;
-	}
-  
-  	hr = (*ppFile)->GetHeader(ppHeader);
-	if (FAILED(hr))
-	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
-		return hr;
-	}
- 	
-	return hr;
-}
 
 static HRESULT CreateAAFFile(
     aafWChar * pFileName,
@@ -404,9 +358,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
 		
+		// Get the AAF file header.
+		checkResult(pFile->GetHeader(&pHeader));
+
 		aafSearchCrit_t		criteria;
 		criteria.searchTag = kAAFNoSearch;
 		checkResult(pHeader->GetMobs (&criteria, &mobIter));

@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceFormatTest.cpp,v 1.30 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFEssenceFormatTest.cpp,v 1.31 2006/10/10 18:58:33 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,65 +84,6 @@ AAFRESULT loadWAVEHeader(aafUInt8 *buf,
 										aafUInt32 *dataOffset,
 										aafUInt32 *dataLen);
 
-
-static HRESULT OpenAAFFile(aafWChar*			pFileName,
-						   aafMediaOpenMode_t	mode,
-						   IAAFFile**			ppFile,
-						   IAAFHeader**			ppHeader)
-{
-	aafProductIdentification_t	ProductInfo;
-	HRESULT						hr = AAFRESULT_SUCCESS;
-	
-	aafProductVersion_t v;
-	v.major = 1;
-	v.minor = 0;
-	v.tertiary = 0;
-	v.patchLevel = 0;
-	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFEssenceFormat Test";
-	ProductInfo.productVersion = &v;
-	ProductInfo.productVersionString = NULL;
-	ProductInfo.productID = UnitTestProductID;
-	ProductInfo.platform = NULL;
-	
-	*ppFile = NULL;
-	
-	switch (mode)
-	{
-	case kAAFMediaOpenReadOnly:
-		hr = AAFFileOpenExistingRead(pFileName, 0, ppFile);
-		break;
-		
-	case kAAFMediaOpenAppend:
-		hr = AAFFileOpenNewModify(pFileName, 0, &ProductInfo, ppFile);
-		break;
-		
-	default:
-		hr = AAFRESULT_TEST_FAILED;
-		break;
-	}
-	
-	if (FAILED(hr))
-	{
-		if (*ppFile)
-		{
-			(*ppFile)->Release();
-			*ppFile = NULL;
-		}
-		return hr;
-	}
-	
-	hr = (*ppFile)->GetHeader(ppHeader);
-	if (FAILED(hr))
-	{
-		(*ppFile)->Release();
-		*ppFile = NULL;
-		return hr;
-	}
-	
-	return hr;
-}
 
 static HRESULT CreateAAFFile(
     aafWChar * pFileName,
@@ -388,9 +329,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	try
 	{
 		// Open the AAF file
-		checkResult(OpenAAFFile(pFileName, kAAFMediaOpenReadOnly, &pFile, &pHeader));
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
 		
+		// Get the AAF file header.
+		checkResult(pFile->GetHeader(&pHeader));
 	}
 	catch (HRESULT& rResult)
 	{
