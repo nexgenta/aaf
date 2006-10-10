@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFEssenceData
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFEssenceDataTest.cpp,v 1.32 2005/01/12 02:51:12 jfpanisset Exp $ $Name:  $
+// $Id: CEnumAAFEssenceDataTest.cpp,v 1.33 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,7 +46,9 @@ using namespace std;
 // Utility class to implement the test.
 struct EnumEssenceDataTest
 {
-  EnumEssenceDataTest();
+  EnumEssenceDataTest(aafUID_constref fileKind,
+                      testRawStorageType_t rawStorageType,
+                      aafProductIdentification_constref productID);
   ~EnumEssenceDataTest();
 
   void createFile(const wchar_t *pFileName);
@@ -63,8 +65,9 @@ struct EnumEssenceDataTest
 
   // Shared member data:
   HRESULT _hr;
-  aafProductVersion_t _productVersion;
   aafProductIdentification_t _productInfo;
+  aafUID_t _fileKind;
+  testRawStorageType_t _rawStorageType;
   IAAFFile *_pFile;
   bool _bFileOpen;
   IAAFHeader *_pHeader;
@@ -79,12 +82,22 @@ struct EnumEssenceDataTest
   static const aafUInt32 _maxMobCount;
 };
 
-extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFEssenceData_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFEssenceData_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
+extern "C" HRESULT CEnumAAFEssenceData_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID)
 {
   HRESULT hr = AAFRESULT_SUCCESS;
-  wchar_t const *fileName = L"EnumAAFEssenceDataTest.aaf";
-  EnumEssenceDataTest edt;
+  const size_t fileNameBufLen = 128;
+  aafWChar fileName[ fileNameBufLen ] = L"";
+  GenerateTestFileName( productID.productName, fileKind, fileNameBufLen, fileName );
+  EnumEssenceDataTest edt( fileKind, rawStorageType, productID );
 
   try
   {
@@ -142,8 +155,14 @@ static const 	aafMobID_t	TEST_MobIDs[EnumEssenceDataTest::_maxMobCount] =
 }; //end mobid block
 
 
-EnumEssenceDataTest::EnumEssenceDataTest():
+EnumEssenceDataTest::EnumEssenceDataTest(
+    aafUID_constref fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_constref productID):
   _hr(AAFRESULT_SUCCESS),
+  _productInfo(productID),
+  _fileKind(fileKind),
+  _rawStorageType(rawStorageType),
   _pFile(NULL),
   _bFileOpen(false),
   _pHeader(NULL),
@@ -155,17 +174,6 @@ EnumEssenceDataTest::EnumEssenceDataTest():
   _pEnumEssenceData(NULL),
   _pEssenceData(NULL)
 {
-  _productVersion.major = 1;
-  _productVersion.minor = 0;
-  _productVersion.tertiary = 0;
-  _productVersion.patchLevel = 0;
-  _productVersion.type = kAAFVersionUnknown;
-  _productInfo.companyName = L"AAF Developers Desk";
-  _productInfo.productName = L"EnumAAFEssenceData Module Test";
-  _productInfo.productVersion = &_productVersion;
-  _productInfo.productVersionString = NULL;
-  _productInfo.productID = UnitTestProductID;
-  _productInfo.platform = NULL;
 }
 
 EnumEssenceDataTest::~EnumEssenceDataTest()
@@ -258,7 +266,7 @@ void EnumEssenceDataTest::createFile(const wchar_t *pFileName)
   removeTestFile(pFileName);
 
 
-  check(AAFFileOpenNewModify(pFileName, 0, &_productInfo, &_pFile));
+  check(CreateTestFile( pFileName, _fileKind, _rawStorageType, _productInfo, &_pFile ));
   _bFileOpen = true;
   check(_pFile->GetHeader(&_pHeader));
   check(_pHeader->GetDictionary(&_pDictionary));

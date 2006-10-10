@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFPropertyDefs
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPropertyDefsTest.cpp,v 1.9 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFPropertyDefsTest.cpp,v 1.10 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,14 +79,22 @@ private:
 	IAAFClassDef *_pKnownClassDef;
 };
 
-extern "C" HRESULT CEnumAAFPropertyDefs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFPropertyDefs_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFPropertyDefs_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
+extern "C" HRESULT CEnumAAFPropertyDefs_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID)
 {
 	try
 	{
 		CEnumAAFPropertyDefsTest Test;
   		if(mode == kAAFUnitTestReadWrite)
-			Test.Run(mode);		// !!! This test requires create & verify intermixed
+			Test.Run(mode, fileKind, rawStorageType, productID);		// !!! This test requires create & verify intermixed
 	}
 	catch(HRESULT& rResult)
 	{

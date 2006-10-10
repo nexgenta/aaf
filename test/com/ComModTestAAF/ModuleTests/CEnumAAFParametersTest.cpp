@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFParameters
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFParametersTest.cpp,v 1.9 2004/11/26 17:20:30 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFParametersTest.cpp,v 1.10 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -198,14 +198,22 @@ void CEnumAAFParametersTest::GetAUID(IAAFParameter *pParameter,aafUID_t *pAUID)
 	checkResult(pDefObject->GetAUID(pAUID));
 }
 
-extern "C" HRESULT CEnumAAFParameters_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFParameters_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFParameters_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
+extern "C" HRESULT CEnumAAFParameters_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID)
 {
 	try
 	{
 		CEnumAAFParametersTest Test;
   		if(mode == kAAFUnitTestReadWrite)
-			Test.Run(mode);		// !!! This test requires create & verify intermixed
+			Test.Run(mode, fileKind, rawStorageType, productID); // !!! This test requires create & verify intermixed
 	}
 	catch(HRESULT& rResult)
 	{

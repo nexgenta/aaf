@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFPropertyValues
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPropertyValuesTest.cpp,v 1.4 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFPropertyValuesTest.cpp,v 1.5 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,9 +35,17 @@
 #include "ModuleTest.h"
 
 // Required function prototype.
-extern "C" HRESULT CEnumAAFPropertyValues_test(testMode_t);
+extern "C" HRESULT CEnumAAFPropertyValues_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
 
-HRESULT CEnumAAFPropertyValues_test(testMode_t /*mode*/)
+HRESULT CEnumAAFPropertyValues_test(
+    testMode_t /*mode*/,
+    aafUID_t /*fileKind*/,
+    testRawStorageType_t /*rawStorageType*/,
+    aafProductIdentification_t /*productID*/)
 {
   return AAFRESULT_NOT_IN_CURRENT_VERSION;
 }

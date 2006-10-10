@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRawStorageTest.cpp,v 1.3 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFRawStorageTest.cpp,v 1.4 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,11 +24,18 @@
 
 #include "AAFTypes.h" //Use #include "AAF.h" for functional module test.
 #include "AAFResult.h"
+#include "ModuleTest.h"
 
 // Required function prototype.
-extern "C" HRESULT CAAFRawStorage_test(void);
+extern "C" HRESULT CAAFRawStorage_test(testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
 
-HRESULT CAAFRawStorage_test()
+HRESULT CAAFRawStorage_test(testMode_t /* mode */,
+    aafUID_t /* fileKind */,
+    testRawStorageType_t /* rawStorageType */,
+    aafProductIdentification_t /* productID */)
 {
   // There is currently no support in the toolkit to make use if
   // non-Random Raw Storages (e.g. streams).  When that's in, we can

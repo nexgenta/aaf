@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssencePluginTest.cpp,v 1.11 2004/02/27 14:26:50 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssencePluginTest.cpp,v 1.12 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,8 +35,16 @@
 #include "ModuleTest.h"
 
 
-extern "C" HRESULT CAAFEssencePlugin_test(testMode_t);
-extern "C" HRESULT CAAFEssencePlugin_test(testMode_t /*mode*/)
+extern "C" HRESULT CAAFEssencePlugin_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
+extern "C" HRESULT CAAFEssencePlugin_test(
+    testMode_t /* mode */,
+    aafUID_t /* fileKind */,
+    testRawStorageType_t /* rawStorageType */,
+    aafProductIdentification_t /* productID */)
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }

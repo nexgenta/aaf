@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFTypeDefs
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFTypeDefsTest.cpp,v 1.14 2004/02/27 14:26:51 stuart_hc Exp $ $Name:  $
+// $Id: CEnumAAFTypeDefsTest.cpp,v 1.15 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,13 +56,21 @@ public:
 	}
 };
 
-extern "C" HRESULT CEnumAAFTypeDefs_test(testMode_t mode);
-extern "C" HRESULT CEnumAAFTypeDefs_test(testMode_t mode)
+extern "C" HRESULT CEnumAAFTypeDefs_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID);
+extern "C" HRESULT CEnumAAFTypeDefs_test(
+    testMode_t mode,
+    aafUID_t fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_t productID)
 {
 	try
 	{
 		CEnumAAFTypeDefsTest Test;
-		Test.Run(mode);
+		Test.Run(mode, fileKind, rawStorageType, productID);
 	}
 	catch(HRESULT& rResult)
 	{
