@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMContainerElementT.h,v 1.36 2004/05/25 17:14:53 stuart_hc Exp $ $Name:  $
+// $Id: OMContainerElementT.h,v 1.37 2006/10/13 17:56:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,7 +81,7 @@ OMVectorElement<ReferencedObject>::operator= (
 {
   TRACE("OMVectorElement<ReferencedObject>::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
@@ -207,7 +207,7 @@ OMSetElement<UniqueIdentification, ReferencedObject>::operator= (
 {
   TRACE("OMSetElement<UniqueIdentification, ReferencedObject>::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
@@ -307,7 +307,7 @@ OMContainerElement<ObjectReference>::operator= (
 {
   TRACE("OMContainerElement<ObjectReference>::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 

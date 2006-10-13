@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReference.cpp,v 1.19 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
+// $Id: OMObjectReference.cpp,v 1.20 2006/10/13 17:56:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -92,7 +92,7 @@ OMObjectReference& OMObjectReference::operator= (const OMObjectReference& rhs)
 {
   TRACE("OMObjectReference::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
   _property = rhs._property;

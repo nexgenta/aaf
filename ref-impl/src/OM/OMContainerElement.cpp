@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMContainerElement.cpp,v 1.19 2006/05/23 22:35:38 tbingham Exp $ $Name:  $
+// $Id: OMContainerElement.cpp,v 1.20 2006/10/13 17:56:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,7 +84,7 @@ OMStrongReferenceVectorElement::operator= (
 {
   TRACE("OMStrongReferenceVectorElement::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
@@ -227,7 +227,7 @@ OMStrongReferenceSetElement::operator= (const OMStrongReferenceSetElement& rhs)
 {
   TRACE("OMStrongReferenceSetElement::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
@@ -459,7 +459,7 @@ OMWeakReferenceVectorElement::operator= (
 {
   TRACE("OMWeakReferenceVectorElement::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
@@ -565,7 +565,7 @@ OMWeakReferenceSetElement::operator= (const OMWeakReferenceSetElement& rhs)
 {
   TRACE("OMWeakReferenceSetElement::operator=");
 
-  if (*this == rhs) {
+  if (this == &rhs) {
     return *this; // early return !
   }
 
