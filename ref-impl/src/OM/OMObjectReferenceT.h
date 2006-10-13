@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceT.h,v 1.1 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
+// $Id: OMObjectReferenceT.h,v 1.2 2006/10/13 17:38:42 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,10 @@
 #include "OMPropertyTable.h"
 #include "OMUtilities.h"
 #include "OMStrongReferenceSet.h"
+
+#if 1 // HACK4MEIP2
+#include "OMUniqueObjectIdentType.h"
+#endif
 
 // class OMWeakObjectReference
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMWeakObjectReference
@@ -216,6 +220,28 @@ OMStorable* OMWeakObjectReference<Key>::getValue(void) const
     set()->find(&nonConstThis->_identification, object);
     nonConstThis->_pointer = object;
   }
+#if 1 // HACK4MEIP2
+  if ((_pointer == 0) &&
+      (_identification != nullOMUniqueObjectIdentification)) {
+    // We failed to resolve the reference as an object id, try again as a label
+    // We should only come here for KLV encoded files.
+    OMUniqueObjectIdentification bid;
+    bid = _identification;
+    if (hostByteOrder() != bigEndian) {
+	  OMUniqueObjectIdentificationType::instance()->reorder(
+                                               reinterpret_cast<OMByte*>(&bid),
+                                               sizeof(bid));
+    }
+    OMKLVKey k;
+    memcpy(&k, &bid, sizeof(OMKLVKey));
+    OMUniqueObjectIdentification id;
+    convert(id, k);
+    nonConstThis->_identification = id;
+    OMStorable* object = 0;
+    set()->find(&nonConstThis->_identification, object);
+    nonConstThis->_pointer = object;
+  }
+#endif
   // If the following assertion is violated we have a dangling weak
   // reference.  The reference illegally designates an object that is
   // not present in the target set.  Code elsewhere prevents the
