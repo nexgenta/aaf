@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMCachedDiskRawStorage.cpp,v 1.11 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: OMCachedDiskRawStorage.cpp,v 1.12 2006/10/16 20:26:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,7 +225,6 @@ OMCachedDiskRawStorage::~OMCachedDiskRawStorage(void)
 {
   TRACE("OMCachedDiskRawStorage::~OMCachedDiskRawStorage");
 
-  flush();
   synchronize();
 }
 
@@ -399,6 +398,10 @@ void OMCachedDiskRawStorage::setPosition(OMUInt64 newPosition) const
 void OMCachedDiskRawStorage::synchronize(void)
 {
   TRACE("OMCachedDiskRawStorage::synchronize");
+
+  if (isWritable()) {
+    flush();
+  }
 }
 
   // @mfunc Read a page or partial page without using the cache.
