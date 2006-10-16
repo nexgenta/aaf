@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMCachedDiskRawStorage.h,v 1.10 2006/10/16 21:39:47 akharkev Exp $ $Name:  $
+// $Id: OMCachedDiskRawStorage.h,v 1.11 2006/10/16 21:41:47 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -92,9 +92,9 @@ private:
   //        This is an Object Manager built-in implementation of the
   //        <c OMRawStorage> interface.
   //
-  //   @base public | <c OMCachedRawStorage>
+  //   @base public | <c OMBaseCachedDiskRawStorage>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMCachedDiskRawStorage : public OMCachedRawStorage {
+class OMCachedDiskRawStorage : public OMBaseCachedDiskRawStorage {
 public:
 
   enum {defaultPageSize  = 4096};
@@ -159,15 +159,15 @@ public:
 private:
   // @access Private members.
 
-    // @cmember Read a page or partial page without using the cache.
-  virtual void readPage(OMUInt64 position,
-                        OMUInt32 byteCount,
-                        OMByte* destination);
-
-    // @cmember Write a page or partial page without using the cache.
-  virtual void writePage(OMUInt64 position,
+    // @cmember Read bytes without using the cache.
+  virtual void rawReadAt(OMUInt64 position,
                          OMUInt32 byteCount,
-                         const OMByte* source);
+                         OMByte* destination);
+
+    // @cmember Write bytes without using the cache.
+  virtual void rawWriteAt(OMUInt64 position,
+                          OMUInt32 byteCount,
+                          const OMByte* source);
 
     // @cmember Constructor.
   OMCachedDiskRawStorage(OMStream* file,
