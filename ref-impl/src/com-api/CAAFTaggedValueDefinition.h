@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTaggedValueDefinition.h,v 1.4 2005/06/09 12:11:20 montrowe Exp $ $Name:  $
+// $Id: CAAFTaggedValueDefinition.h,v 1.5 2006/11/08 16:21:30 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -72,7 +72,7 @@ public:
   // Init all fields of a definition object.
   //
   STDMETHOD (Initialize) (
-    // AUID for new DeObject
+    // AUID for new DefObject
     /*[in, ref]*/ aafUID_constref  id,
 
     // Name for new DefObject

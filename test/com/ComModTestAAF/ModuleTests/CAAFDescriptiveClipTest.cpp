@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: CAAFDescriptiveClipTest.cpp,v 1.4 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFDescriptiveClipTest.cpp,v 1.5 2006/11/08 16:25:15 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,8 +42,8 @@
 using namespace std;
 
 
-aafUInt32 TestSourceTrackIDsVector[] = { 1, 3, 5, 7, 11 };
-const aafUInt32 TestSourceTrackIDsVectorSize = 5;
+static aafUInt32 TestSourceTrackIDsVector[] = { 1, 3, 5, 7, 11 };
+static const aafUInt32 TestSourceTrackIDsVectorSize = 5;
 
 static aafSourceRef_t sourceRef; 
 static aafWChar *slotName = L"SLOT1";

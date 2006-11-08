@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginManager.h,v 1.15 2004/02/27 14:26:48 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPluginManager.h,v 1.16 2006/11/08 16:21:30 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -94,7 +94,7 @@ AAFRESULT ForEachPluginWithDefinitionDo(
   AAFDOTOPLUGINWITHDEFINTIONPROC proc, 
   void *refCon);
 
-bool FindPluginFromDefintion(
+bool FindPluginFromDefinition(
   aafUID_constref	pluginID,
   CLSID& clsid);
 

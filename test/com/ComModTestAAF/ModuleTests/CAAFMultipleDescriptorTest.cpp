@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFMultipleDescriptorTest.cpp,v 1.3 2005/07/25 20:23:19 montrowe Exp $ $Name:  $
+// $Id: CAAFMultipleDescriptorTest.cpp,v 1.4 2006/11/08 16:25:15 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -95,7 +95,7 @@ static HRESULT CreateAAFFile(
 		// Initialize mob properties:
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));
 		checkResult(pMob->SetMobID(TEST_MobID));
-		checkResult(pMob->SetName(L"EssenceDescriptorTest"));
+		checkResult(pMob->SetName(L"MultipleDescriptorTest"));
 		
 
 		IAAFEssenceDescriptor 		*eDesc = NULL;

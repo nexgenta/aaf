@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveClip.cpp,v 1.3 2006/07/14 18:49:07 heydowns Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.cpp,v 1.4 2006/11/08 16:21:27 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

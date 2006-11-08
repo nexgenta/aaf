@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFRIFFChunksTest.cpp,v 1.3 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFRIFFChunksTest.cpp,v 1.4 2006/11/08 16:25:16 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,7 @@ using namespace std;
 
 static const aafUInt32 chunkID = 1;
 static const aafUInt32 chunkID2 = 2;
-static const aafUInt32 chunkLength= 25;
+//static const aafUInt32 chunkLength= 25;
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -174,9 +174,12 @@ static HRESULT CreateAAFFile(
 		//Add the MOB to the file
 		checkResult(pHeader->AddMob(pMob));
 		
-		checkResult(pRIFFChunk->Initialize(chunkID, chunkLength, sizeof(RIFFChunksmiley), (unsigned char *)RIFFChunksmiley));
-		checkResult(pRIFFChunk2->Initialize(chunkID2, chunkLength, sizeof(RIFFChunkfrowney), (unsigned char *)RIFFChunkfrowney));
-		
+		aafUInt32 bBytesWrote = 0;
+		checkResult(pRIFFChunk->Initialize(chunkID));
+		checkResult(pRIFFChunk->Write(sizeof(RIFFChunksmiley), (unsigned char *)RIFFChunksmiley, &bBytesWrote));
+		checkResult(pRIFFChunk2->Initialize(chunkID2));
+		checkResult(pRIFFChunk2->Write(sizeof(RIFFChunkfrowney), (unsigned char *)RIFFChunkfrowney, &bBytesWrote));
+
 		pFile->Save();
 
 		pEssDesc->Release();

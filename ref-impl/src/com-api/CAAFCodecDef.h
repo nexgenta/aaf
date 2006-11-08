@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFCodecDef.h,v 1.5 2005/06/09 12:11:17 montrowe Exp $ $Name:  $
+// $Id: CAAFCodecDef.h,v 1.6 2006/11/08 16:21:25 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ public:
   // Init all fields of a definition object.
   //
   STDMETHOD (Initialize) (
-    // AUID for new DeObject
+    // AUID for new DefObject
     /*[in, ref]*/ aafUID_constref  id,
 
     // Name for new DefObject

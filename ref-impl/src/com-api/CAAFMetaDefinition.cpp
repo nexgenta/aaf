@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFMetaDefinition.cpp,v 1.9 2006/07/07 15:16:37 tbingham Exp $ $Name:  $
+// $Id: CAAFMetaDefinition.cpp,v 1.10 2006/11/08 16:21:27 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

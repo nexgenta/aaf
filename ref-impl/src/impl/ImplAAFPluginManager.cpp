@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPluginManager.cpp,v 1.45 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFPluginManager.cpp,v 1.46 2006/11/08 16:21:30 bmdurksen Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -456,7 +456,7 @@ AAFRESULT ImplAAFPluginManager::ForEachPluginWithDefinitionDo(
 }
 
 
-bool ImplAAFPluginManager::FindPluginFromDefintion(
+bool ImplAAFPluginManager::FindPluginFromDefinition(
   aafUID_constref	pluginID,
   CLSID& clsid)
 {
@@ -482,7 +482,7 @@ AAFRESULT ImplAAFPluginManager::CreateInstanceFromDefinition(
 
 	XPROTECT()
 	{
-		if(!FindPluginFromDefintion(pluginID, codecCLSID))
+		if(!FindPluginFromDefinition(pluginID, codecCLSID))
 			return(AAFRESULT_CODEC_INVALID);
 		CHECK(CreateInstance(codecCLSID,
 			pUnkOuter, 
