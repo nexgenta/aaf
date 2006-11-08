@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFDataDef.dod,v 1.29 2005/02/10 17:47:21 heydowns Exp $ $Name:  $
+#c $Id: AAFDataDef.dod,v 1.30 2006/11/08 16:08:41 bmdurksen Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -44,7 +44,7 @@ AD_XMETHOD3(Initialize,
 		   objPass,
 		   aafUID_constref,
 		   id,
-		   AUID for new DeObject,
+		   AUID for new DefObject,
 		   [in\, string],
 		   objPass,
 		   aafCharacter_constptr,

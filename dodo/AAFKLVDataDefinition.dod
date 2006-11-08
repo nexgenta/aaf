@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFKLVDataDefinition.dod,v 1.4 2005/06/08 15:37:05 montrowe Exp $ $Name:  $
+#c $Id: AAFKLVDataDefinition.dod,v 1.5 2006/11/08 16:08:42 bmdurksen Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -48,7 +48,7 @@ AD_XMETHOD3(Initialize,
 		   objPass,
 		   aafUID_constref,
 		   id,
-		   AUID for new DeObject,
+		   AUID for new DefObject,
 		   [in\, string],
 		   objPass,
 		   aafCharacter_constptr,
