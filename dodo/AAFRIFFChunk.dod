@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFRIFFChunk.dod,v 1.2 2006/11/08 16:08:43 bmdurksen Exp $ $Name:  $
+#c $Id: AAFRIFFChunk.dod,v 1.3 2006/11/16 12:24:41 bakerian Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -123,10 +123,9 @@ AD_XMETHOD1(GetChunkID,
 
 AD_METHOD3(Read,
 [in],aafUInt32, bytes, read this many bytes,
-[out\\\, size_is\\\(bytes\\\)\\\, length_is\\\(*bytesRead\\\)],aafDataBuffer_t,buffer, buffer to receive chunk data,
+[out\\\, size_is\\\(bytes\\\)\\\, length_is\\\(*pBytesRead\\\)],aafDataBuffer_t,buffer, buffer to receive chunk data,
 [out\\\,ref],aafUInt32 *,pBytesRead,,
-Reads data from this RIFFChunk at the current position. Advances the position \
-by the number of bytes read.)
+Reads data from this RIFFChunk at the current position. Advances the position by the number of bytes read.)
 
 
 AD_METHOD3(Write,
