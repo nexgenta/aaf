@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.29 2006/12/11 17:06:47 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.30 2006/12/11 18:17:31 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,6 @@
 #include "OMVector.h"
 
 class OMMXFStorage;
-class OMMXFStream;
 
   // @class Implementation of <c OMStoredStream> for
   //        SMPTE (Society of Motion Picture and Television Engineers)
@@ -43,9 +42,6 @@ public:
 
     // @cmember Constructor.
   OMKLVStoredStream(OMMXFStorage* store, OMUInt32 sid);
-
-    // @cmember Constructor.
-  OMKLVStoredStream(OMMXFStorage* store);
 
     // @cmember Destructor.
   ~OMKLVStoredStream(void);
@@ -123,7 +119,6 @@ private:
   OMMXFStorage* _store;
   OMUInt32 _sid;
   OMUInt64 _position;
-  OMMXFStream* _stream;
 
 };
 
