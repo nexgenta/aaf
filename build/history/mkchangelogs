@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkchangelogs,v 1.48 2006/12/23 04:09:17 tbingham Exp $ $Name:  $
+# $Id: mkchangelogs,v 1.49 2006/12/23 06:08:05 tbingham Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -305,12 +305,7 @@ do
   ptag=${tagnames[i - 1]}
   tag=${tagnames[i]}
   file=Changes-${ptag}-${tag}
-  if [[ -s ${file}.clog ]]
-  then
-    echo "<li><a href=\"${file}.html\">${ptag} -&gt; ${tag}</a>"
-  else
-    echo "<li>${ptag} -&gt; ${tag} - no changes"
-  fi
+  echo "<li><a href=\"${file}.html\">${ptag} -&gt; ${tag}</a>"
   let i=$i-1
 done >> $index
 
