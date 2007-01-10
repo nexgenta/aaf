@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStreamFilter.cpp,v 1.1 2006/12/11 17:08:33 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStreamFilter.cpp,v 1.2 2007/01/10 20:25:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -156,8 +156,15 @@ void OMKLVStoredStreamFilter::setSize(const OMUInt64 newSize)
     initialize();
   }
 
+  OMUInt64 currentPosition = _stream->position();
+
   _stream->setSize(_klvValueOffset + newSize);
   _klvLength = newSize;
+
+  // Update KLV length
+  _stream->setPosition(_klvValueOffset + newSize);
+  OMKLVStoredStream::fixupKLVLength(*_stream, _klvLengthOffset);
+  _stream->setPosition(currentPosition);
 }
 
 OMUInt64 OMKLVStoredStreamFilter::position(void) const
