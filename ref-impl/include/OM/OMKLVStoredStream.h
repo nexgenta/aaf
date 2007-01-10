@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.31 2007/01/10 20:13:03 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.32 2007/01/10 20:30:49 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -86,6 +86,9 @@ public:
 
     // @cmember Close this <c OMKLVStoredStream>.
   virtual void close(void);
+
+    // @cmember Filter this <c OMStoredStream>.
+  virtual OMStoredStreamFilter* createFilter(void);
 
   virtual OMUInt32 streamIdentification(void) const;
 

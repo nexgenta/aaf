@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredStream.cpp,v 1.5 2006/05/31 17:41:57 tbingham Exp $ $Name:  $
+// $Id: OMSSStoredStream.cpp,v 1.6 2007/01/10 20:30:59 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,7 @@
 #include "OMMSStructuredStorage.h"
 #include "OMAssertions.h"
 #include "OMExceptions.h"
+#include "OMTransparentStoredStreamFilter.h"
 
 static void checkStatus(HRESULT status);
 
@@ -172,6 +173,15 @@ void OMSSStoredStream::close(void)
   _stream->Release();
 #endif
   _stream = 0;
+}
+
+OMStoredStreamFilter* OMSSStoredStream::createFilter(void)
+{
+  TRACE("OMKLVStoredStream::createFilter");
+
+  OMStoredStreamFilter* result = new OMTransparentStoredStreamFilter(this);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
 }
 
 static void checkStatus(HRESULT status)

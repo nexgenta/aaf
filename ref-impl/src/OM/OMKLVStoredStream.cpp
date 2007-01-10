@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.cpp,v 1.37 2007/01/10 20:13:11 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStream.cpp,v 1.38 2007/01/10 20:30:59 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #include "OMKLVStoredStream.h"
 
 #include "OMAssertions.h"
+#include "OMKLVStoredStreamFilter.h"
 #include "OMMXFStorage.h"
 
 OMKLVStoredStream::OMKLVStoredStream(OMMXFStorage* store, OMUInt32 sid)
@@ -138,6 +139,15 @@ void OMKLVStoredStream::close(void)
 
   // We don't own _store
   _store = 0;
+}
+
+OMStoredStreamFilter* OMKLVStoredStream::createFilter(void)
+{
+  TRACE("OMKLVStoredStream::createFilter");
+
+  OMStoredStreamFilter* result = new OMKLVStoredStreamFilter(this);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
 }
 
 OMUInt32 OMKLVStoredStream::streamIdentification(void) const

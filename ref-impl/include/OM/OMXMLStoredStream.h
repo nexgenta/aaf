@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredStream.h,v 1.9 2006/05/31 17:41:56 tbingham Exp $ $Name:  $
+// $Id: OMXMLStoredStream.h,v 1.10 2007/01/10 20:30:49 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,6 +83,9 @@ public:
 
     // @cmember Close this <c OMStoredStream>.
   virtual void close(void);
+
+    // @cmember Filter this <c OMStoredStream>.
+  virtual OMStoredStreamFilter* createFilter(void);
 
 private:
   // @access Private members.

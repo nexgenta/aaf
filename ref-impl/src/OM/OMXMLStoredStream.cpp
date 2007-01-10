@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredStream.cpp,v 1.12 2006/05/31 17:41:57 tbingham Exp $ $Name:  $
+// $Id: OMXMLStoredStream.cpp,v 1.13 2007/01/10 20:30:59 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,7 @@
 
 #include "OMAssertions.h"
 #include "OMRawStorage.h"
+#include "OMTransparentStoredStreamFilter.h"
 #include "OMUtilities.h"
 
 OMXMLStoredStream::OMXMLStoredStream(OMRawStorage* store)
@@ -140,3 +141,13 @@ void OMXMLStoredStream::close(void)
   _store = 0;
   _position = 0;
 }
+
+OMStoredStreamFilter* OMXMLStoredStream::createFilter(void)
+{
+  TRACE("OMXMLStoredStream::createFilter");
+
+  OMStoredStreamFilter* result = new OMTransparentStoredStreamFilter(this);
+  ASSERT("Valid heap pointer", result != 0);
+  return result;
+}
+
