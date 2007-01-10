@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.163 2006/07/25 23:06:34 tbingham Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.164 2007/01/10 15:59:08 wschilp Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,7 @@ AAFNONPERSISTENTOBJECTS=""
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
 AAFCOMINTERFACESONLY="\
+	AAFAES3PCMDescriptor2 \
 	AAFCDCIDescriptor2 \
 	AAFComponent2 \
 	AAFCompositionMob2 \
