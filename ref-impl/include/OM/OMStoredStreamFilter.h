@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStoredStreamFilter.h,v 1.1 2006/12/11 17:06:47 akharkev Exp $ $Name:  $
+// $Id: OMStoredStreamFilter.h,v 1.2 2007/01/10 18:20:58 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,9 +34,6 @@ class OMStoredStream;
 class OMStoredStreamFilter {
 public:
   // @access Public members.
-
-    // @cmember Destructor.
-  virtual ~OMStoredStreamFilter(void) {} = 0;
 
     // @cmember Read <p size> bytes from this <c OMStoredStreamFilter>
     //          into the buffer at address <p data>.
