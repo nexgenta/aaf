@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.65 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.66 2007/01/10 20:44:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,7 @@
 #include "OMType.h"
 #include "OMUtilities.h"
 #include "OMDataStreamAccess.h"
+#include "OMDataStreamPropertyFilter.h"
 
 OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
                                            const wchar_t* name)
@@ -587,6 +588,15 @@ OMDataStreamAccess* OMDataStreamProperty::streamAccess(void) const
   PRECONDITION("Has stream access", hasStreamAccess());
   OMDataStreamAccess* result = _streamAccess;
   POSTCONDITION("Valid result", result != 0);
+  return result;
+}
+
+OMDataStreamPropertyFilter* OMDataStreamProperty::createFilter()
+{
+  TRACE("OMDataStreamProperty::createFilter");
+
+  OMDataStreamPropertyFilter* result = new OMDataStreamPropertyFilter(this);
+  ASSERT("Valid heap pointer", result != 0);
   return result;
 }
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.h,v 1.39 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMDataStreamProperty.h,v 1.40 2007/01/10 20:44:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,7 @@
 
 class OMStoredStream;
 class OMDataStreamAccess;
+class OMDataStreamPropertyFilter;
 
   // @class Persistent data stream properties supported by the Object
   //        Manager.
@@ -170,6 +171,11 @@ public:
   OMDataStreamAccess* streamAccess(void) const;
 
   OMStoredStream* stream(void) const; // tjb should be private
+
+  // Stream filtering
+
+  virtual OMDataStreamPropertyFilter* createFilter();
+
 
 protected:
 
