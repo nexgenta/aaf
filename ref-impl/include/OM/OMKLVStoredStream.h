@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStream.h,v 1.30 2006/12/11 18:17:31 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStream.h,v 1.31 2007/01/10 20:13:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -110,6 +110,15 @@ public:
   static bool readKLVKey(const OMStoredStream& stream, OMKLVKey& key);
 
   static bool readKLVLength(const OMStoredStream& stream, OMUInt64& length);
+
+  static void writeKLVKey(OMStoredStream& stream, const OMKLVKey& key);
+
+  static void writeKLVLength(OMStoredStream& stream, const OMUInt64& length);
+
+  static OMUInt64 reserveKLVLength(OMStoredStream& stream);
+
+  static void fixupKLVLength(OMStoredStream& stream,
+                             const OMUInt64 lengthPosition);
 
 private:
   // @access Private members.
