@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.164 2007/01/10 15:59:08 wschilp Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.165 2007/01/16 21:09:55 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,7 @@ AAFCOMINTERFACESONLY="\
 	AAFStreamAccess \
 	AAFTimelineMobSlot2 \
 	AAFTypeDefStreamEx \
+	AAFTypeDefStream2 \
 	AAFTypeDefVariableArrayEx "
 
 # These are the impl files that are typed by humans.  Be sure to

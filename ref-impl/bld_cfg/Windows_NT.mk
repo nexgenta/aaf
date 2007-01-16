@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: Windows_NT.mk,v 1.15 2004/03/18 18:58:42 stuart_hc Exp $ $Name:  $
+# $Id: Windows_NT.mk,v 1.16 2007/01/16 21:10:41 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,11 +38,11 @@ CP = cp.exe
 CAT = cat.exe
 CHMOD = chmod.exe
 MV = mv.exe
-SH = bash.exe
+SH = sh.exe
 TOUCH = touch.exe
 PERL = perl.exe
 
-SHELL = bash.exe
+SHELL = sh.exe
 MAKE_SUFFIX =
 
 CC = cl
