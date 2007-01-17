@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.12 2006/11/08 16:21:30 bmdurksen Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.13 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -152,6 +152,7 @@ extern "C" const aafClassID_t CLSID_AAFTypeDefExtEnum;
 extern "C" const aafClassID_t CLSID_AAFTypeDefFixedArray;
 extern "C" const aafClassID_t CLSID_AAFTypeDefIndirect;
 extern "C" const aafClassID_t CLSID_AAFTypeDefInt;
+extern "C" const aafClassID_t CLSID_AAFTypeDefMXFEssenceStream;
 extern "C" const aafClassID_t CLSID_AAFTypeDefObjectRef;
 extern "C" const aafClassID_t CLSID_AAFTypeDefOpaque;
 extern "C" const aafClassID_t CLSID_AAFTypeDefRecord;

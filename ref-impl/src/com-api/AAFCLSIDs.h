@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.13 2006/11/08 16:21:23 bmdurksen Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.14 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -151,6 +151,7 @@ EXTERN_C const CLSID CLSID_AAFTypeDefExtEnum;
 EXTERN_C const CLSID CLSID_AAFTypeDefFixedArray;
 EXTERN_C const CLSID CLSID_AAFTypeDefIndirect;
 EXTERN_C const CLSID CLSID_AAFTypeDefInt;
+EXTERN_C const CLSID CLSID_AAFTypeDefMXFEssenceStream;
 EXTERN_C const CLSID CLSID_AAFTypeDefObjectRef;
 EXTERN_C const CLSID CLSID_AAFTypeDefOpaque;
 EXTERN_C const CLSID CLSID_AAFTypeDefRecord;

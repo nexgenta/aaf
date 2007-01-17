@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.13 2006/11/08 16:21:23 bmdurksen Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.14 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -148,6 +148,7 @@
 #include "CAAFTypeDefFixedArray.h"
 #include "CAAFTypeDefIndirect.h"
 #include "CAAFTypeDefInt.h"
+#include "CAAFTypeDefMXFEssenceStream.h"
 #include "CAAFTypeDefObjectRef.h"
 #include "CAAFTypeDefOpaque.h"
 #include "CAAFTypeDefRecord.h"

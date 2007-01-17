@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.13 2006/11/08 16:21:23 bmdurksen Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.14 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -170,6 +170,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFTypeDefFixedArray)
 	AAF_OBJECT_ENTRY(AAFTypeDefIndirect)
 	AAF_OBJECT_ENTRY(AAFTypeDefInt)
+	AAF_OBJECT_ENTRY(AAFTypeDefMXFEssenceStream)
 	AAF_OBJECT_ENTRY(AAFTypeDefObjectRef)
 	AAF_OBJECT_ENTRY(AAFTypeDefOpaque)
 	AAF_OBJECT_ENTRY(AAFTypeDefRecord)
