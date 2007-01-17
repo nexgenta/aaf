@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.20 2005/09/06 13:40:01 montrowe Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.21 2007/01/17 20:45:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@ typedef IAAFSmartPointer<IAAFTypeDef>               IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefStream>         IAAFTypeDefStreamSP;
 typedef IAAFSmartPointer<IAAFTypeDefStreamEx>       IAAFTypeDefStreamExSP;
 typedef IAAFSmartPointer<IAAFSourceMob>             IAAFSourceMobSP;
+typedef IAAFSmartPointer<IAAFMetaDefinition>        IAAFMetaDefinitionSP;
 typedef IAAFSmartPointer<IAAFMob>                   IAAFMobSP;
 typedef IAAFSmartPointer<IAAFEssenceDescriptor>     IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFEssenceData>           IAAFEssenceDataSP;
@@ -547,10 +548,10 @@ class TestStreamAccess : public IAAFStreamAccess
 HRESULT STDMETHODCALLTYPE
 TestStreamAccess::WriteStream (IAAFPropertyValue *propertyValue, aafMemPtr_t pUserData)
 {
-	IAAFTypeDef			*pTypeDef;
-	IAAFTypeDefStream	*pTypeDefStream;
-	IAAFMetaDefinition	*pMetaDef;
-	aafCharacter		debugBuf[256];
+	IAAFTypeDefSP			pTypeDef;
+	IAAFTypeDefStreamSP		pTypeDefStream;
+	IAAFMetaDefinitionSP	pMetaDef;
+	aafCharacter			debugBuf[256];
 
 	CheckResult(propertyValue->GetType(&pTypeDef));
 	CheckResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **)&pMetaDef));
