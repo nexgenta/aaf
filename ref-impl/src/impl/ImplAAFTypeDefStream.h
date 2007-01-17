@@ -2,7 +2,7 @@
 #define __ImplAAFTypeDefStream_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.h,v 1.21 2007/01/17 05:21:24 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.h,v 1.22 2007/01/17 22:14:21 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -300,7 +300,7 @@ public:
         (ImplAAFTypeDef ** ppRawTypeDef);
 
 
-private:
+protected:
 
 
   //****************
