@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.22 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.23 2007/01/17 05:21:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -342,6 +342,18 @@ AAFRESULT STDMETHODCALLTYPE
   PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
   
   return pStreamPropertyValue->AppendElements(pElementType, dataSize, pData);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::GetMXFEssenceStream (
+      aafUInt32 filterType,
+      ImplAAFTypeDefStream ** pFilteredStream)
+{
+  AAFRESULT result = AAFRESULT_NOT_IMPLEMENTED;
+
+  return result;
 }
 
 

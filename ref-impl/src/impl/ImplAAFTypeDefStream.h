@@ -2,7 +2,7 @@
 #define __ImplAAFTypeDefStream_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.h,v 1.20 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.h,v 1.21 2007/01/17 05:21:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -268,6 +268,18 @@ public:
 
          // @parm [in, ref, size_is(dataSize)] buffer into which elements from the stream should be written
          aafMemPtr_t  pData);
+
+
+  //****************
+  // GetMXFEssenceStream()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetMXFEssenceStream
+        (// @parm [in] type of the stream data filter
+         aafUInt32 filterType,
+
+         // @parm [in] filtered stream access
+         ImplAAFTypeDefStream ** pFilteredStream);
 
 
   //****************
