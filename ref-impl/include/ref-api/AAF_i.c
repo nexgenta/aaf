@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF_i.c,v 1.22 2007/01/10 16:01:22 wschilp Exp $ $Name:  $
+// $Id: AAF_i.c,v 1.23 2007/01/17 05:34:56 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -570,6 +570,9 @@ const IID IID_IAAFTimelineMobSlot2 = {0xdb347978,0xba72,0x4bdf,{0xa1,0x88,0x81,0
 
 
 const IID IID_IAAFTypeDefStreamEx = {0xA7A76BEF,0xE074,0x4da8,{0xB1,0x8D,0x07,0xE3,0x55,0xC6,0x0D,0xF4}};
+
+
+const IID IID_IAAFTypeDefStream2 = {0xD1E43120,0xD90A,0x463f,{0xBC,0x4D,0xBB,0x11,0x74,0xA8,0xDB,0xD3}};
 
 
 const IID IID_IAAFTypeDefVariableArrayEx = {0x7f73d4b3,0x6f9a,0x11d4,{0x8e,0x59,0x00,0x90,0x27,0xdf,0xcc,0x26}};
