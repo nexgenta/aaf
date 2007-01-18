@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPCMDescriptor.h,v 1.3 2004/11/05 11:28:40 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFPCMDescriptor.h,v 1.4 2007/01/18 19:18:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -16,7 +16,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 // 
-// The Original Code of this file is Copyright 1998-2001, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 // 
 // The Initial Developer of the Original Code of this file and the
@@ -30,6 +30,9 @@
 
 #include "ImplAAFSoundDescriptor.h"
 
+
+
+class OMDataStreamPropertyFilter;
 
 
 class ImplAAFPCMDescriptor : public ImplAAFSoundDescriptor
@@ -315,7 +318,7 @@ public:
         aafUInt32* pBytesRead);
 
   //********************************
-  // AAF SDK exported methods start
+  // AAF SDK exported methods end
   //********************************
 
 protected:
@@ -333,6 +336,7 @@ protected:
     OMFixedSizeProperty<aafPosition_t>          _peakOfPeaksPosition;
     OMFixedSizeProperty<aafTimeStamp_t>         _peakEnvelopeTimestamp;
     OMDataStreamProperty                        _peakEnvelopeData;
+    OMDataStreamPropertyFilter*                 _peakEnvelopeDataFilter;
 };
 
 #endif // ! __ImplAAFPCMDescriptor_h__
