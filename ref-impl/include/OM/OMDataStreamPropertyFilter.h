@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamPropertyFilter.h,v 1.1 2007/01/10 20:39:19 akharkev Exp $ $Name:  $
+// $Id: OMDataStreamPropertyFilter.h,v 1.2 2007/01/18 19:09:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -102,6 +102,10 @@ public:
 
 private:
   // @access Private members.
+
+        OMStoredStreamFilter* streamFilter();
+  const OMStoredStreamFilter* streamFilter() const;
+
 
   OMDataStreamProperty* _property;
   OMStoredStreamFilter* _streamFilter;
