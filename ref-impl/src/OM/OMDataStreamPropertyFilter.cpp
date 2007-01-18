@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamPropertyFilter.cpp,v 1.1 2007/01/10 20:39:26 akharkev Exp $ $Name:  $
+// $Id: OMDataStreamPropertyFilter.cpp,v 1.2 2007/01/18 19:00:40 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,6 +75,7 @@ void OMDataStreamPropertyFilter::setSize(const OMUInt64 newSize)
   TRACE("OMDataStreamPropertyFilter::setSize");
 
   _streamFilter->setSize(newSize);
+  _property->setPresent();
 
   POSTCONDITION("Size properly set", size() == newSize);
 }
@@ -141,6 +142,7 @@ void OMDataStreamPropertyFilter::write(const OMByte* buffer,
   TRACE("OMDataStreamPropertyFilter::write");
 
   _streamFilter->write(buffer, bytes, bytesWritten);
+  _property->setPresent();
 }
 
   // @mfunc Attempt to read the number of elements given by
@@ -280,5 +282,6 @@ void OMDataStreamPropertyFilter::writeTypedElements(const OMType* elementType,
   }
   delete [] buffer;
   elementsWritten = elementCount;
+  _property->setPresent();
 }
 
