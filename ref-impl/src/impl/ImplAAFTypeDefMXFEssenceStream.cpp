@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefMXFEssenceStream.cpp,v 1.1 2007/01/17 22:11:01 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefMXFEssenceStream.cpp,v 1.2 2007/01/18 21:11:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -170,22 +170,5 @@ AAFRESULT STDMETHODCALLTYPE
   
   return pStreamPropertyValue->AppendElementsFiltered(pElementType, dataSize, pData);
 }
-
-
-
-// Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-// for the given OMProperty.
-/*
-AAFRESULT STDMETHODCALLTYPE
-  ImplAAFTypeDefMXFEssenceStream::CreatePropertyValue(
-    OMProperty *property,
-    ImplAAFPropertyValue ** ppPropertyValue ) const
-{
-  AAFRESULT result = AAFRESULT_SUCCESS;
- 
-  result = ImplAAFTypeDefStream::CreatePropertyValue (property, ppPropertyValue);
-  return result;
-}
-*/
 
 

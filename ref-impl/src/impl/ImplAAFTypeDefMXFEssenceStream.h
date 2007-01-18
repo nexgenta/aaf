@@ -2,7 +2,7 @@
 #define __ImplAAFTypeDefMXFEssenceStream_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefMXFEssenceStream.h,v 1.1 2007/01/17 22:11:01 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefMXFEssenceStream.h,v 1.2 2007/01/18 21:11:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -210,14 +210,6 @@ public:
   // Methods used internally by the SDK.
   //
 
-  //****************
-  // Allocate and initialize the correct subclass of ImplAAFPropertyValue 
-  // for the given OMProperty.
-  /*
-  virtual AAFRESULT STDMETHODCALLTYPE
-    CreatePropertyValue(OMProperty *property, 
-                        ImplAAFPropertyValue ** pPropertyValue) const;
-                        */
 
 
 protected:
