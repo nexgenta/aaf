@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStreamFilter.cpp,v 1.2 2007/01/10 20:25:50 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStreamFilter.cpp,v 1.3 2007/01/26 23:20:11 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -115,9 +115,13 @@ void OMKLVStoredStreamFilter::write(const OMByte* data,
 
   if (!_keyWritten)
   {
-    OMKLVKey key = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
-                    0x0e, 0x04, 0x03, 0x01, 0xff, 0xff, 0xff, 0xff};
-    _stream->setLabel(key);
+    OMKLVKey key = _stream->label();
+    if (key == nullOMKLVKey) {
+      OMKLVKey defalutKey = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
+                             0x0e, 0x04, 0x03, 0x01, 0xff, 0xff, 0xff, 0xff};
+      key = defalutKey;
+      _stream->setLabel(key);
+    }
     _stream->setPosition(0);
     OMKLVStoredStream::writeKLVKey(*_stream, key);
     _keyWritten = true;
