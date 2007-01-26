@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.49 2007/01/26 18:45:54 akharkev Exp $ $Name:  $
+// $Id: AAF.h,v 1.50 2007/01/26 19:16:44 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50715,6 +50715,38 @@ DECLARE_INTERFACE_(IAAFTypeDefStream3, IUnknown)
     IAAFTypeDef * pElementType,
     aafUInt32  dataSize,
     aafMemPtr_t  pData) PURE;
+
+  //***********************************************************
+  //
+  // SetCallback()
+  //
+  /// Sets a callback interface to be called when a stream is written to or
+  /// read from the file.  This allows the stream property to be built bottom up.
+  ///
+  /// Succeeds if:
+  /// - Initialize() has already been called on this object.
+  /// - pPropertyValue pointer is valid.
+  /// - pCallbackIF pointer is valid.
+  /// - pUserData pointer is valid.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - either pPropertyValue or pCallbackIF or pUserData arg is NULL.
+  ///
+  /// @param pPropertyValue [in] Issue the callback for this property
+  /// @param pCallbackIF [in] Interface of the callback object
+  /// @param pUserData [in] Client-specific data passed through to the callback
+  ///
+  STDMETHOD(SetCallback) (THIS_
+    IAAFPropertyValue * pPropertyValue,
+    IAAFStreamAccess*  pCallbackIF,
+    aafMemPtr_t  pUserData) PURE;
 
   //***********************************************************
   //
