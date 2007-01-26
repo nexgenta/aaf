@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamPropertyFilter.h,v 1.2 2007/01/18 19:09:43 akharkev Exp $ $Name:  $
+// $Id: OMDataStreamPropertyFilter.h,v 1.3 2007/01/26 23:22:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -103,6 +103,8 @@ public:
 private:
   // @access Private members.
 
+    // @cmember A filter on top of the stored stream in the data stream
+    //          property.
         OMStoredStreamFilter* streamFilter();
   const OMStoredStreamFilter* streamFilter() const;
 
