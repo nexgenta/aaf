@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.14 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.15 2007/01/26 18:49:07 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

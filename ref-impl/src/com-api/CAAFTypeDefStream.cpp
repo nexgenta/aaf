@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.cpp,v 1.12 2007/01/17 05:37:32 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.cpp,v 1.13 2007/01/26 18:49:07 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1388,9 +1388,9 @@ HRESULT CAAFTypeDefStream::InternalQueryInterface
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
-    if (EQUAL_UID(riid,IID_IAAFTypeDefStream2)) 
+    if (EQUAL_UID(riid,IID_IAAFTypeDefStream3)) 
     { 
-        *ppvObj = (IAAFTypeDefStream2 *)this; 
+        *ppvObj = (IAAFTypeDefStream3 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }

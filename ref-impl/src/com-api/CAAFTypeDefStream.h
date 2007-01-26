@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.h,v 1.8 2007/01/17 05:37:32 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.h,v 1.9 2007/01/26 18:49:07 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,7 @@ class ImplAAFTypeDefStream;
 class CAAFTypeDefStream
   : public IAAFTypeDefStream,
     public IAAFTypeDefStreamEx,
-	public IAAFTypeDefStream2,
+	public IAAFTypeDefStream3,
     public CAAFTypeDef
 {
 protected:
@@ -643,7 +643,7 @@ public:
   // METHOD NAME: GetMXFEssenceStream()
   //
   // DESCRIPTION:
-  // @mfunc AAFRESULT | AAFTypeDefStream2 | GetMXFEssenceStream |
+  // @mfunc AAFRESULT | AAFTypeDefStream3 | GetMXFEssenceStream |
   // Creates a type definition object which implements
   // the IAAFTypeDefStream interface and performs a file
   // encoding dependent filtering of the raw stream data.
