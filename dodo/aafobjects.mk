@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.167 2007/01/26 18:40:48 akharkev Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.168 2007/01/30 19:49:00 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -126,6 +126,7 @@ HUMAN_TYPED_IMPL="\
 	AAFParameter \
 	AAFParameterDef \
 	AAFPhysicalDescriptor \
+	AAFPlainStreamData \
 	AAFPluginDef \
 	AAFPluginManager \
 	AAFProperty \
@@ -166,7 +167,6 @@ HUMAN_TYPED_IMPL="\
 	AAFTypeDefFixedArray \
 	AAFTypeDefIndirect \
 	AAFTypeDefInt \
-	AAFTypeDefMXFEssenceStream \
 	AAFTypeDefObjectRef \
 	AAFTypeDefOpaque \
 	AAFTypeDefRecord \

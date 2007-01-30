@@ -1,8 +1,8 @@
-#ifndef __ImplAAFTypeDefMXFEssenceStream_h__
-#define __ImplAAFTypeDefMXFEssenceStream_h__
+#ifndef __ImplAAFPlainStreamData_h__
+#define __ImplAAFPlainStreamData_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefMXFEssenceStream.h,v 1.2 2007/01/18 21:11:09 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainStreamData.h,v 1.1 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,14 +27,14 @@
 #include "ImplAAFTypeDefStream.h"
 
 
-class ImplAAFTypeDefMXFEssenceStream : public ImplAAFTypeDefStream
+class ImplAAFPlainStreamData : public ImplAAFTypeDefStream
 {
 public:
   //
   // Constructor/destructor
   //
   //********
-  ImplAAFTypeDefMXFEssenceStream ();
+  ImplAAFPlainStreamData ();
 
 
 public:
@@ -213,8 +213,8 @@ public:
 
 
 protected:
-  virtual ~ImplAAFTypeDefMXFEssenceStream ();
+  virtual ~ImplAAFPlainStreamData ();
 
 };
 
-#endif // ! __ImplAAFTypeDefMXFEssenceStream_h__
+#endif // ! __ImplAAFPlainStreamData_h__

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCLSIDs.h,v 1.15 2007/01/26 18:49:07 akharkev Exp $ $Name:  $
+// $Id: AAFCLSIDs.h,v 1.16 2007/01/30 19:58:30 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -111,6 +111,7 @@ EXTERN_C const CLSID CLSID_AAFPCMDescriptor;
 EXTERN_C const CLSID CLSID_AAFParameter;
 EXTERN_C const CLSID CLSID_AAFParameterDef;
 EXTERN_C const CLSID CLSID_AAFPhysicalDescriptor;
+EXTERN_C const CLSID CLSID_AAFPlainStreamData;
 EXTERN_C const CLSID CLSID_AAFPluginDef;
 EXTERN_C const CLSID CLSID_AAFPluginManager;
 EXTERN_C const CLSID CLSID_AAFProperty;
@@ -151,7 +152,6 @@ EXTERN_C const CLSID CLSID_AAFTypeDefExtEnum;
 EXTERN_C const CLSID CLSID_AAFTypeDefFixedArray;
 EXTERN_C const CLSID CLSID_AAFTypeDefIndirect;
 EXTERN_C const CLSID CLSID_AAFTypeDefInt;
-EXTERN_C const CLSID CLSID_AAFTypeDefMXFEssenceStream;
 EXTERN_C const CLSID CLSID_AAFTypeDefObjectRef;
 EXTERN_C const CLSID CLSID_AAFTypeDefOpaque;
 EXTERN_C const CLSID CLSID_AAFTypeDefRecord;

@@ -1,13 +1,13 @@
 //@doc
-//@class    AAFTypeDefMXFEssenceStream | Implementation class for AAFTypeDefMXFEssenceStream
-#ifndef __CAAFTypeDefMXFEssenceStream_h__
-#define __CAAFTypeDefMXFEssenceStream_h__
+//@class    AAFPlainStreamData | Implementation class for AAFPlainStreamData
+#ifndef __CAAFPlainStreamData_h__
+#define __CAAFPlainStreamData_h__
 
 //=---------------------------------------------------------------------=
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefMXFEssenceStream.h,v 1.1 2007/01/17 22:08:12 akharkev Exp $ $Name:  $
+// $Id: CAAFPlainStreamData.h,v 1.1 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -44,8 +44,8 @@
 #endif
 
 
-class CAAFTypeDefMXFEssenceStream
-  : public IAAFTypeDefMXFEssenceStream,
+class CAAFPlainStreamData
+  : public IAAFPlainStreamData,
     public CAAFTypeDefStream
 {
 protected:
@@ -54,8 +54,8 @@ protected:
   //
   // Constructor/destructor
   //
-  CAAFTypeDefMXFEssenceStream (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
-  virtual ~CAAFTypeDefMXFEssenceStream ();
+  CAAFPlainStreamData (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
+  virtual ~CAAFPlainStreamData ();
 
 public:
 
@@ -81,6 +81,6 @@ public:
   //********
 };
 
-#endif // ! __CAAFTypeDefMXFEssenceStream_h__
+#endif // ! __CAAFPlainStreamData_h__
 
 

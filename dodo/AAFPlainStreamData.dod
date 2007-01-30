@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypeDefMXFEssenceStream.dod,v 1.1 2007/01/17 21:59:22 akharkev Exp $ $Name:  $
+#c $Id: AAFPlainStreamData.dod,v 1.1 2007/01/30 19:49:00 akharkev Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -22,7 +22,7 @@
 #c
 #c *********************************************************************
 #startm .this-module 0
-AAFTypeDefMXFEssenceStream\
+AAFPlainStreamData\
 #endm
 #c
 #startm .parent-module 0

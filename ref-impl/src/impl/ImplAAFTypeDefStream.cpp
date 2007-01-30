@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.24 2007/01/17 22:17:10 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.25 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,7 @@
 
 
 extern "C" const aafClassID_t CLSID_AAFStreamPropertyValue;
-extern "C" const aafClassID_t CLSID_AAFTypeDefMXFEssenceStream;
+extern "C" const aafClassID_t CLSID_AAFPlainStreamData;
 
 class ImplAAFOMDataStreamAccess : public OMDataStreamAccess {
 public:
@@ -357,11 +357,11 @@ AAFRESULT STDMETHODCALLTYPE
       ImplAAFTypeDefStream ** pFilteredStream)
 {
   AAFRESULT result = AAFRESULT_NOT_IMPLEMENTED;
-  ImplAAFTypeDefStream* pTypeDefMXFEssenceStream =
-    (ImplAAFTypeDefStream*) CreateImpl (CLSID_AAFTypeDefMXFEssenceStream);
-  if (pTypeDefMXFEssenceStream)
+  ImplAAFTypeDefStream* pPlainStreamData =
+    (ImplAAFTypeDefStream*) CreateImpl (CLSID_AAFPlainStreamData);
+  if (pPlainStreamData)
   {
-    *pFilteredStream = pTypeDefMXFEssenceStream;
+    *pFilteredStream = pPlainStreamData;
     result = AAFRESULT_SUCCESS;
   }
   else
