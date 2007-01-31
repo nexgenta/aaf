@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassIDs.h,v 1.15 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
+// $Id: AAFClassIDs.h,v 1.16 2007/01/31 18:23:08 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -112,6 +112,7 @@ extern "C" const aafClassID_t CLSID_AAFPCMDescriptor;
 extern "C" const aafClassID_t CLSID_AAFParameter;
 extern "C" const aafClassID_t CLSID_AAFParameterDef;
 extern "C" const aafClassID_t CLSID_AAFPhysicalDescriptor;
+extern "C" const aafClassID_t CLSID_AAFPlainEssenceData;
 extern "C" const aafClassID_t CLSID_AAFPlainStreamData;
 extern "C" const aafClassID_t CLSID_AAFPluginDef;
 extern "C" const aafClassID_t CLSID_AAFPluginManager;

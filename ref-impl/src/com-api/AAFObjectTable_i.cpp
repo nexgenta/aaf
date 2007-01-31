@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.16 2007/01/30 19:58:30 akharkev Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.17 2007/01/31 18:23:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -108,6 +108,7 @@
 #include "CAAFParameter.h"
 #include "CAAFParameterDef.h"
 #include "CAAFPhysicalDescriptor.h"
+#include "CAAFPlainEssenceData.h"
 #include "CAAFPlainStreamData.h"
 #include "CAAFPluginDef.h"
 #include "CAAFPluginManager.h"

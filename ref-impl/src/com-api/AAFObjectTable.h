@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.16 2007/01/30 19:58:30 akharkev Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.17 2007/01/31 18:23:06 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,6 +130,7 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFParameter)
 	AAF_OBJECT_ENTRY(AAFParameterDef)
 	AAF_OBJECT_ENTRY(AAFPhysicalDescriptor)
+	AAF_OBJECT_ENTRY(AAFPlainEssenceData)
 	AAF_OBJECT_ENTRY(AAFPlainStreamData)
 	AAF_OBJECT_ENTRY(AAFPluginDef)
 	AAF_OBJECT_ENTRY(AAFPluginManager)
