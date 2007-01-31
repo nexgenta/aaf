@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.cpp,v 1.30 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.cpp,v 1.31 2007/01/31 16:33:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -405,4 +405,8 @@ const OMMaterialIdentification&
 
 
 
+OMDataStreamPropertyFilter* ImplAAFEssenceData::createMediaDataFilter()
+{
+  return _mediaData.createFilter();
+}
 

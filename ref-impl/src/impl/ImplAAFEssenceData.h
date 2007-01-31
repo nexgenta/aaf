@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.h,v 1.19 2004/03/06 00:00:48 tbingham Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.h,v 1.20 2007/01/31 16:33:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,9 @@ class ImplAAFSourceMob;
 #ifndef __ImplAAFObject_h__
 #include "ImplAAFObject.h"
 #endif
+
+
+class OMDataStreamPropertyFilter;
 
 
 class ImplAAFEssenceData : public ImplAAFObject
@@ -200,6 +203,8 @@ public:
         (aafMobID_t *  pFileMobID);
 
   virtual const OMMaterialIdentification& identification(void) const;
+
+  OMDataStreamPropertyFilter* createMediaDataFilter();
 
 private:
   OMFixedSizeProperty<aafMobID_t> _fileMobID;
