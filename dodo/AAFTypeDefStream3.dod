@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypeDefStream3.dod,v 1.2 2007/01/26 19:12:31 akharkev Exp $ $Name:  $
+#c $Id: AAFTypeDefStream3.dod,v 1.3 2007/01/31 22:14:14 akharkev Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -526,28 +526,28 @@ AD_XMETHOD3(SetCallback,
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(either pPropertyValue or pCallbackIF or pUserData\))
 
-AD_XMETHOD2(GetMXFEssenceStream,
+AD_XMETHOD2(GetPlainStreamData,
 			[in],
 			objPass,
 			aafUInt32,
-			filterType,
-			type of the stream data filter,
+			reserved,
+			Reserved for future use,
 
 			[out\,retval],
 			objOut,
 			AAFTypeDefStream,
-			pFilteredStream,
-			filtered stream access,
+			pPlainStreamData,
+			file encoding-independent stream data,
 
-     Creates a type definition object which implements
-  // the IAAFTypeDefStream interface and performs a file
-  // encoding dependent filtering of the raw stream data.
+     Creates an object which implements the IAAFTypeDefStream
+  // interface and provides access to the file encoding-independent
+  // stream data.
   //
   // Succeeds if:
   // - Initialize\(\) has already been called on this object.
-  // - pFilteredStream is a valid pointer.
+  // - pPlainStreamData is a valid pointer.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pFilteredStream\))
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pPlainStreamData\))
 
 AD_XCLASS_END(Concrete, StoredObject)

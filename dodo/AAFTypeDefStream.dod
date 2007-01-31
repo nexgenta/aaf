@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypeDefStream.dod,v 1.17 2007/01/26 18:40:48 akharkev Exp $ $Name:  $
+#c $Id: AAFTypeDefStream.dod,v 1.18 2007/01/31 22:14:14 akharkev Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -502,7 +502,7 @@ AD_XMETHOD4(AppendElements,
   ///  - struct offsets have not yet been registered for the element typedef.)
 AD_OVERRIDE(.method-GetTypeCategory)
 AD_COM_METH(.method-SetCallback)
-AD_COM_METH(.method-GetMXFEssenceStream)
+AD_COM_METH(.method-GetPlainStreamData)
 
 #c AD_XCLASS_END(Concrete, StoredObject)
 AD_COM_EXT2_CLASS_END(AAFTypeDefStreamEx, AAFTypeDefStream3)

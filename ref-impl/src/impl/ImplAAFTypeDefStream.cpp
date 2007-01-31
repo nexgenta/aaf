@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.25 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.26 2007/01/31 22:14:22 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -352,16 +352,16 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFTypeDefStream::GetMXFEssenceStream (
-      aafUInt32 /*filterType*/,
-      ImplAAFTypeDefStream ** pFilteredStream)
+    ImplAAFTypeDefStream::GetPlainStreamData (
+      aafUInt32 /*reserved*/,
+      ImplAAFTypeDefStream ** pPlainStreamData)
 {
   AAFRESULT result = AAFRESULT_NOT_IMPLEMENTED;
-  ImplAAFTypeDefStream* pPlainStreamData =
+  ImplAAFTypeDefStream* pResult =
     (ImplAAFTypeDefStream*) CreateImpl (CLSID_AAFPlainStreamData);
   if (pPlainStreamData)
   {
-    *pFilteredStream = pPlainStreamData;
+    *pPlainStreamData = pResult;
     result = AAFRESULT_SUCCESS;
   }
   else
