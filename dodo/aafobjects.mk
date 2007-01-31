@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.168 2007/01/30 19:49:00 akharkev Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.169 2007/01/31 18:13:13 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -126,6 +126,7 @@ HUMAN_TYPED_IMPL="\
 	AAFParameter \
 	AAFParameterDef \
 	AAFPhysicalDescriptor \
+	AAFPlainEssenceData \
 	AAFPlainStreamData \
 	AAFPluginDef \
 	AAFPluginManager \
