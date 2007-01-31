@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.h,v 1.20 2007/01/31 16:33:57 akharkev Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.h,v 1.21 2007/01/31 19:38:16 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -201,6 +201,18 @@ public:
     GetFileMobID
 		// @parm [out] the file mob id associated with essence
         (aafMobID_t *  pFileMobID);
+
+/****/
+  //****************
+  // GetPlainEssenceData()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetPlainEssenceData
+        (// @parm [in] Reserved for future use
+         aafUInt32 reserved,
+
+         // @parm [in] plain essence data
+         ImplAAFEssenceData ** pPlainEssenceData);
 
   virtual const OMMaterialIdentification& identification(void) const;
 
