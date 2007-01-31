@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.h,v 1.21 2007/01/31 19:38:16 akharkev Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.h,v 1.22 2007/01/31 22:12:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -211,7 +211,7 @@ public:
         (// @parm [in] Reserved for future use
          aafUInt32 reserved,
 
-         // @parm [in] plain essence data
+         // @parm [in] file encoding-independent essence data
          ImplAAFEssenceData ** pPlainEssenceData);
 
   virtual const OMMaterialIdentification& identification(void) const;

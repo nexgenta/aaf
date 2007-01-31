@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.cpp,v 1.32 2007/01/31 19:38:16 akharkev Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.cpp,v 1.33 2007/01/31 22:12:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -406,15 +406,15 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceData::GetPlainEssenceData (
       aafUInt32 /*reserved*/,
-      ImplAAFEssenceData ** pEssenceData)
+      ImplAAFEssenceData ** pPlainEssenceData)
 {
   AAFRESULT result = AAFRESULT_NOT_IMPLEMENTED;
-  ImplAAFPlainEssenceData* pPlainEssenceData =
+  ImplAAFPlainEssenceData* pResult =
     (ImplAAFPlainEssenceData*) CreateImpl (CLSID_AAFPlainEssenceData);
-  if (pEssenceData)
+  if (pResult)
   {
-    pPlainEssenceData->pvtInitialize(this);
-    *pEssenceData = pPlainEssenceData;
+    pResult->pvtInitialize(this);
+    *pPlainEssenceData = pResult;
     result = AAFRESULT_SUCCESS;
   }
   else
