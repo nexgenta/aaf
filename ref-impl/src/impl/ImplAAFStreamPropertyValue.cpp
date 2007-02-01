@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStreamPropertyValue.cpp,v 1.13 2007/01/16 20:31:06 akharkev Exp $ $Name:  $
+// $Id: ImplAAFStreamPropertyValue.cpp,v 1.14 2007/02/01 23:30:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -36,6 +36,7 @@
 #include "OMPropertyDefinition.h"
 #include "OMDataStreamProperty.h"
 #include "OMDataStreamPropertyFilter.h"
+#include "OMUtilities.h"
 
 #include "OMAssertions.h"
 #include <string.h>
@@ -831,3 +832,41 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFStreamPropertyValue::WriteTo(
     
   return AAFRESULT_SUCCESS;
 }
+
+AAFRESULT STDMETHODCALLTYPE ImplAAFStreamPropertyValue::GetEssenceElementKey(
+  aafUID_t * pEssenceElementKey)
+{
+  ASSERTU(HasEssenceElementKey());
+
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pEssenceElementKey)
+    return AAFRESULT_NULL_PARAM;
+
+  convert( *reinterpret_cast<OMUniqueObjectIdentification*>(pEssenceElementKey),
+           _streamProperty->essenceElementKey() );
+
+  return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE ImplAAFStreamPropertyValue::SetEssenceElementKey(
+  aafUID_constref  key)
+{
+  ASSERTU(HasEssenceElementKey());
+
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+
+  OMKLVKey klvKey;
+  convert( klvKey,
+           *reinterpret_cast<const OMUniqueObjectIdentification*>(&key) );
+  _streamProperty->setEssenceElementKey(klvKey);
+
+  return AAFRESULT_SUCCESS;
+}
+
+bool ImplAAFStreamPropertyValue::HasEssenceElementKey() const
+{
+  return _streamProperty->hasEssenceElementKey();
+}
+

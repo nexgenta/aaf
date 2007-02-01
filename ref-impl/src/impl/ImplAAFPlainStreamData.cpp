@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainStreamData.cpp,v 1.1 2007/01/30 19:58:31 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainStreamData.cpp,v 1.2 2007/02/01 23:30:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -169,6 +169,34 @@ AAFRESULT STDMETHODCALLTYPE
   PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
   
   return pStreamPropertyValue->AppendElementsFiltered(pElementType, dataSize, pData);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::GetEssenceElementKey (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUID_t * pEssenceElementKey)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+
+  if (!pStreamPropertyValue->HasEssenceElementKey())
+      return AAFRESULT_OPERATION_NOT_PERMITTED;
+
+  return pStreamPropertyValue->GetEssenceElementKey(pEssenceElementKey);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::SetEssenceElementKey (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUID_constref  key)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  if (!pStreamPropertyValue->HasEssenceElementKey())
+      return AAFRESULT_OPERATION_NOT_PERMITTED;
+
+  return pStreamPropertyValue->SetEssenceElementKey(key);
 }
 
 

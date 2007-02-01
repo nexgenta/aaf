@@ -2,7 +2,7 @@
 #define __ImplAAFStreamPropertyValue_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStreamPropertyValue.h,v 1.8 2007/01/16 20:31:06 akharkev Exp $ $Name:  $
+// $Id: ImplAAFStreamPropertyValue.h,v 1.9 2007/02/01 23:30:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -15,7 +15,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -375,6 +375,28 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE WriteTo(OMProperty* pOmProp);
 
   void setStreamAccess(OMDataStreamAccess* access);
+
+
+  //****************
+  // GetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetEssenceElementKey
+        (// @parm [in] key of the essence elements in this stream
+         aafUID_t *  pEssenceElementKey);
+
+
+  //****************
+  // SetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEssenceElementKey
+        (// @parm [in] key of the essence elements in this stream
+         aafUID_constref  key);
+
+
+  bool HasEssenceElementKey() const;
+
 
 protected:
   virtual ~ImplAAFStreamPropertyValue ();
