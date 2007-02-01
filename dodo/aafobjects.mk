@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.170 2007/01/31 19:38:08 akharkev Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.171 2007/02/01 23:32:22 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@ AAFCOMINTERFACESONLY="\
 	AAFEventMobSlot2 \
 	AAFFileDescriptor2 \
 	AAFHeader2 \
+	AAFKLVStreamParameters \
 	AAFMasterMob2 \
 	AAFMasterMobEx \
 	AAFMob2 \
