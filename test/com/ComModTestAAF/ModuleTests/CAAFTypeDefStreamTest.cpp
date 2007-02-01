@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.24 2007/01/31 22:14:30 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.25 2007/02/01 18:33:54 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -734,7 +734,7 @@ void CAAFTypeDefStream_create (
 
     Test_EssenceStreamPullWrite(pFile, defs);
 
-    // Test IAAFTypeDefStream3 methods
+    // Test IAAFTypeDefStream2 methods
     IAAFEssenceDataSP pEssenceData2;
     IAAFPropertyValueSP pDataPropertyValue2;
     IAAFPropertyValueSP pSampleIndexPropertyValue2;
@@ -815,7 +815,7 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
     }  
 
 
-    // Test IAAFTypeDefStream3 methods
+    // Test IAAFTypeDefStream2 methods
     IAAFEssenceDataSP pEssenceData2;
 
     // sMobID[3] may not be in the file, in the case
