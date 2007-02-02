@@ -2,7 +2,7 @@
 #define __ImplAAFStreamPropertyValue_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFStreamPropertyValue.h,v 1.9 2007/02/01 23:30:43 akharkev Exp $ $Name:  $
+// $Id: ImplAAFStreamPropertyValue.h,v 1.10 2007/02/02 21:46:45 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -393,9 +393,6 @@ public:
     SetEssenceElementKey
         (// @parm [in] key of the essence elements in this stream
          aafUID_constref  key);
-
-
-  bool HasEssenceElementKey() const;
 
 
 protected:
