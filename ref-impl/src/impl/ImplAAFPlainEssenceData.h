@@ -2,7 +2,7 @@
 #define __ImplAAFPlainStreamData_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainEssenceData.h,v 1.1 2007/01/31 18:13:21 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainEssenceData.h,v 1.2 2007/02/02 19:22:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -193,6 +193,33 @@ public:
         (aafMobID_t *  pFileMobID);
 
 
+
+  // Stream parameters
+
+/****/
+  //****************
+  // GetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetEssenceElementKey
+        (// @parm [out,ref] key of the essence elements in this stream
+         aafUID_t *  pEssenceElementKey);
+
+
+/****/
+  //****************
+  // SetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEssenceElementKey
+        (// @parm [in] new stream alignment grid size
+         aafUID_constref  key);
+
+
+
+  //
+  // Methods used internally by the SDK.
+  //
 
   //****************
   // pvtInitialize()

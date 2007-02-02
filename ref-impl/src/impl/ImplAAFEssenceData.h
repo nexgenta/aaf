@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFEssenceData.h,v 1.22 2007/01/31 22:12:39 akharkev Exp $ $Name:  $
+// $Id: ImplAAFEssenceData.h,v 1.23 2007/02/02 19:22:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -213,6 +213,30 @@ public:
 
          // @parm [in] file encoding-independent essence data
          ImplAAFEssenceData ** pPlainEssenceData);
+
+
+  //
+  // Methods used internally by the SDK.
+  //
+
+  //****************
+  // GetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetEssenceElementKey
+        (// @parm [out,ref] key of the essence elements in this stream
+         aafUID_t *  pEssenceElementKey);
+
+
+/****/
+  //****************
+  // SetEssenceElementKey()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetEssenceElementKey
+        (// @parm [in] new stream alignment grid size
+         aafUID_constref  key);
+
 
   virtual const OMMaterialIdentification& identification(void) const;
 

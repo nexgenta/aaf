@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainEssenceData.cpp,v 1.1 2007/01/31 18:13:21 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainEssenceData.cpp,v 1.2 2007/02/02 19:22:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -214,6 +214,22 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPlainEssenceData::GetFileMobID (aafMobID_t *  pFileMobID)
 {
   return _mediaDataContainer->GetFileMobID(pFileMobID);
+}
+
+
+/****/
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainEssenceData::GetEssenceElementKey (aafUID_t * pEssenceElementKey)
+{
+  return _mediaDataContainer->GetEssenceElementKey(pEssenceElementKey);
+}
+
+
+/****/
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainEssenceData::SetEssenceElementKey (aafUID_constref  key)
+{
+  return _mediaDataContainer->SetEssenceElementKey(key);
 }
 
 
