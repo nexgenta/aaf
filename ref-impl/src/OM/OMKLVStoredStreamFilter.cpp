@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStreamFilter.cpp,v 1.3 2007/01/26 23:20:11 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStreamFilter.cpp,v 1.4 2007/02/05 22:31:11 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -134,9 +134,9 @@ void OMKLVStoredStreamFilter::write(const OMByte* data,
 
   _stream->setPosition(_klvValueOffset + _position);
   _stream->write(data, bytes, bytesWritten);
-  OMKLVStoredStream::fixupKLVLength(*_stream, _klvLengthOffset);
   _position += bytesWritten;
   if (_position > _klvLength) {
+    OMKLVStoredStream::fixupKLVLength(*_stream, _klvLengthOffset);
     _klvLength = _position;
   }
 }
