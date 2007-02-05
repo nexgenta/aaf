@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataStream.cpp,v 1.25 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceDataStream.cpp,v 1.26 2007/02/05 22:33:19 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,16 @@ CAAFEssenceDataStream::Init(
   if (NULL != _data)
     return AAFRESULT_NOT_INITIALIZED;
 
-	return(essenceData->QueryInterface (IID_IAAFEssenceData, (void **)&_data));
+  IAAFEssenceData2* essenceData2 = NULL;
+  AAFRESULT hr = essenceData->QueryInterface (IID_IAAFEssenceData2, (void **)&essenceData2);
+  if (AAFRESULT_SUCCEEDED(hr))
+  {
+    hr = essenceData2->GetPlainEssenceData(0, &_data);
+    essenceData2->Release();
+    essenceData2 = NULL;
+  }
+
+  return hr;
 }
 
 HRESULT STDMETHODCALLTYPE
