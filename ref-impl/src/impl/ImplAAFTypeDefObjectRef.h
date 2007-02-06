@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefObjectRef.h,v 1.22 2006/06/15 19:53:15 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefObjectRef.h,v 1.23 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,7 +32,7 @@
 class ImplAAFPropertyValue;
 class ImplAAFRoot;
 class ImplAAFClassDef;
-
+class OMTypeVisitor;
 
 
 
@@ -99,35 +99,6 @@ public:
 
          // @parm [in] pointer to object value
          ImplAAFRoot * ppObject);
-
-
-
-  //*************************************************************
-  //
-  // Overrides from OMType, via inheritace through ImplAAFTypeDef
-  //
-  //*************************************************************
-
-  virtual void reorder(OMByte* externalBytes,
-                       OMUInt32 externalBytesSize) const;
-
-  virtual OMUInt32 externalSize(const OMByte* internalBytes,
-							  OMUInt32 internalBytesSize) const;
-
-  virtual void externalize(const OMByte* internalBytes,
-                           OMUInt32 internalBytesSize,
-                           OMByte* externalBytes,
-                           OMUInt32 externalBytesSize,
-                           OMByteOrder byteOrder) const;
-
-  virtual OMUInt32 internalSize(const OMByte* externalBytes,
-							  OMUInt32 externalBytesSize) const;
-
-  virtual void internalize(const OMByte* externalBytes,
-                           OMUInt32 externalBytesSize,
-                           OMByte* internalBytes,
-                           OMUInt32 internalBytesSize,
-                           OMByteOrder byteOrder) const;
 
 
 

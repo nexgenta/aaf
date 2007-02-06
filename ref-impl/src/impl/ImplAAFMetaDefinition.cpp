@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.19 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.20 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,11 @@ typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 
 //#include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+
+#define HACK_ISPREDEFINED 1
+#ifdef HACK_ISPREDEFINED
+#include "AAFObjectModel.h"
+#endif
 
 #include "OMAssertions.h"
 #include <string.h>
@@ -432,6 +437,46 @@ const wchar_t* ImplAAFMetaDefinition::name(void) const
 {
   return _name;
 }
+
+
+
+bool ImplAAFMetaDefinition::hasDescription(void) const
+{
+  return _description.isPresent();
+}
+
+
+
+const wchar_t* ImplAAFMetaDefinition::description(void) const
+{
+  ASSERTU(hasDescription() == true);
+  return _description;
+}
+
+
+
+bool ImplAAFMetaDefinition::isPredefined(void) const
+{
+#ifdef HACK_ISPREDEFINED
+  const AAFObjectModel *objectModel = AAFObjectModel::singleton();
+  const Definition* builtinDefinition =
+                        objectModel->findDefinition(&_identification);
+
+  bool result = false;
+  if(!(builtinDefinition->isNil()))
+  {
+    result = true;
+  }
+
+  return result;
+
+#else
+  ASSERTU(false); // not implemented
+  return false;
+#endif
+}
+
+
 
 // Private method to install the AAFObjectModel definition associated with
 // this meta definition.

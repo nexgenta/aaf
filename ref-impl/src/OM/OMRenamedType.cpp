@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRenamedType.cpp,v 1.4 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMRenamedType.cpp,v 1.5 2007/02/06 15:46:14 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,8 @@
 // @doc OMEXTERNAL
 #include "OMRenamedType.h"
 
-// Nothing yet
+OMType::Tag OMRenamedType::tag(void) const
+{
+  return OMType::OMTTRename;
+}
+

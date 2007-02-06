@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUniqueObjectIdentType.h,v 1.8 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMUniqueObjectIdentType.h,v 1.9 2007/02/06 15:46:11 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,8 @@
 #define OMUNIQUEOBJECTIDENTTYPE_H
 
 #include "OMType.h"
+#include "OMRecordType.h"
+#include "OMDefinition.h"
 #include "OMSingleton.h"
 
 class OMUniqueObjectIdentificationType;
@@ -36,8 +38,9 @@ class OMUniqueObjectIdentificationType;
   //   @base public | <c OMSingleton>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMUniqueObjectIdentificationType :
-                         public OMType,
-                         public OMSingleton<OMUniqueObjectIdentificationType> {
+                         public OMRecordType,
+                         public OMSingleton<OMUniqueObjectIdentificationType>,
+                         private OMBuiltinDefinition {
 public:
 
   OMUniqueObjectIdentificationType(void);
@@ -70,6 +73,22 @@ public:
                            OMByte* internalBytes,
                            OMUInt32 internalBytesSize,
                            OMByteOrder byteOrder) const;
+
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+
+  virtual const wchar_t* name(void) const;
+
+  virtual bool hasDescription(void) const;
+
+  virtual const wchar_t* description(void) const;
+
+  virtual bool isPredefined(void) const;
+
+  virtual OMUInt32 memberCount(void) const;
+
+  virtual const wchar_t* memberName(OMUInt32 index) const;
+
+  virtual const OMType* memberType(OMUInt32 index) const;
 
 };
 

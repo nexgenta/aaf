@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMType.cpp,v 1.16 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMType.cpp,v 1.17 2007/02/06 15:46:15 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -168,12 +168,4 @@ void OMType::copy(const OMByte* inputBytes,
   OMByte* op = outputBytes;
 
   memcpy(op, ip, bytesSize);
-}
-
-  // tjb this is only here so that the library compiles and links
-const OMUniqueObjectIdentification& OMType::uniqueIdentification(void) const
-{
-  TRACE("OMType::uniqueIdentification");
-  ASSERT("Code not reached", false);
-  return nullOMUniqueObjectIdentification;
 }

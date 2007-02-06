@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRecordType.h,v 1.5 2007/02/06 15:46:10 wschilp Exp $ $Name:  $
+// $Id: OMOpaqueType.h,v 1.2 2007/02/06 15:46:09 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2004, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -23,28 +23,16 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
-#ifndef OMRECORDTYPE_H
-#define OMRECORDTYPE_H
+#ifndef OMOPAQUETYPE_H
+#define OMOPAQUETYPE_H
 
 #include "OMType.h"
 
-#include "OMDataTypes.h"
-
-class OMTypeVisitor;
-
-// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRecordType
-class OMRecordType : public OMType {
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMOpaqueType
+class OMOpaqueType : public OMType {
 public:
 
   virtual OMType::Tag tag(void) const;
-
-  virtual OMUInt32 memberCount(void) const = 0;
-
-  virtual const wchar_t* memberName(OMUInt32 index) const = 0;
-
-  virtual const OMType* memberType(OMUInt32 index) const = 0;
-
-  virtual void accept(OMTypeVisitor& visitor) const;
 
 };
 

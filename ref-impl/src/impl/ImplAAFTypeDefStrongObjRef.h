@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.27 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.28 2007/02/06 15:46:19 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,15 +31,18 @@
 class ImplAAFPropertyValue;
 
 class ImplAAFClassDef;
+class OMTypeVisitor;
 
 #ifndef __ImplAAFTypeDefObjectRef_h__
 #include "ImplAAFTypeDefObjectRef.h"
 #endif
 
+#include "OMObjectReferenceType.h"
 #include "OMWeakRefVectorProperty.h"
 #include "OMWeakRefProperty.h"
 
-class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef
+class ImplAAFTypeDefStrongObjRef : public ImplAAFTypeDefObjectRef,
+                                   public OMStrongObjectReferenceType
 {
 public:
   //
@@ -100,6 +103,67 @@ public:
         (const aafUID_t & id,
          const ImplAAFClassDef *pType,
          const aafCharacter * pTypeName);
+
+  //*************************************************************
+  //
+  // Overrides from OMDefinition
+  //
+  //*************************************************************
+
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+
+  virtual const wchar_t* name(void) const;
+
+  virtual bool hasDescription(void) const;
+
+  virtual const wchar_t* description(void) const;
+
+  virtual bool isPredefined(void) const;
+
+
+  //*************************************************************
+  //
+  // Overrides from OMType, via inheritace through ImplAAFTypeDef
+  //
+  //*************************************************************
+
+  virtual bool isFixedSize(void) const;
+
+  virtual void reorder(OMByte* externalBytes,
+                       OMUInt32 externalBytesSize) const;
+
+  virtual OMUInt32 externalSize(const OMByte* internalBytes,
+                                OMUInt32 internalBytesSize) const;
+
+  virtual OMUInt32 externalSize(void) const;
+
+  virtual void externalize(const OMByte* internalBytes,
+                           OMUInt32 internalBytesSize,
+                           OMByte* externalBytes,
+                           OMUInt32 externalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual OMUInt32 internalSize(const OMByte* externalBytes,
+                                OMUInt32 externalSize) const;
+
+  virtual OMUInt32 internalSize(void) const;
+
+  virtual void internalize(const OMByte* externalBytes,
+                           OMUInt32 externalBytesSize,
+                           OMByte* internalBytes,
+                           OMUInt32 internalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual void accept(OMTypeVisitor& visitor) const;
+
+  //*************************************************************
+  //
+  // Overrides from OMObjectReferenceType
+  //
+  //*************************************************************
+
+  virtual const OMUniqueObjectIdentification& referencedType(void) const;
+
 
   // overrides from ImplAAFTypeDef
   //

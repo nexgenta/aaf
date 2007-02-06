@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFixedSizeProperty.h,v 1.10 2006/06/15 19:53:19 tbingham Exp $ $Name:  $
+// $Id: OMFixedSizeProperty.h,v 1.11 2007/02/06 15:46:08 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -61,6 +61,9 @@ public:
 
     // @cmember "Address of" operator.
   PropertyType* operator &(void);
+
+    // @cmember Const "Address of" operator.
+  const PropertyType* operator &(void) const;
 
     // @cmember Convert this <c OMFixedSizeProperty> into a const
     //          reference to a <p PropertyType>.

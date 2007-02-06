@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStreamType.cpp,v 1.4 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStreamType.cpp,v 1.5 2007/02/06 15:46:14 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,8 @@
 // @doc OMEXTERNAL
 #include "OMStreamType.h"
 
-// Nothing yet
+OMType::Tag OMStreamType::tag(void) const
+{
+  return OMTTStream;
+}
+

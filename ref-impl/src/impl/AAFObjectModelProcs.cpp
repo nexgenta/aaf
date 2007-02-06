@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModelProcs.cpp,v 1.9 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
+// $Id: AAFObjectModelProcs.cpp,v 1.10 2007/02/06 15:46:15 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -207,6 +207,7 @@ static bool InitializePropertyDefinition(
   ImplAAFPropertyDef *pProperty = NULL;
   ImplAAFTypeDef *pType = NULL;
   const TypeDefinition *typeDefinition = NULL;
+  ImplAAFClassDef *pClass = NULL;
   AAFRESULT result;
 
   
@@ -219,16 +220,24 @@ static bool InitializePropertyDefinition(
     pType = metaDictionary->findAxiomaticTypeDefinition(*typeDefinition->id());
     ASSERTU (pType);
 
+    pClass = metaDictionary->findAxiomaticClassDefinition(*(propertyDefinition->classId()));
+    ASSERTU (pClass);
+
     result = pProperty->pvtInitialize (
       *propertyDefinition->id(),
       propertyDefinition->pid(),
       propertyDefinition->name(),
       pType,
       (propertyDefinition->required()) ? kAAFFalse : kAAFTrue,
-      (propertyDefinition->uid()) ? kAAFTrue : kAAFFalse);
+      (propertyDefinition->uid()) ? kAAFTrue : kAAFFalse,
+      pClass);
     ASSERTU (AAFRESULT_SUCCEEDED(result));
     if (AAFRESULT_FAILED(result))
+    {
+      pClass->ReleaseReference();
+      pClass = NULL;
       throw result;
+    }
 
     return true;
   }

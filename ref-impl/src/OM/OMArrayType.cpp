@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMArrayType.cpp,v 1.4 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: OMArrayType.cpp,v 1.5 2007/02/06 15:46:11 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,18 @@
 // @doc OMEXTERNAL
 #include "OMArrayType.h"
 
-// Nothing yet
+// class OMFixedArrayType;
+
+OMType::Tag OMFixedArrayType::tag(void) const
+{
+  return OMTTFixedArray;
+}
+
+
+// class OMVaryingArrayType;
+
+OMType::Tag OMVaryingArrayType::tag(void) const
+{
+  return OMTTVaryingArray;
+}
+

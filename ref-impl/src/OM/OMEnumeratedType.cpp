@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMEnumeratedType.cpp,v 1.4 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMEnumeratedType.cpp,v 1.5 2007/02/06 15:46:12 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,9 @@
 // @doc OMEXTERNAL
 #include "OMEnumeratedType.h"
 
-// Nothing yet
+OMType::Tag OMEnumeratedType::tag(void) const
+{
+  return OMTTEnumerated;
+}
+
+

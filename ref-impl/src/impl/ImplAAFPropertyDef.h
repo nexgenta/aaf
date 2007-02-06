@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.h,v 1.28 2006/05/24 18:01:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.h,v 1.29 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -108,7 +108,10 @@ public:
 		  aafBoolean_t isOptional,
 
         // @parm [in] Is this property a unique identifier
-		  aafBoolean_t isUniqueIdentifier);
+		  aafBoolean_t isUniqueIdentifier,
+
+        // @parm [in] The class definition to which this property belongs
+		  OMClassDefinition* pContainingClass);
 
 
   //****************
@@ -132,7 +135,10 @@ public:
 	aafBoolean_t isOptional,
 
         // @parm [in] Is this property a unique identifier
-	aafBoolean_t isUniqueIdentifier);
+	aafBoolean_t isUniqueIdentifier,
+
+        // @parm [in] The class definition to which this property belongs
+	OMClassDefinition* pContainingClass);
 
 
   OMPropertyId OmPid (void) const;
@@ -142,10 +148,17 @@ public:
   //
   // Overrides from OMPropertyDefinition
   //
+  virtual OMClassDefinition* containingClass(void) const;
+
   const OMType* type(void) const;
-  const OMUniqueObjectIdentification& uniqueIdentification(void) const;
+  
+  const OMUniqueObjectIdentification& identification(void) const;
   const wchar_t* name(void) const;
+  virtual bool hasDescription(void) const;
+  virtual const wchar_t* description(void) const;
+  virtual bool isPredefined(void) const;
   OMPropertyId localIdentification(void) const;
+  void setLocalIdentification(OMPropertyId propertyId);
   bool isOptional(void) const;
 
   // Allocates and returns an OMProperty which can represent this
@@ -184,9 +197,10 @@ private:
 
   ImplAAFTypeDef *                           _cachedType;
 
-  wchar_t * _wname;  // name in wide characters
-
   ImplAAFOMPropertyCreateFunc_t              _OMPropCreateFunc;
+
+  // The class to which this property belongs
+  OMClassDefinition*                         _containingClass;
 
 };
 

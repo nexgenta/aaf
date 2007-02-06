@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFixedSizePropertyT.h,v 1.13 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
+// $Id: OMFixedSizePropertyT.h,v 1.14 2007/02/06 15:46:12 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -117,6 +117,17 @@ template <typename PropertyType>
 PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void)
 {
   return reinterpret_cast<PropertyType*>(_bits);
+}
+
+  // @mfunc Const "Address of" operator.
+  //   @tcarg class | PropertyType | The type of the property. This
+  //          can be any type with well defined copy and assignment
+  //          semantics.
+  //   @rdesc Const pointer to a <p PropertyType>
+template <typename PropertyType>
+const PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void) const
+{
+  return reinterpret_cast<const PropertyType*>(_bits);
 }
 
   // @mfunc Convert this <c OMFixedSizeProperty> into a const

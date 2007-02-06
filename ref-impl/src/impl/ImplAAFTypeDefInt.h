@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefInt.h,v 1.22 2006/06/15 19:53:15 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefInt.h,v 1.23 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,9 +32,13 @@
 #include "ImplAAFTypeDef.h"
 #endif
 
-class ImplAAFPropertyValue;
+#include "OMIntegerType.h"
 
-class ImplAAFTypeDefInt : public ImplAAFTypeDef
+class ImplAAFPropertyValue;
+class OMTypeVisitor;
+
+class ImplAAFTypeDefInt : public ImplAAFTypeDef,
+                          public OMIntegerType
 {
 public:
   //
@@ -143,6 +147,22 @@ public:
 
   //*************************************************************
   //
+  // Overrides from OMDefinition
+  //
+  //*************************************************************
+
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+
+  virtual const wchar_t* name(void) const;
+
+  virtual bool hasDescription(void) const;
+
+  virtual const wchar_t* description(void) const;
+
+  virtual bool isPredefined(void) const;
+
+  //*************************************************************
+  //
   // Overrides from OMType, via inheritace through ImplAAFTypeDef
   //
   //*************************************************************
@@ -168,6 +188,17 @@ public:
                            OMUInt32 internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+  virtual void accept(OMTypeVisitor& visitor) const;
+
+  //*************************************************************
+  //
+  // Overrides from OMIntegerType
+  //
+  //*************************************************************
+
+  virtual OMUInt8 size(void) const;
+
+  virtual bool isSigned(void) const;
 
 public:
 

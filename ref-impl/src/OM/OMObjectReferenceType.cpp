@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceType.cpp,v 1.4 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMObjectReferenceType.cpp,v 1.5 2007/02/06 15:46:13 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,18 @@
 // @doc OMEXTERNAL
 #include "OMObjectReferenceType.h"
 
-// Nothing yet
+// class OMStrongObjectReferenceType;
+
+OMType::Tag OMStrongObjectReferenceType::tag(void) const
+{
+  return OMTTStrongObjectReference;
+}
+
+// class OMWeakObjectReferenceType;
+
+OMType::Tag OMWeakObjectReferenceType::tag(void) const
+{
+  return OMTTWeakObjectReference;
+}
+
+

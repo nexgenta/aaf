@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStreamType.h,v 1.4 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMStreamType.h,v 1.5 2007/02/06 15:46:10 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,17 @@
 #ifndef OMSTREAMTYPE_H
 #define OMSTREAMTYPE_H
 
-// Nothing yet
+#include "OMType.h"
+#include "OMSingleton.h"
+
+class OMStreamType;
+
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMStreamType
+class OMStreamType : public OMType, public OMSingleton<OMStreamType> {
+public:
+
+  virtual OMType::Tag tag(void) const;
+
+};
 
 #endif

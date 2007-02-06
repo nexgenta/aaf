@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRecordType.cpp,v 1.4 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMRecordType.cpp,v 1.5 2007/02/06 15:46:14 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,4 +25,15 @@
 // @doc OMEXTERNAL
 #include "OMRecordType.h"
 
-// Nothing yet
+#include "OMAssertions.h"
+
+OMType::Tag OMRecordType::tag(void) const
+{
+  return OMTTRecord;
+}
+
+void OMRecordType::accept(OMTypeVisitor& /* visitor */) const
+{
+  TRACE("OMRecordType::accept");
+  ASSERT("Unimplemented code not reached", false); // tjb - not yet
+}

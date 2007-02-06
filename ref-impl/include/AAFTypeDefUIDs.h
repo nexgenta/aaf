@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.25 2006/03/29 17:58:44 jlow Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.26 2007/02/06 15:46:06 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -288,6 +288,14 @@ const aafUID_t kAAFTypeID_UInt8Array8 =
 //{04010900-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_UInt32Array =
 {0x04010900, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{04010a00-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_ChannelStatusModeArray =
+{0x04010a00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{04010b00-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_UserDataModeArray =
+{0x04010b00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{04020100-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_RGBALayout =

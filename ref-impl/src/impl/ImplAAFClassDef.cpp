@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.62 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.63 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -849,7 +849,8 @@ AAFRESULT STDMETHODCALLTYPE
 								pName,
 								typeId,
 								isOptional,
-                isUniqueIdentifier));
+								isUniqueIdentifier,
+								this));
 
 //  ImplAAFPropertyDef * pdTemp = pd;
 //  _Properties.appendValue(pdTemp);

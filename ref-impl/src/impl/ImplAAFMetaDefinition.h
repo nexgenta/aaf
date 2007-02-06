@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.h,v 1.14 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.h,v 1.15 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -160,6 +160,9 @@ public:
 
   virtual const OMUniqueObjectIdentification& identification(void) const;
   virtual const wchar_t* name(void) const;
+  virtual bool hasDescription(void) const;
+  virtual const wchar_t* description(void) const;
+  virtual bool isPredefined(void) const;
 
   // Private method to assign the unique identifier.
   AAFRESULT SetIdentification(aafUID_constref identification);

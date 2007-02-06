@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefString.h,v 1.30 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefString.h,v 1.31 2007/02/06 15:46:19 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,15 +28,17 @@
 //=---------------------------------------------------------------------=
 
 class ImplAAFPropertyValue;
+class OMTypeVisitor;
 
 #ifndef __ImplAAFTypeDef_h__
 #include "ImplAAFTypeDef.h"
 #endif
 
+#include "OMStringType.h"
 #include "OMWeakRefVectorProperty.h"
 #include "OMWeakRefProperty.h"
 
-class ImplAAFTypeDefString : public ImplAAFTypeDef
+class ImplAAFTypeDefString : public ImplAAFTypeDef, public OMStringType
 {
 public:
   //
@@ -155,15 +157,35 @@ public:
 
   //*************************************************************
   //
+  // Overrides from OMDefinition
+  //
+  //*************************************************************
+
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+
+  virtual const wchar_t* name(void) const;
+
+  virtual bool hasDescription(void) const;
+
+  virtual const wchar_t* description(void) const;
+
+  virtual bool isPredefined(void) const;
+
+  //*************************************************************
+  //
   // Overrides from OMType, via inheritace through ImplAAFTypeDef
   //
   //*************************************************************
+
+  virtual bool isFixedSize(void) const;
 
   virtual void reorder(OMByte* externalBytes,
                        OMUInt32 externalBytesSize) const;
 
   virtual OMUInt32 externalSize(const OMByte* internalBytes,
-                                OMUInt32 internalBytesSize) const;
+								OMUInt32 internalBytesSize) const;
+
+  virtual OMUInt32 externalSize(void) const;
 
   virtual void externalize(const OMByte* internalBytes,
                            OMUInt32 internalBytesSize,
@@ -172,7 +194,9 @@ public:
                            OMByteOrder byteOrder) const;
 
   virtual OMUInt32 internalSize(const OMByte* externalBytes,
-                                OMUInt32 externalBytesSize) const;
+								OMUInt32 externalBytesSize) const;
+
+  virtual OMUInt32 internalSize(void) const;
 
   virtual void internalize(const OMByte* externalBytes,
                            OMUInt32 externalBytesSize,
@@ -180,6 +204,15 @@ public:
                            OMUInt32 internalBytesSize,
                            OMByteOrder byteOrder) const;
 
+  virtual void accept(OMTypeVisitor& visitor) const;
+
+  //*************************************************************
+  //
+  // Overrides from OMStringType
+  //
+  //*************************************************************
+
+  virtual OMType* elementType(void) const;
 
   //****************
   // pvtInitialize()

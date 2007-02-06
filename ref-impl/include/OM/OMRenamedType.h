@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRenamedType.h,v 1.4 2004/02/27 14:26:41 stuart_hc Exp $ $Name:  $
+// $Id: OMRenamedType.h,v 1.5 2007/02/06 15:46:10 wschilp Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,16 @@
 #ifndef OMRENAMEDTYPE_H
 #define OMRENAMEDTYPE_H
 
-// Nothing yet
+#include "OMType.h"
+
+// @author Tim Bingham | tjb | Avid Technology, Inc. | OMRenamedType
+class OMRenamedType : public OMType {
+public:
+
+  virtual OMType::Tag tag(void) const;
+
+  virtual OMType* renamedType(void) const = 0;
+
+};
 
 #endif
