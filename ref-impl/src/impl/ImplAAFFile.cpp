@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFFile.cpp,v 1.154 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFFile.cpp,v 1.155 2007/02/14 23:49:21 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -321,13 +321,11 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 			// which is always (supposed to be) legible.  If it is
 			// present, find out the version number to determine if
 			// the file is legible.
-			if (_head->GetObjectModelVersion() >
-				  static_cast<aafUInt32>(sCurrentAAFObjectModelVersion))
-			  {
-				// File version is higher than the version understood
-				// by this toolkit.  Therefore this file cannot be read.
-				return AAFRESULT_FILEREV_DIFF;
-			  }
+			// If file version is higher than the version understood
+			// by this toolkit this file cannot be read.
+			checkExpression(_head->GetObjectModelVersion() <=
+							static_cast<aafUInt32>(sCurrentAAFObjectModelVersion),
+							AAFRESULT_FILEREV_DIFF);
 		  }
 
 		// Now that the file is open and the header has been
@@ -469,13 +467,11 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 			// which is always (supposed to be) legible.  If it is
 			// present, find out the version number to determine if
 			// the file is legible.
-			if (_head->GetObjectModelVersion() >
-				  static_cast<aafUInt32>(sCurrentAAFObjectModelVersion))
-			  {
-				// File version is higher than the version understood
-				// by this toolkit.  Therefore this file cannot be read.
-				return AAFRESULT_FILEREV_DIFF;
-			  }
+			// If file version is higher than the version understood
+			// by this toolkit this file cannot be read.
+			checkExpression(_head->GetObjectModelVersion() <=
+							static_cast<aafUInt32>(sCurrentAAFObjectModelVersion),
+							AAFRESULT_FILEREV_DIFF);
 		  }
 
 		// Now that the file is open and the header has been
@@ -1127,14 +1123,11 @@ ImplAAFFile::Open ()
 			  // which is always (supposed to be) legible.  If it is
 			  // present, find out the version number to determine if
 			  // the file is legible.
-			  if (_head->GetObjectModelVersion() >
-				  static_cast<aafUInt32>(sCurrentAAFObjectModelVersion))
-				{
-				  // File version is higher than the version
-				  // understood by this toolkit.  Therefore this file
-				  // cannot be read.
-				  return AAFRESULT_FILEREV_DIFF;
-				}
+			  // If file version is higher than the version understood
+			  // by this toolkit this file cannot be read.
+			  checkExpression(_head->GetObjectModelVersion() <=
+							  static_cast<aafUInt32>(sCurrentAAFObjectModelVersion),
+							  AAFRESULT_FILEREV_DIFF);
 			}
 		  // Now that the file is open and the header has been
 		  // restored, complete the initialization of the
