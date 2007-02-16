@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.48 2006/06/14 19:55:49 tbingham Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.49 2007/02/16 22:52:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -117,6 +117,15 @@ const OMByteOrder unspecified       = 0x55; // 'U' for unspecified
 
 #include <string.h>  // For use of memcmp() below.
 
+// Template to declare a set of constants of
+// the specified type.
+//
+template<typename T>
+struct OMConstant
+{
+  static const T null;
+};
+
 // A GUID in all but name.
 //
 struct OMObjectIdentification
@@ -160,6 +169,16 @@ typedef OMObjectIdentification OMStoredObjectIdentification;
 // For uniquely identifying an object instance.
 //
 typedef OMObjectIdentification OMUniqueObjectIdentification;
+
+template<>
+const OMUniqueObjectIdentification
+OMConstant<OMUniqueObjectIdentification>::null =
+{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
+
+// For backwards compatibility - all instances of
+// nullOMUniqueObjectIdentification should eventually be replaced
+// with OMConstant<OMUniqueObjectIdentification>::null.
+//
 const OMUniqueObjectIdentification nullOMUniqueObjectIdentification = {0,0,0,{0}};
 
 // For backwards compatibility - all instances of OMClassId should
