@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceT.h,v 1.3 2006/10/13 17:56:44 akharkev Exp $ $Name:  $
+// $Id: OMObjectReferenceT.h,v 1.4 2007/02/16 22:02:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -315,6 +315,15 @@ const Key&
 OMWeakObjectReference<Key>::identification(void) const
 {
   return _identification;
+}
+
+template<typename Key>
+void
+OMWeakObjectReference<Key>::setIdentification(const Key& id)
+{
+  TRACE("OMWeakObjectReference<Key>::setIdentification");
+
+  _identification = id;
 }
 
 template<typename Key>
