@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefProperty.h,v 1.39 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
+// $Id: OMWeakRefProperty.h,v 1.40 2007/02/16 23:16:20 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -122,8 +122,7 @@ public:
   const Key& identification(void) const;
 
     // tjb - deprecated
-  virtual OMWeakObjectReference<OMUniqueObjectIdentification>&
-                                                         reference(void) const;
+  virtual OMWeakObjectReference<Key>& reference(void) const;
 
     // @cmember The <c OMStrongReferenceSet> in which the object
     //          referenced by this <c OMWeakReferenceProperty>

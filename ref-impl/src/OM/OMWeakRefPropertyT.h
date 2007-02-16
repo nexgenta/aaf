@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.63 2007/02/16 22:53:07 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.64 2007/02/16 23:16:30 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,7 @@ OMWeakReferenceProperty<Key, ReferencedObject>::OMWeakReferenceProperty(
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::"
                                                     "OMWeakReferenceProperty");
 
-  _reference = OMWeakObjectReference<OMUniqueObjectIdentification>(this);
+  _reference = OMWeakObjectReference<Key>(this);
 }
 
   // @mfunc Constructor.
@@ -86,7 +86,7 @@ OMWeakReferenceProperty<Key, ReferencedObject>::OMWeakReferenceProperty(
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::"
                                                     "OMWeakReferenceProperty");
 
-  _reference = OMWeakObjectReference<OMUniqueObjectIdentification>(this);
+  _reference = OMWeakObjectReference<Key>(this);
   _targetPropertyPath = savePropertyPath(targetPropertyPath);
 }
 
@@ -311,7 +311,7 @@ bool OMWeakReferenceProperty<Key, ReferencedObject>::isVoid(void) const
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::isVoid");
 
   bool result;
-  const OMUniqueObjectIdentification& key = _reference.identification();
+  const Key& key = _reference.identification();
   if (key == OMConstant<Key>::null) {
     result = true;
   } else {
@@ -436,7 +436,7 @@ OMWeakReferenceProperty<Key, ReferencedObject>::identification(void) const
 }
 
 template <typename Key, typename ReferencedObject>
-OMWeakObjectReference<OMUniqueObjectIdentification>&
+OMWeakObjectReference<Key>&
 OMWeakReferenceProperty<Key, ReferencedObject>::reference(void) const
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::reference");
@@ -616,7 +616,7 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::deepCopyTo(
   OMStorable* source = _reference.getValue();
   if (source != 0) {
     // There's a referenced object, copy it
-    OMUniqueObjectIdentification id = reference().identification();
+    Key id = reference().identification();
 
     typedef OMWeakReferenceProperty<Key, ReferencedObject> Property;
     Property* wp = dynamic_cast<Property*>(destination);
