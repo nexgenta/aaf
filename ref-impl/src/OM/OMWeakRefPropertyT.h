@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.62 2006/06/15 19:53:21 tbingham Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.63 2007/02/16 22:53:07 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -173,7 +173,7 @@ OMWeakReferenceProperty<Key, ReferencedObject>::clearValue(void)
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::clearValue");
 
-  OMStorable* p = _reference.setValue(nullOMUniqueObjectIdentification, 0);
+  OMStorable* p = _reference.setValue(OMConstant<Key>::null, 0);
   ReferencedObject* result = 0;
   if (p != 0) {
     result = dynamic_cast<ReferencedObject*>(p);
@@ -312,7 +312,7 @@ bool OMWeakReferenceProperty<Key, ReferencedObject>::isVoid(void) const
 
   bool result;
   const OMUniqueObjectIdentification& key = _reference.identification();
-  if (key == nullOMUniqueObjectIdentification) {
+  if (key == OMConstant<Key>::null) {
     result = true;
   } else {
     result = false;
