@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefProperty.h,v 1.40 2007/02/16 23:16:20 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefProperty.h,v 1.41 2007/02/17 17:00:45 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -123,6 +123,21 @@ public:
 
     // tjb - deprecated
   virtual OMWeakObjectReference<Key>& reference(void) const;
+
+    // @cmember Get the raw bits of the identification of this
+    //          <c OMWeakReferenceProperty>.
+  virtual const void* identificationBits(void) const;
+
+    // @cmember Set the raw bits of the identification of this
+    //          <c OMWeakReferenceProperty>. The raw bits are
+    //          copied from the buffer at address <p id> which
+    //          is <p idSize> bytes in size.
+  virtual void setIdentificationBits(const void* id, OMKeySize idSize);
+
+    // @cmember The size of the raw bits of the identification
+    //          of this <c OMWeakReferenceProperty>. The size is
+    //          given in bytes.
+  virtual OMKeySize keySize(void) const;
 
     // @cmember The <c OMStrongReferenceSet> in which the object
     //          referenced by this <c OMWeakReferenceProperty>
