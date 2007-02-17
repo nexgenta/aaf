@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakReference.h,v 1.10 2007/02/17 17:00:45 akharkev Exp $ $Name:  $
+// $Id: OMWeakReference.h,v 1.11 2007/02/17 21:57:14 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,10 +45,6 @@ public:
 
     // @cmember Destructor.
   ~OMWeakReference(void);
-
-    // tjb - deprecated
-  virtual OMWeakObjectReference<OMUniqueObjectIdentification>&
-                                                     reference(void) const = 0;
 
     // @cmember Get the raw bits of the identification of this
     //          <c OMWeakReferenceProperty>.

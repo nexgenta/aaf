@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.66 2007/02/17 21:43:13 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.67 2007/02/17 21:57:20 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -433,15 +433,6 @@ OMWeakReferenceProperty<Key, ReferencedObject>::identification(void) const
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::identification");
 
   return _reference.identification();
-}
-
-template <typename Key, typename ReferencedObject>
-OMWeakObjectReference<Key>&
-OMWeakReferenceProperty<Key, ReferencedObject>::reference(void) const
-{
-  TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::reference");
-
-  return const_cast<OMWeakObjectReference<Key>&>(_reference);
 }
 
   // @mfunc Get the raw bits of the identification of this
