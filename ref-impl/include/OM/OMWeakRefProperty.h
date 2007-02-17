@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefProperty.h,v 1.41 2007/02/17 17:00:45 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefProperty.h,v 1.42 2007/02/17 21:43:05 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -164,6 +164,13 @@ public:
 
   virtual void deepCopyTo(OMProperty* destination,
                           void* clientContext) const;
+
+protected:
+  // @access Protected members.
+
+    // @cmember Get the value of this <c OMWeakReferenceProperty>.
+    //          The value is a pointer to the referenced <c OMStorable>.
+  OMStorable* getReferencedValue(void) const;
 
 private:
 
