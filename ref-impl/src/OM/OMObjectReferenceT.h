@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceT.h,v 1.5 2007/02/16 22:53:02 akharkev Exp $ $Name:  $
+// $Id: OMObjectReferenceT.h,v 1.6 2007/02/18 04:01:27 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -225,8 +225,10 @@ OMStorable* OMWeakObjectReference<Key>::getValue(void) const
       (_identification != OMConstant<Key>::null)) {
     // We failed to resolve the reference as an object id, try again as a label
     // We should only come here for KLV encoded files.
+    ASSERT("Referenced object ID can be a label",
+                        sizeof(Key) == sizeof(OMUniqueObjectIdentification));
     OMUniqueObjectIdentification bid;
-    bid = _identification;
+    *reinterpret_cast<Key*>(&bid) = _identification;
     if (hostByteOrder() != bigEndian) {
 	  OMUniqueObjectIdentificationType::instance()->reorder(
                                                reinterpret_cast<OMByte*>(&bid),
@@ -236,7 +238,8 @@ OMStorable* OMWeakObjectReference<Key>::getValue(void) const
     memcpy(&k, &bid, sizeof(OMKLVKey));
     OMUniqueObjectIdentification id;
     convert(id, k);
-    nonConstThis->_identification = id;
+    nonConstThis->_identification =
+                         *reinterpret_cast<Key*>(&id);
     OMStorable* object = 0;
     set()->find(&nonConstThis->_identification, object);
     nonConstThis->_pointer = object;
