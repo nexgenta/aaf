@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.h,v 1.55 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFHeader.h,v 1.56 2007/02/18 04:09:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -458,7 +458,7 @@ private:
   OMSetProperty<aafUID_t>                          _essenceContainers;
   OMSetProperty<aafUID_t>                          _descriptiveSchemes;
 #if 0 // tjb - not yet
-  OMWeakReferenceProperty<OMMaterialIdentification, ImplAAFMob*> _primaryMob;
+  OMWeakReferenceProperty<OMUniqueMaterialIdentification, ImplAAFMob> _primaryMob;
 #endif
 };
 

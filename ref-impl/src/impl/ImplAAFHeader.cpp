@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.97 2006/06/15 19:52:50 tbingham Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.98 2007/02/18 04:09:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -14,7 +14,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -101,7 +101,7 @@ ImplAAFHeader::ImplAAFHeader ()
   _essenceContainers(PID_Header_EssenceContainers, L"EssenceContainers"),
   _descriptiveSchemes(PID_Header_DescriptiveSchemes, L"DescriptiveSchemes")
 #if 0 // tjb - not yet
-, _primaryMob(PID_Header_PrimaryMob, L"PrimaryMob")
+, _primaryMob(PID_Header_PrimaryMob, L"PrimaryMob", L"/Header/Content/Mobs", PID_Mob_MobID)
 #endif
 {
   _persistentProperties.put(_byteOrder.address());
