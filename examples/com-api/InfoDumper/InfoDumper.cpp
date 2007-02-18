@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.35 2006/08/03 20:18:53 tbingham Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.36 2007/02/18 01:54:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -296,6 +296,20 @@ static void printMobID (const aafMobID_t &mobIDVal,
   os << buf << ", ";
   printAUID(mobIDVal.material,os);
   os << " }" ;
+}
+
+static HRESULT printMobID (
+		IAAFMob  *pMob,
+		ostream		    &os )
+{
+    HRESULT         status = AAFRESULT_SUCCESS;
+    aafMobID_t      mobID;
+
+    checkResult( pMob->GetMobID( &mobID ) );
+    printMobID(mobID, os);
+
+
+    return status;
 }
 
 static HRESULT dumpSummary
@@ -1719,6 +1733,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 	      {
 		IAAFDefObjectSP pDefObj;
 		IAAFMetaDefinitionSP pMetaDef;
+		IAAFMobSP pMob;
 		// weak object reference; only dump summary info (not
 		// recursively)
 		IAAFTypeDefObjectRefSP pTDO;
@@ -1736,6 +1751,10 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 					      (IUnknown**)&pMetaDef))
 		  {
 		    checkResult(printAAFName(pMetaDef, os));
+		  } else if (!pTDO->GetObject(pPVal, IID_IAAFMob, 
+					      (IUnknown**)&pMob))
+		  {
+		    checkResult(printMobID(pMob, os));
 		  } else
 		  {
 		    // treat as AUID
