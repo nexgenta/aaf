@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.49 2007/02/16 22:52:12 akharkev Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.50 2007/02/18 02:08:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -229,6 +229,13 @@ inline bool operator > (const OMMaterialIdentification& lhs,
 // For uniquely identifying material instances.
 //
 typedef OMMaterialIdentification OMUniqueMaterialIdentification;
+
+template<>
+const OMUniqueMaterialIdentification
+OMConstant<OMUniqueMaterialIdentification>::null =
+{{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+ 0, 0, 0, 0,
+ {0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}}};
 
 // For (but more general than) a SMPTE Universal label
 struct OMKLVKey
