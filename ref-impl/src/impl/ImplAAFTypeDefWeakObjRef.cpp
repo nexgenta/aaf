@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.43 2007/02/06 15:46:19 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.44 2007/02/18 04:05:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -68,6 +68,8 @@
 #endif
 
 #include "ImplAAFDictionary.h"
+#include "ImplAAFEssenceData.h"
+#include "ImplAAFMob.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyDefs.h"
 #include "AAFPropertyIDs.h"
@@ -897,6 +899,14 @@ OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMProperty
       result = new OMWeakReferenceProperty<OMUniqueObjectIdentification, ImplAAFDefObject>(pid, name, _uniqueIdentifierPid, _targetPids);
       break;
     
+    case PID_Mob_MobID:
+      result = new OMWeakReferenceProperty<OMUniqueMaterialIdentification, ImplAAFMob>(pid, name, _uniqueIdentifierPid, _targetPids);
+      break;
+
+    case PID_EssenceData_MobID:
+      result = new OMWeakReferenceProperty<OMUniqueMaterialIdentification, ImplAAFEssenceData>(pid, name, _uniqueIdentifierPid, _targetPids);
+      break;
+
     default:
       // No support for other "key properties"
       ASSERTU (0);
