@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStreamFilter.cpp,v 1.4 2007/02/05 22:31:11 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStreamFilter.cpp,v 1.5 2007/02/22 23:15:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -270,7 +270,7 @@ void OMKLVStoredStreamFilter::initialize() const
   _stream->setPosition(0);
   OMKLVKey key;
   if (OMKLVStoredStream::readKLVKey(*_stream, key)) {
-    const OMUInt64 lengthPosition = _stream->position();
+    lengthPosition = _stream->position();
 
     // Attempt to read the length following the key
     if (OMKLVStoredStream::readKLVLength(*_stream, length)) {
