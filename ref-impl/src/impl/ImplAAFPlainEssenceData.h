@@ -2,7 +2,7 @@
 #define __ImplAAFPlainStreamData_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainEssenceData.h,v 1.2 2007/02/02 19:22:27 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainEssenceData.h,v 1.3 2007/02/22 23:17:36 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -230,8 +230,8 @@ public:
        ImplAAFEssenceData* pRawEssenceData);
 
 private:
-  OMDataStreamPropertyFilter* _mediaDataFilter;
   ImplAAFEssenceData* _mediaDataContainer;
+  OMDataStreamPropertyFilter* _mediaDataFilter;
 
 };
 
