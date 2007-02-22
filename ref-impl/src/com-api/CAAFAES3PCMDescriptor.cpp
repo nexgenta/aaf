@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFAES3PCMDescriptor.cpp,v 1.4 2007/01/18 21:19:42 wschilp Exp $ $Name:  $
+// $Id: CAAFAES3PCMDescriptor.cpp,v 1.5 2007/02/22 22:45:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
