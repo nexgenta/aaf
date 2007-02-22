@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFAES3PCMDescriptor.cpp,v 1.3 2007/01/18 21:19:42 wschilp Exp $ $Name:  $
+// $Id: ImplAAFAES3PCMDescriptor.cpp,v 1.4 2007/02/22 22:54:41 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
