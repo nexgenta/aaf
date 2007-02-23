@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetPropertyT.h,v 1.69 2007/02/23 22:40:10 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefSetPropertyT.h,v 1.70 2007/02/23 23:07:03 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -816,6 +816,22 @@ OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag(
   TRACE("OMWeakReferenceSetProperty<ReferencedObject>::setTargetTag");
 
   _targetTag = targetTag;
+}
+
+  // @mfunc The size of the identification of <c OMObject> in this
+  //        <c OMWeakReferenceSetProperty>. The size is given
+  //        in bytes.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc The size of the identification.
+template <typename ReferencedObject>
+OMKeySize
+OMWeakReferenceSetProperty<ReferencedObject>::keySize(void) const
+{
+  TRACE("OMWeakReferenceSetProperty<ReferencedObject>::keySize");
+
+  return sizeof(OMUniqueObjectIdentification);
 }
 
 template <typename ReferencedObject>

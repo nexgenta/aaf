@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefVectorProperty.h,v 1.36 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
+// $Id: OMWeakRefVectorProperty.h,v 1.37 2007/02/23 23:06:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -258,6 +258,11 @@ public:
                       const OMWeakReferenceVectorElement& element);
 
   const OMUniqueObjectIdentification& identification(OMUInt32 index) const;
+
+  // @cmember The size of the identification of <c OMObject> in this
+  //          <c OMWeakReferenceVectorProperty>. The size is given
+  //          in bytes.
+  virtual OMKeySize keySize(void) const;
 
     // @cmember The <c OMStrongReferenceSet> in which the objects
     //          referenced by this <c OMWeakReferenceVectorProperty>

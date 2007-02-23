@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetProperty.h,v 1.34 2006/06/15 19:53:20 tbingham Exp $ $Name:  $
+// $Id: OMWeakRefSetProperty.h,v 1.35 2007/02/23 23:06:51 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -206,6 +206,11 @@ public:
 
   virtual void insert(void* key,
                       const OMWeakReferenceSetElement& element);
+
+  // @cmember The size of the identification of <c OMObject> in this
+  //          <c OMWeakReferenceSetProperty>. The size is given
+  //          in bytes.
+  virtual OMKeySize keySize(void) const;
 
     // @cmember The <c OMStrongReferenceSet> in which the objects
     //          referenced by this <c OMWeakReferenceSetProperty>

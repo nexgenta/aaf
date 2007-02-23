@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefVectorPropertyT.h,v 1.79 2007/02/23 22:18:55 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefVectorPropertyT.h,v 1.80 2007/02/23 23:07:08 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1079,6 +1079,22 @@ OMWeakReferenceVectorProperty<ReferencedObject>::identification(
   VectorElement& element = _vector.getAt(index);
 
   return *reinterpret_cast<const OMUniqueObjectIdentification*>(element.identification());
+}
+
+  // @mfunc The size of the identification of <c OMObject> in this
+  //        <c OMWeakReferenceVectorProperty>. The size is given
+  //        in bytes.
+  //   @tcarg class | ReferencedObject | The type of the referenced
+  //          (contained) object. This type must be a descendant of
+  //          <c OMStorable> and <c OMUnique>.
+  //   @rdesc The size of the identification.
+template <typename ReferencedObject>
+OMKeySize
+OMWeakReferenceVectorProperty<ReferencedObject>::keySize(void) const
+{
+  TRACE("OMWeakReferenceVectorProperty<ReferencedObject>::keySize");
+
+  return sizeof(OMUniqueObjectIdentification);
 }
 
 template <typename ReferencedObject>
