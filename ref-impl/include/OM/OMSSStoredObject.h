@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.h,v 1.4 2007/02/18 04:01:15 akharkev Exp $ $Name:  $
+// $Id: OMSSStoredObject.h,v 1.5 2007/02/23 23:41:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -262,8 +262,9 @@ protected:
 
     // @cmember Save a collection (vector/set) of weak references.
   void save(const wchar_t* collectionName,
-            const OMUniqueObjectIdentification* index,
+            const OMByte* index,
             OMUInt32 count,
+            OMKeySize keySize,
             OMPropertyTag tag,
             OMPropertyId keyPropertyId);
 
@@ -296,8 +297,9 @@ protected:
 
     // @cmember Restore a collection (vector/set) of weak references.
   void restore(const wchar_t* collectionName,
-               OMUniqueObjectIdentification*& index,
+               OMByte*& index,
                OMUInt32& count,
+               OMKeySize& keySize,
                OMPropertyTag& tag,
                OMPropertyId& keyPropertyId);
 
