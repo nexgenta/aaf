@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefSetPropertyT.h,v 1.68 2007/02/23 22:18:55 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefSetPropertyT.h,v 1.69 2007/02/23 22:40:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -322,7 +322,7 @@ bool OMWeakReferenceSetProperty<ReferencedObject>::ensureAbsent(
   SetElement* element = 0;
   bool result = _set.find(identification, &element);
   if (result) {
-    element->setValue(nullOMUniqueObjectIdentification, 0);
+    element->setValue(&nullOMUniqueObjectIdentification, 0);
     _set.remove(identification);
   }
 
