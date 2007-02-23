@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.40 2007/02/18 04:01:27 akharkev Exp $ $Name:  $
+// $Id: OMXMLStoredObject.cpp,v 1.41 2007/02/23 22:18:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -594,11 +594,13 @@ void OMXMLStoredObject::save(const OMWeakReferenceVector& vector)
 
     OMWeakReferenceVectorElement& element = iterator.value();
 
-    OMObjectIdentification key = element.identification();
+    const void* key = element.identification();
 
     _stream << indent;
     _stream << beginl;
-    _stream << "<identification guid=\"" << key << "\"/>" << endl;
+    const OMUniqueObjectIdentification* id =
+                    reinterpret_cast<const OMUniqueObjectIdentification*>(key);
+    _stream << "<identification guid=\"" << *id << "\"/>" << endl;
     _stream << outdent;
   }
   _stream << beginl;
@@ -631,11 +633,13 @@ void OMXMLStoredObject::save(const OMWeakReferenceSet& set)
 
     OMWeakReferenceSetElement& element = iterator.value();
 
-    OMObjectIdentification key = element.identification();
+    const void* key = element.identification();
 
     _stream << indent;
     _stream << beginl;
-    _stream << "<identification guid=\"" << key << "\"/>" << endl;
+    const OMUniqueObjectIdentification* id =
+                    reinterpret_cast<const OMUniqueObjectIdentification*>(key);
+    _stream << "<identification guid=\"" << *id << "\"/>" << endl;
     _stream << outdent;
   }
   _stream << beginl;

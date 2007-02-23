@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakReferenceSetIterT.h,v 1.13 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakReferenceSetIterT.h,v 1.14 2007/02/23 22:18:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -245,7 +245,7 @@ OMWeakReferenceSetIterator<ReferencedObject>::setValue(
   SetElement& element = _iterator.value();
 
   ReferencedObject* result = 0;
-  OMStorable* p = element.setValue(id, newObject);
+  OMStorable* p = element.setValue(&id, newObject);
   if (p != 0) {
     result = dynamic_cast<ReferencedObject*>(p);
     ASSERT("Object is correct type", result != 0);
@@ -268,7 +268,7 @@ OMWeakReferenceSetIterator<ReferencedObject>::clearValue(void)
   SetElement& element = _iterator.value();
 
   ReferencedObject* result = 0;
-  OMStorable* p = element.setValue(nullOMUniqueObjectIdentification, 0);
+  OMStorable* p = element.setValue(&nullOMUniqueObjectIdentification, 0);
   if (p != 0) {
     result = dynamic_cast<ReferencedObject*>(p);
     ASSERT("Object is correct type", result != 0);

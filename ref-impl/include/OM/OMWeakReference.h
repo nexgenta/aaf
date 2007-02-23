@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakReference.h,v 1.11 2007/02/17 21:57:14 akharkev Exp $ $Name:  $
+// $Id: OMWeakReference.h,v 1.12 2007/02/23 22:18:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,6 @@
 
 #include "OMRefProperty.h"
 
-template <typename Key>
 class OMWeakObjectReference;
 
   // @class Persistent weak reference (pointer to shared object)

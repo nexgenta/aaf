@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefProperty.h,v 1.43 2007/02/17 21:57:14 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefProperty.h,v 1.44 2007/02/23 22:18:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -173,7 +173,7 @@ private:
 
   OMPropertyId* targetPropertyPath(void) const;
 
-  OMWeakObjectReference<Key> _reference;
+  OMWeakObjectReference _reference;
   OMPropertyTag _targetTag;
   const wchar_t* _targetName;
   OMPropertyId* _targetPropertyPath;
