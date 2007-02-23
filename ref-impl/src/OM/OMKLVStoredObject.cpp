@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.226 2007/02/23 22:18:54 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.227 2007/02/23 22:37:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2116,7 +2116,7 @@ void OMKLVStoredObject::deepRestore(const OMPropertySet& properties)
           objects.grow(count);
           while (++iterator) {
             OMWeakReferenceSetElement& element = iterator.value();
-            OMWeakObjectReference& r = element.reference();
+            //OMWeakObjectReference& r = element.reference();
             const OMUniqueObjectIdentification id =
                 *reinterpret_cast<const OMUniqueObjectIdentification*>(
                                                      element.identification());
