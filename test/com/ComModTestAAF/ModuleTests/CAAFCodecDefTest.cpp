@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCodecDefTest.cpp,v 1.38 2006/11/08 16:25:15 bmdurksen Exp $ $Name:  $
+// $Id: CAAFCodecDefTest.cpp,v 1.39 2007/02/23 00:36:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,11 +125,11 @@ static HRESULT CreateAAFFile(
 		checkExpression(AreUnksSame(pReturnedClassDef,pWaveClassDef)==kAAFTrue,
 			AAFRESULT_TEST_FAILED);
 
-#if NOT_TESTED
+                /* Not tested
 		virtual HRESULT STDMETHODCALLTYPE RemoveEssenceKind();
 		virtual HRESULT STDMETHODCALLTYPE CountEssenceKinds();
 		virtual HRESULT STDMETHODCALLTYPE GetEssenceKinds();
-#endif
+                */
 
 	}
 	catch (HRESULT& rResult)
