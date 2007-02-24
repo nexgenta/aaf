@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDefinition.cpp,v 1.20 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
+// $Id: ImplAAFMetaDefinition.cpp,v 1.21 2007/02/24 00:31:58 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -307,7 +307,7 @@ ImplAAFMetaDefinition::bootstrapTypeWeakReference(
 
 ImplAAFTypeDef*
 ImplAAFMetaDefinition::bootstrapTypeWeakReferenceVectorElement(
-                   const OMWeakReferenceVectorProperty<ImplAAFTypeDef>& vector,
+                   const OMWeakReferenceVectorProperty<OMUniqueObjectIdentification, ImplAAFTypeDef>& vector,
                    aafUInt32 index) const
 {
   ImplAAFTypeDef* result = 0;

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCodecDef.h,v 1.23 2006/05/23 22:35:39 tbingham Exp $ $Name:  $
+// $Id: ImplAAFCodecDef.h,v 1.24 2007/02/24 00:31:58 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@ class ImplEnumAAFCodecFlavours;
 #include "ImplEnumAAFDataDefs.h"
 
 #include "OMWeakRefVectorProperty.h"
-typedef OMWeakReferenceVectorProperty<ImplAAFDataDef> DataDefWeakRefArrayProp_t;
+typedef OMWeakReferenceVectorProperty<OMUniqueObjectIdentification, ImplAAFDataDef> DataDefWeakRefArrayProp_t;
 
 class ImplAAFCodecDef : public ImplAAFDefObject
 {

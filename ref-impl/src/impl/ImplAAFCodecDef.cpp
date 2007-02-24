@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFCodecDef.cpp,v 1.35 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
+// $Id: ImplAAFCodecDef.cpp,v 1.36 2007/02/24 00:31:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -366,8 +366,8 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-		OMWeakReferenceVectorIterator</*OMUniqueObjectIdentification,*/ ImplAAFDataDef>* iter = 
-			new OMWeakReferenceVectorIterator</*OMUniqueObjectIdentification,*/ ImplAAFDataDef>(_dataDefs);
+		OMWeakReferenceVectorIterator<OMUniqueObjectIdentification, ImplAAFDataDef>* iter = 
+			new OMWeakReferenceVectorIterator<OMUniqueObjectIdentification, ImplAAFDataDef>(_dataDefs);
 		if(iter == 0)
 			RAISE(AAFRESULT_NOMEMORY);
 		CHECK(theEnum->Initialize(&CLSID_EnumAAFDataDefs, this, iter));
