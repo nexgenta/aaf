@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.67 2007/02/24 00:31:59 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.68 2007/02/24 02:56:50 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -620,13 +620,13 @@ OMProperty * ImplAAFTypeDefVariableArray::pvtCreateOMProperty
           result = new OMWeakReferenceVectorProperty<OMUniqueObjectIdentification, ImplAAFDefObject>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
           break;
     
-//			  case PID_Mob_MobID:
-//          result = new OMWeakReferenceVectorProperty<OMUniqueMaterialIdentification, ImplAAFMob>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
-//          break;
-//
-//			  case PID_EssenceData_MobID:
-//          result = new OMWeakReferenceVectorProperty<OMUniqueMaterialIdentification, ImplAAFEssenceData>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
-//          break;
+        case PID_Mob_MobID:
+          result = new OMWeakReferenceVectorProperty<OMUniqueMaterialIdentification, ImplAAFMob>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
+
+        case PID_EssenceData_MobID:
+          result = new OMWeakReferenceVectorProperty<OMUniqueMaterialIdentification, ImplAAFEssenceData>(pid, name, pWeakRefType->GetUniqueIdentifierPid(), pWeakRefType->GetTargetPids());
+          break;
     
         default:
           // No support for other "key properties"
