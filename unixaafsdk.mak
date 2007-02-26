@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: unixaafsdk.mak,v 1.15 2005/11/25 15:48:41 ajakowpa Exp $ $Name:  $
+# $Id: unixaafsdk.mak,v 1.16 2007/02/26 07:45:15 bmdurksen Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -401,9 +401,9 @@ endif
 
 $(AAFSDK_HELP) :
 	@$(ECHO) Skipping $(AAFSDK_HELP) 
-	@#@if [ ! -d $@ ]; then \
-	@#	$(MKDIR) $(MKDIR_OPTS) $@; \
-	@#fi
+	#@if [ ! -d $@ ]; then \
+	#	$(MKDIR) $(MKDIR_OPTS) $@; \
+	#fi
 
 $(AAFSDK_INCLUDE) :
 	@if [ ! -d $@ ]; then \
