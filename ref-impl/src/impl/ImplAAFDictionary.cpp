@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.132 2007/02/27 19:44:15 akharkev Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.133 2007/02/27 22:25:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -355,6 +355,20 @@ void ImplAAFDictionary::destroy(OMStorable* victim) const
   ImplAAFObject* v = dynamic_cast<ImplAAFObject*>(victim);
   ASSERTU(v != 0);
   v->ReleaseReference();
+}
+
+void ImplAAFDictionary::associate(const aafUID_t& id,
+                                  const OMPropertyId propertyId)
+{
+  ASSERTU (_pBuiltinClasses);
+  if (propertyId >= 0x8000) { // Only remap dynamic pids
+    OMPropertyId oldPid;
+    AAFRESULT r = _pBuiltinClasses->LookupOmPid(id, oldPid);
+    if (AAFRESULT_SUCCEEDED(r)) {
+      r = _pBuiltinClasses->MapOmPid(id, propertyId);
+      ASSERTU(AAFRESULT_SUCCEEDED(r));
+    } // else doesn't currently work for properties that aren't compiled-in
+  }
 }
 
 ImplAAFObject *

@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.71 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.72 2007/02/27 22:25:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -115,6 +115,9 @@ public:
   OMStorable* create(const OMClassId& classId) const;
 
   void destroy(OMStorable* victim) const;
+
+  void associate(const aafUID_t& id,
+                 const OMPropertyId propertyId);
 
   //****************
   // CreateInstance()

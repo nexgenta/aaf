@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModel.h,v 1.8 2005/04/05 17:23:37 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectModel.h,v 1.9 2007/02/27 22:25:10 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,7 +18,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -297,6 +297,7 @@ public:
   virtual void makeAxiomatic (void) const; // override
 
   aafUInt16 pid(void) const { return _pid; }
+  void setPid(aafUInt16 pid) { _pid = pid; }
   aafUID_constptr typeId(void) const { return _typeId; }
   bool required(void) const { return _required; }
   bool uid(void) const { return _uid; }
