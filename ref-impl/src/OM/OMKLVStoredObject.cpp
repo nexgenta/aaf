@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.229 2007/02/26 18:04:48 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.230 2007/02/27 18:51:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -890,6 +890,7 @@ OMRootStorable* OMKLVStoredObject::restore(OMFile& file)
     _storage->readKLVKey(k);
     convert(cid, k);
   }
+  ASSERT("Root object found", r != 0);
   OMProperty* hp = root->propertySet()->get(PID_Root_Header);
   OMStrongReference* hsr = dynamic_cast<OMStrongReference*>(hp);
   ASSERT("Valid type", hsr != 0);
