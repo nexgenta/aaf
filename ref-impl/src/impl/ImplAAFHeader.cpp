@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.98 2007/02/18 04:09:03 akharkev Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.99 2007/02/27 18:46:12 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -765,6 +765,10 @@ ImplAAFDictionary *ImplAAFHeader::GetDictionary() const
 	  aafUInt32 refcnt = result->ReleaseReference ();
 	  // make sure at least one reference remains.
 	  ASSERTU (refcnt > 0);
+#if 1 // HACK4MEIP2
+	  const_cast<ImplAAFHeader*>(this)->_dictionary = result;
+	  const_cast<ImplAAFHeader*>(this)->_dictionary->AcquireReference();
+#endif
 	}
   return(result);
 }
