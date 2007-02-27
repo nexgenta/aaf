@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.130 2006/06/15 19:52:49 tbingham Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.131 2007/02/27 18:43:47 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -298,9 +298,22 @@ ImplAAFDictionary *ImplAAFDictionary::CreateDictionary(void)
   return pDictionary;
 }
 
-bool ImplAAFDictionary::isRegistered(const OMClassId& classId ) const
+bool ImplAAFDictionary::isRegistered(const OMClassId& classId) const
 {
-  return metaDictionary()->isRegistered( classId );
+  bool result;
+  const aafUID_t* auid  = reinterpret_cast<const aafUID_t*>(&classId);
+  ImplAAFDictionary* pNonConstThis = const_cast<ImplAAFDictionary*>(this);
+  ImplAAFClassDef* pClassDef = 0;
+  HRESULT hr = pNonConstThis->LookupClassDef(*auid, &pClassDef);
+  if (AAFRESULT_SUCCEEDED(hr)) {
+    result = true;
+    ASSERTU(pClassDef != 0);
+    pClassDef->ReleaseReference();
+    pClassDef = 0;
+  } else {
+    result = false;
+  }
+  return result;
 }
 
 //
