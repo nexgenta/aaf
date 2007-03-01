@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFObject.cpp,v 1.83 2006/06/21 15:12:36 tbingham Exp $ $Name:  $
+// $Id: ImplAAFObject.cpp,v 1.84 2007/03/01 19:51:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -906,6 +906,11 @@ AAFRESULT STDMETHODCALLTYPE
 		return ar;
 	}
   ASSERTU (_pProperties);
+
+
+  // Make sure the given property exists in the collection
+  ar = _pProperties->SynchronizeProperty(this, pPropDef);
+
 
   return(_pProperties->SetPropertyValue (pPropDef, pPropVal));
 }
