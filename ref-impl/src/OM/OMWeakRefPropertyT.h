@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.68 2007/02/23 22:18:55 akharkev Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.69 2007/03/06 23:45:21 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -261,7 +261,8 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::save(void) const
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::save");
 
-  PRECONDITION("Non-void weak reference", !_reference.isVoid());
+  // Is this->isVoid() good enough? 
+  PRECONDITION("Non-void weak reference", !isVoid());
 
   store()->save(*this);
 }
