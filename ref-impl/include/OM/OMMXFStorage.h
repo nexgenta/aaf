@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.158 2007/02/16 22:05:39 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.159 2007/03/07 21:44:31 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -520,6 +520,8 @@ public:
 
     // @cmember Destroy all <c Fixup>s.
   void destroyFixups(void);
+
+  static bool endsMetadata(const OMKLVKey& k);
 
 private:
   // @access Private members.

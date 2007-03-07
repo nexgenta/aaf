@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.230 2007/02/16 22:05:52 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.231 2007/03/07 21:44:40 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2676,6 +2676,23 @@ bool OMMXFStorage::findPattern(const OMRawStorage* store,
     }
   } while ((!found) && (pos < limit) && (c == 1));
   return found;
+}
+
+bool OMMXFStorage::endsMetadata(const OMKLVKey& k)
+{
+  TRACE("OMMXFStorage::endsMetadata");
+
+  bool result = false;
+  if (isPartition(k)) {
+    result = true;
+  } else if (k == RandomIndexMetadataKey) {
+    result = true;
+  } else if (isEssence(k) || k == SystemMetadataKey) {
+    result = true;
+  } else if (isIndex(k)) {
+    result = true;
+  }
+  return result;
 }
 
 void OMMXFStorage::markMetadataStart(OMUInt64 primerKeyPosition)
