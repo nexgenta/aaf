@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.130 2007/02/06 15:46:04 wschilp Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.131 2007/03/11 17:31:46 bakerian Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,8 +48,8 @@
 //
 // AAFMetaDict.csv 
 //
-// This file was generated on Fri Feb  2 15:47:31 EST 2007
-// by user wschilp on system wschilppc.
+// This file was generated on Sun Mar 11 17:26:55 GMTST 2007
+// by user ian on system IANS.
 //
 // Key to macros.
 //
