@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.cpp,v 1.14 2007/01/31 22:20:20 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.cpp,v 1.15 2007/03/16 18:07:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,9 @@
 #include <assert.h>
 #include <string.h>
 
+
+#include "CAAFPlainStreamData.h"
+#include "ImplAAFPlainStreamData.h"
 
 #include "CAAFPropertyValue.h"
 #include "ImplAAFPropertyValue.h"
@@ -1278,7 +1281,7 @@ HRESULT STDMETHODCALLTYPE
 
 HRESULT STDMETHODCALLTYPE
     CAAFTypeDefStream::GetPlainStreamData (aafUInt32  reserved,
-        IAAFTypeDefStream ** pPlainStreamData)
+        IAAFPlainStreamData ** pPlainStreamData)
 {
   HRESULT hr;
 
@@ -1293,8 +1296,8 @@ HRESULT STDMETHODCALLTYPE
   //
   // set up for pPlainStreamData
   //
-  ImplAAFTypeDefStream * internalpPlainStreamData = NULL;
-  ImplAAFTypeDefStream ** pinternalpPlainStreamData = NULL;
+  ImplAAFPlainStreamData * internalpPlainStreamData = NULL;
+  ImplAAFPlainStreamData ** pinternalpPlainStreamData = NULL;
   if (pPlainStreamData)
     {
       pinternalpPlainStreamData = &internalpPlainStreamData;
@@ -1346,7 +1349,7 @@ HRESULT STDMETHODCALLTYPE
       if (internalpPlainStreamData)
         {
           pUnknown = static_cast<IUnknown *> (internalpPlainStreamData->GetContainer());
-          hStat = pUnknown->QueryInterface(IID_IAAFTypeDefStream, (void **)pPlainStreamData);
+          hStat = pUnknown->QueryInterface(IID_IAAFPlainStreamData, (void **)pPlainStreamData);
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalpPlainStreamData->ReleaseReference(); // We are through with this pointer.

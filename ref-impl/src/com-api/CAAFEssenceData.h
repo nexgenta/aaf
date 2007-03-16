@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEssenceData.h,v 1.7 2007/01/31 19:44:49 akharkev Exp $ $Name:  $
+// $Id: CAAFEssenceData.h,v 1.8 2007/03/16 18:07:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 #ifndef __AAF_h__
 #include "AAF.h"
 #endif
+
 
 
 
@@ -320,7 +321,7 @@ public:
   // DESCRIPTION:
   // @mfunc AAFRESULT | AAFEssenceData2 | GetPlainEssenceData |
   // Creates an object which implements
-  // the IAAFEssenceData interface and provides access to a file
+  // the AAFPlainEssenceData interface and provides access to a file
   // encoding-independent essence data.
   //
   // Succeeds if:
@@ -346,8 +347,8 @@ public:
     // @parm [in] aafUInt32 | reserved | Reserved for future use
     aafUInt32  reserved,
 
-    // @parm [out,retval] AAFEssenceData | pPlainEssenceData | file encoding-independent essence data
-    IAAFEssenceData ** pPlainEssenceData
+    // @parm [out,retval] AAFPlainEssenceData | pPlainEssenceData | file encoding-independent essence data
+    IAAFPlainEssenceData ** pPlainEssenceData
   );
 
 

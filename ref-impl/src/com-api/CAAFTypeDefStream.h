@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.h,v 1.10 2007/01/31 22:20:20 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.h,v 1.11 2007/03/16 18:07:39 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,7 @@
 #ifndef __AAF_h__
 #include "AAF.h"
 #endif
+
 
 
 
@@ -644,8 +645,8 @@ public:
   //
   // DESCRIPTION:
   // @mfunc AAFRESULT | AAFTypeDefStream3 | GetPlainStreamData |
-  // Creates an object which implements the IAAFTypeDefStream
-  // interface and provides access to a file encoding-independent
+  // Creates an object which implements the IAAFPlainStreamData
+  // interface and provides access to the file encoding-independent
   // stream data.
   //
   // Succeeds if:
@@ -671,8 +672,8 @@ public:
     // @parm [in] aafUInt32 | reserved | Reserved for future use
     aafUInt32  reserved,
 
-    // @parm [out,retval] AAFTypeDefStream | pPlainStreamData | file encoding-independent stream data
-    IAAFTypeDefStream ** pPlainStreamData
+    // @parm [out,retval] AAFPlainStreamData | pPlainStreamData | file encoding-independent stream data
+    IAAFPlainStreamData ** pPlainStreamData
   );
 
 
