@@ -2,7 +2,7 @@
 #define __ImplAAFTypeDefStream_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.h,v 1.24 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.h,v 1.25 2007/03/16 18:00:26 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,7 @@
 #include "OMStreamType.h"
 
 
+class ImplAAFPlainStreamData;
 class ImplAAFPropertyValue;
 class ImplAAFStreamPropertyValue;
 struct IAAFIOCompletion;
@@ -288,7 +289,7 @@ public:
          aafUInt32 reserved,
 
          // @parm [in] file encoding-independent stream data
-         ImplAAFTypeDefStream ** pPlainStreamData);
+         ImplAAFPlainStreamData ** pPlainStreamData);
 
 
   //****************

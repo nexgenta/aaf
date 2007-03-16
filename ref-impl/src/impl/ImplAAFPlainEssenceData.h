@@ -2,7 +2,7 @@
 #define __ImplAAFPlainStreamData_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainEssenceData.h,v 1.3 2007/02/22 23:17:36 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainEssenceData.h,v 1.4 2007/03/16 18:00:26 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,13 +24,14 @@
 //
 //=---------------------------------------------------------------------=
 
-#include "ImplAAFEssenceData.h"
+#include "ImplAAFRoot.h"
 
 
+class ImplAAFEssenceData;
+class ImplAAFSourceMob;
 class OMDataStreamPropertyFilter;
 
-
-class ImplAAFPlainEssenceData : public ImplAAFEssenceData
+class ImplAAFPlainEssenceData : public ImplAAFRoot
 {
 public:
   //

@@ -2,7 +2,7 @@
 #define __ImplAAFPlainStreamData_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainStreamData.h,v 1.2 2007/02/01 23:30:43 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainStreamData.h,v 1.3 2007/03/16 18:00:26 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,10 +24,15 @@
 //
 //=---------------------------------------------------------------------=
 
+#include "ImplAAFRoot.h"
 #include "ImplAAFTypeDefStream.h"
 
 
-class ImplAAFPlainStreamData : public ImplAAFTypeDefStream
+class ImplAAFPropertyValue;
+class ImplAAFStreamPropertyValue;
+
+
+class ImplAAFPlainStreamData : public ImplAAFRoot
 {
 public:
   //
@@ -139,6 +144,54 @@ public:
 
 
   // 
+  // Access byte order of the stream 
+  // 
+
+
+  //****************
+  // HasStoredByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    HasStoredByteOrder
+        (// @parm [in] stream property value
+         ImplAAFPropertyValue * pStreamPropertyValue,
+
+         // @parm [out] kAAFTrue if this stream has a stored byte order
+         aafBoolean_t *  pHasByteOrder);
+
+  //****************
+  // GetStoredByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetStoredByteOrder
+        (// @parm [in] stream property value
+         ImplAAFPropertyValue * pStreamPropertyValue,
+
+         // @parm [out] Pointer to variable where byte order is to be copied
+         eAAFByteOrder_t *  pByteOrder);
+
+  //****************
+  // SetStoredByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetStoredByteOrder
+        (// @parm [in] stream property value
+         ImplAAFPropertyValue * pStreamPropertyValue,
+
+         // @parm [in] byte order is to be stored with the stream
+         eAAFByteOrder_t  byteOrder);
+
+  //****************
+  // ClearStoredByteOrder()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ClearStoredByteOrder
+        // @parm [in] stream property value
+        (ImplAAFPropertyValue * pStreamPropertyValue);
+
+
+
+  // 
   // Access in typed chunks of Elements 
   // 
 
@@ -237,7 +290,21 @@ public:
 
 
 protected:
+
   virtual ~ImplAAFPlainStreamData ();
+
+  //****************
+  // GetStreamPropertyValue()
+  //
+  // Validate/conversion utility.
+  //
+  AAFRESULT STDMETHODCALLTYPE
+    GetStreamPropertyValue
+        (// @parm [in] opaque property value
+         ImplAAFPropertyValue * pPropertyValue,
+         
+         // @parm [out] stream property value
+         ImplAAFStreamPropertyValue *& pStreamPropertyValue);
 
 };
 

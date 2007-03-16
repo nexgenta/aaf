@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypeDefStream3.dod,v 1.3 2007/01/31 22:14:14 akharkev Exp $ $Name:  $
+#c $Id: AAFTypeDefStream3.dod,v 1.4 2007/03/16 18:00:05 akharkev Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,7 @@ AD_IDL(///
 /// very large pieces of data \(such as essence\).
 /// Note: All reads/and writes advance the current position.
 AD_STD_COMMENT_IFC_HEADER)
+AD_FORWARD_DECLARATION(AAFPlainStreamData)
 AD_FORWARD_DECLARATION(AAFPropertyValue)
 
 AD_CLASS_UUID(6F9A7E6D, 29F0, 4b8b, 9E, A0, B4, F0, DB, 7F, 8B, C4)
@@ -535,11 +536,11 @@ AD_XMETHOD2(GetPlainStreamData,
 
 			[out\,retval],
 			objOut,
-			AAFTypeDefStream,
+			AAFPlainStreamData,
 			pPlainStreamData,
 			file encoding-independent stream data,
 
-     Creates an object which implements the IAAFTypeDefStream
+     Creates an object which implements the IAAFPlainStreamData
   // interface and provides access to the file encoding-independent
   // stream data.
   //

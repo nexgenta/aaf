@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceData
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataTest.cpp,v 1.36 2007/02/02 19:24:38 akharkev Exp $ $Name:  $
+// $Id: CAAFEssenceDataTest.cpp,v 1.37 2007/03/16 18:00:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,10 +71,10 @@ struct EssenceDataTest
   void createEssenceData(IAAFSourceMob *pSourceMob);
   void openEssenceData();
 
-  void writeEssenceData(IAAFEssenceData *pEssenceData,
+  void writeEssenceData(IAAFPlainEssenceData *pEssenceData,
 		        const aafDataBuffer_t data,
 			aafUInt32 dataSize);
-  void readEssenceData(IAAFEssenceData *pEssenceData,
+  void readEssenceData(IAAFPlainEssenceData *pEssenceData,
 		        const aafDataBuffer_t data,
 			aafUInt32 dataSize);
 
@@ -97,7 +97,7 @@ struct EssenceDataTest
   IAAFEssenceDescriptor *_pEssenceDescriptor;
   IAAFFileDescriptor *_pFileDescriptor;
   IEnumAAFEssenceData *_pEnumEssenceData;
-  IAAFEssenceData *_pEssenceData;
+  IAAFPlainEssenceData *_pEssenceData;
   aafDataBuffer_t _buffer;
   aafUInt32 _bufferSize;
 
@@ -541,7 +541,7 @@ void EssenceDataTest::openEssenceData()
   _pEnumEssenceData = NULL;
 }
 
-void EssenceDataTest::writeEssenceData(IAAFEssenceData *pEssenceData,
+void EssenceDataTest::writeEssenceData(IAAFPlainEssenceData *pEssenceData,
 				       const aafDataBuffer_t data,
 				       aafUInt32 dataSize)
 {
@@ -580,7 +580,7 @@ void EssenceDataTest::writeEssenceData(IAAFEssenceData *pEssenceData,
   }
 }
 
-void EssenceDataTest::readEssenceData(IAAFEssenceData *pEssenceData,
+void EssenceDataTest::readEssenceData(IAAFPlainEssenceData *pEssenceData,
 				      const aafDataBuffer_t data,
 				      aafUInt32 dataSize)
 {

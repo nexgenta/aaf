@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFContentStorage
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFContentStorageTest.cpp,v 1.35 2007/01/31 19:47:44 akharkev Exp $ $Name:  $
+// $Id: CAAFContentStorageTest.cpp,v 1.36 2007/03/16 18:00:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,10 +65,10 @@ struct ContentStorageTest
 	void createEssenceData(IAAFSourceMob *pSourceMob);
 	void openEssenceData();
 	
-	void writeEssenceData(IAAFEssenceData *pEssenceData,
+	void writeEssenceData(IAAFPlainEssenceData *pEssenceData,
 		const aafDataBuffer_t data,
 		aafUInt32 dataSize);
-	void readEssenceData(IAAFEssenceData *pEssenceData,
+	void readEssenceData(IAAFPlainEssenceData *pEssenceData,
 		const aafDataBuffer_t data,
 		aafUInt32 dataSize);
 	
@@ -94,7 +94,7 @@ struct ContentStorageTest
 	IAAFEssenceDescriptor *_pEssenceDescriptor;
 	IAAFFileDescriptor *_pFileDescriptor;
 	IEnumAAFEssenceData *_pEnumEssenceData;
-	IAAFEssenceData *_pEssenceData;
+	IAAFPlainEssenceData *_pEssenceData;
 	aafDataBuffer_t _buffer;
 	aafUInt32 _bufferSize;
 	
@@ -578,7 +578,7 @@ void ContentStorageTest::openEssenceData()
 	_pEnumEssenceData = NULL;
 }
 
-void ContentStorageTest::writeEssenceData(IAAFEssenceData *pEssenceData,
+void ContentStorageTest::writeEssenceData(IAAFPlainEssenceData *pEssenceData,
 				       const aafDataBuffer_t data,
 				       aafUInt32 dataSize)
 {
@@ -617,7 +617,7 @@ void ContentStorageTest::writeEssenceData(IAAFEssenceData *pEssenceData,
 	}
 }
 
-void ContentStorageTest::readEssenceData(IAAFEssenceData *pEssenceData,
+void ContentStorageTest::readEssenceData(IAAFPlainEssenceData *pEssenceData,
 				      const aafDataBuffer_t data,
 				      aafUInt32 dataSize)
 {

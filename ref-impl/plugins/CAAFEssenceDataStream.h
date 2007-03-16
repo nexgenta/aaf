@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataStream.h,v 1.13 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceDataStream.h,v 1.14 2007/03/16 18:00:13 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -141,7 +141,7 @@ public:
 
 
 private:
-	IAAFEssenceData		*_data;
+	IAAFPlainEssenceData		*_data;
 };
 
 #endif // ! __CAAFEssenceDataStream_h__

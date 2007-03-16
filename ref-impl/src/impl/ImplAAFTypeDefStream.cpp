@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.27 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.28 2007/03/16 18:00:26 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -362,11 +362,11 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefStream::GetPlainStreamData (
       aafUInt32 /*reserved*/,
-      ImplAAFTypeDefStream ** pPlainStreamData)
+      ImplAAFPlainStreamData ** pPlainStreamData)
 {
   AAFRESULT result = AAFRESULT_NOT_IMPLEMENTED;
-  ImplAAFTypeDefStream* pResult =
-    (ImplAAFTypeDefStream*) CreateImpl (CLSID_AAFPlainStreamData);
+  ImplAAFPlainStreamData* pResult =
+    (ImplAAFPlainStreamData*) CreateImpl (CLSID_AAFPlainStreamData);
   if (pPlainStreamData)
   {
     *pPlainStreamData = pResult;
