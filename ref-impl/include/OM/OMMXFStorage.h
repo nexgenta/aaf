@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.159 2007/03/07 21:44:31 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.160 2007/03/20 18:35:56 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -243,6 +243,8 @@ public:
   static bool isIndex(const OMKLVKey& k);
 
   static bool isEssence(const OMKLVKey& k);
+
+  static bool isFill(const OMKLVKey& k);
 
   virtual void writeHeaderPartition(OMUInt32 bodySID,
                                     OMUInt32 indexSID,

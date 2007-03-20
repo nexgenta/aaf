@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.232 2007/03/14 21:12:54 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.233 2007/03/20 18:36:14 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -787,7 +787,7 @@ OMRootStorable* OMKLVStoredObject::restore(OMFile& file)
     _storage->readHeaderPartition();
     _storage->readKLVKey(k);
   }
-  if (k == fillKey) {
+  if (OMMXFStorage::isFill(k)) {
     _storage->readKLVFill();
     _storage->readKLVKey(k);
   }
@@ -800,7 +800,7 @@ OMRootStorable* OMKLVStoredObject::restore(OMFile& file)
   file.setLoadMode(OMFile::lazyLoad);
 
   _storage->readKLVKey(k);
-  if (k == fillKey) {
+  if (OMMXFStorage::isFill(k)) {
     _storage->readKLVFill();
     _storage->readKLVKey(k);
   }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.231 2007/03/07 21:44:40 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.232 2007/03/20 18:36:14 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -353,6 +353,18 @@ bool OMMXFStorage::isEssence(const OMKLVKey& k)
   TRACE("OMMXFStorage::isEssence");
   bool result;
   if (memcmp(&EssenceElementPrefix, &k, sizeof(EssenceElementPrefix)) == 0) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMMXFStorage::isFill(const OMKLVKey& k)
+{
+  TRACE("OMMXFStorage::isFill");
+  bool result;
+  if (memcmp(&fillKey, &k, sizeof(k)) == 0) {
     result = true;
   } else {
     result = false;
@@ -2353,7 +2365,7 @@ void OMMXFStorage::restoreStreams(void)
         markIndexStart(k, indexSID, gridSize, keyPosition);
         needIndex = false;
         skipV(length);
-      } else if (k == fillKey) {
+      } else if (isFill(k)) {
         skipV(length);
         markFill(keyPosition, position());
       } else {
@@ -2398,7 +2410,7 @@ void OMMXFStorage::restoreStreams(void)
       markMetadataEnd(keyPosition);
       markIndexStart(k, indexSID, gridSize, keyPosition);
       skipV(length);
-    } else if (k == fillKey) {
+    } else if (isFill(k)) {
       skipV(length);
       markFill(keyPosition, position());
     } else {
