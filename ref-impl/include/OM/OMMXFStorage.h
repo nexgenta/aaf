@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.160 2007/03/20 18:35:56 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.161 2007/03/20 18:54:21 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,6 +84,10 @@ static const OMKLVKey primerKey =
 
 static const OMKLVKey fillKey =
   {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x01,
+   0x03, 0x01, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00};
+
+static const OMKLVKey V2FillKey =
+  {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02,
    0x03, 0x01, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00};
 
 static const OMKLVKey IndexTableSegmentKey =

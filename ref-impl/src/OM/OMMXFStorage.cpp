@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.232 2007/03/20 18:36:14 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.233 2007/03/20 18:54:32 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -365,6 +365,8 @@ bool OMMXFStorage::isFill(const OMKLVKey& k)
   TRACE("OMMXFStorage::isFill");
   bool result;
   if (memcmp(&fillKey, &k, sizeof(k)) == 0) {
+    result = true;
+  } else if (memcmp(&V2FillKey, &k, sizeof(k)) == 0) {
     result = true;
   } else {
     result = false;
