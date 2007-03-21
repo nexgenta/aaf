@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFTypeDefStream3.dod,v 1.4 2007/03/16 18:00:05 akharkev Exp $ $Name:  $
+#c $Id: AAFTypeDefStream3.dod,v 1.5 2007/03/21 20:02:54 akharkev Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public
 #c Source License Agreement (the "License"); You may not use this file
@@ -547,8 +547,12 @@ AD_XMETHOD2(GetPlainStreamData,
   // Succeeds if:
   // - Initialize\(\) has already been called on this object.
   // - pPlainStreamData is a valid pointer.
+  // - reserved is 0.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NO_INIT
-  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pPlainStreamData\))
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pPlainStreamData\)
+  ///
+  /// AAFRESULT_INVALID_PARAM
+  ///   - reserved is not 0.)
 
 AD_XCLASS_END(Concrete, StoredObject)
