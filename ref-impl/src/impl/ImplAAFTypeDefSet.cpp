@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefSet.cpp,v 1.30 2007/02/24 02:56:50 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefSet.cpp,v 1.31 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -222,6 +222,7 @@ OMType* ImplAAFTypeDefSet::elementType(void) const
   result->ReleaseReference();
   return result->type();
 }
+
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefSet::pvtInitialize (

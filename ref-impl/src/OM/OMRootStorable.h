@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRootStorable.h,v 1.13 2004/02/27 14:26:43 stuart_hc Exp $ $Name:  $
+// $Id: OMRootStorable.h,v 1.14 2007/03/26 16:00:55 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -83,6 +83,8 @@ public:
 
   static const OMClassId _rootClassId;
 
+  void setDictionary(OMDictionary* dictionary);
+  
 private:
 
   void initialize(OMStorable* clientRoot,

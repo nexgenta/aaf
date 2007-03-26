@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefExtEnum.h,v 1.26 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefExtEnum.h,v 1.27 2007/03/26 16:00:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -269,6 +269,14 @@ public:
 
 	virtual OMUniqueObjectIdentification elementValue(OMUInt32 index) const;
 
+    virtual wchar_t* elementNameFromValue(OMUniqueObjectIdentification value) const;
+
+    virtual OMUniqueObjectIdentification elementValueFromName(const wchar_t* name) const;
+    
+    virtual bool isValidValue(OMUniqueObjectIdentification value) const;
+    
+    virtual bool registerElement(const wchar_t* name, OMUniqueObjectIdentification value);
+        
 
 	AAFRESULT STDMETHODCALLTYPE
 		GetElementNameBufLen (aafUInt32  index,

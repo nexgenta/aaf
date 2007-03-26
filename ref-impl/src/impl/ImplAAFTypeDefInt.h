@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefInt.h,v 1.23 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefInt.h,v 1.24 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -199,6 +199,8 @@ public:
   virtual OMUInt8 size(void) const;
 
   virtual bool isSigned(void) const;
+  
+  
 
 public:
 

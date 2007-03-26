@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMEnumeratedType.h,v 1.5 2007/02/06 15:46:08 wschilp Exp $ $Name:  $
+// $Id: OMEnumeratedType.h,v 1.6 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #define OMENUMERATEDTYPE_H
 
 #include "OMType.h"
+#include "OMVector.h"
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMEnumeratedType
 class OMEnumeratedType : public OMType {
@@ -42,7 +43,9 @@ public:
 
   virtual OMInt64 elementValue(OMUInt32 index) const = 0;
 
+  virtual wchar_t* elementNameFromValue(OMInt64 value) const = 0;
 
+  virtual OMInt64 elementValueFromName(const wchar_t* name) const = 0;
 
 };
 

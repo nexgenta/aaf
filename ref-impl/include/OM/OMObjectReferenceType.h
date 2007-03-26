@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMObjectReferenceType.h,v 1.5 2007/02/06 15:46:09 wschilp Exp $ $Name:  $
+// $Id: OMObjectReferenceType.h,v 1.6 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,8 @@
 
 #include "OMType.h"
 #include "OMSingleton.h"
+#include "OMClassDefinition.h"
+#include "OMVector.h"
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
 //         OMObjectReferenceType
@@ -36,6 +38,7 @@ public:
 
   virtual const OMUniqueObjectIdentification& referencedType(void) const = 0;
 
+  virtual OMClassDefinition* referencedClass(void) const = 0;
 };
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
@@ -58,6 +61,7 @@ public:
 
   virtual const OMUniqueObjectIdentification& targetPathElement(OMUInt32 index) const = 0;
 
+  virtual const OMPropertyId* targetPath(void) const = 0;
 };
 
 

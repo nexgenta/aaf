@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.h,v 1.7 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.h,v 1.8 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -202,6 +202,16 @@ public:
 
   virtual void accept(OMTypeVisitor& visitor) const;
 
+  // overrides from OMOpaqueType
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      OMUInt32 externalSize) const;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, OMUInt32 externalSize) const;
+
+  virtual void externalData(const OMByte* externalBytes, OMUInt32 externalSize, 
+        const OMByte*& externalDataBytes, OMUInt32& externalDataSize) const;
+        
+  
   // override from OMStorable.
   virtual const OMClassId& classId(void) const;
 

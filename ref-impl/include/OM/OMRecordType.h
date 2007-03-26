@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRecordType.h,v 1.5 2007/02/06 15:46:10 wschilp Exp $ $Name:  $
+// $Id: OMRecordType.h,v 1.6 2007/03/26 16:00:57 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,8 +27,8 @@
 #define OMRECORDTYPE_H
 
 #include "OMType.h"
-
 #include "OMDataTypes.h"
+#include "OMVector.h"
 
 class OMTypeVisitor;
 

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.h,v 1.35 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.h,v 1.36 2007/03/26 16:00:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -149,10 +149,17 @@ public:
 
   virtual OMUInt32 internalSize(void) const;
 
-  virtual OMType* elementType(void) const;
-
   virtual void accept(OMTypeVisitor& visitor) const;
 
+  //*************************************************************
+  //
+  // Overrides from OMArrayType
+  //
+  //*************************************************************
+
+  virtual OMType* elementType(void) const;
+
+  
   //*************************************************************
   //
   // Overrides from OMFixedArrayType
@@ -161,6 +168,7 @@ public:
 
   virtual OMUInt32 elementCount(void) const;
 
+  
   //****************
   // pvtInitialize()
   //

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2004/12/06 17:22:15 philipn Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2007/03/26 16:01:00 philipn Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -24,7 +24,7 @@
 
 
 .PHONY : all
-all : aafextract aafomf eli2aaf aafviewer aafdump
+all : aafextract aafomf eli2aaf aafviewer aafdump formatconv
 
 # AafOmf depends upon OMF development libraries which are no longer distributed
 # with the SDK.  They are available from http://aafassociation.org/download/
@@ -49,6 +49,10 @@ aafviewer:
 aafdump:
 	cd aafdump && $(MAKE)
 
+.PHONY : formatconv
+formatconv:
+	cd formatconv && $(MAKE)
+
 .PHONY : clean
 clean :
 	cd AafOmf && $(MAKE) GENDEPS=0 $@
@@ -57,6 +61,7 @@ clean :
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@
 	cd aafdump && $(MAKE) GENDEPS=0 $@
+	cd formatconv && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
@@ -66,4 +71,5 @@ realclean :
 	cd aafviewer/src/aaf2dot && $(MAKE) GENDEPS=0 $@
 	cd aafviewer/src/aafmeta2dot && $(MAKE) GENDEPS=0 $@
 	cd aafdump && $(MAKE) GENDEPS=0 $@
+	cd formatconv && $(MAKE) GENDEPS=0 $@
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.cpp,v 1.21 2007/02/06 15:46:12 wschilp Exp $ $Name:  $
+// $Id: OMDictionary.cpp,v 1.22 2007/03/26 16:00:56 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,17 +116,19 @@ void OMDictionary::newClass(const OMUniqueObjectIdentification& /* id */,
   ASSERT("Unimplemented code not reached.", false);
 }
 
-void OMDictionary::newProperty(
-                            const OMUniqueObjectIdentification& /* id */,
-                            const wchar_t* /* name */,
-                            const wchar_t* /* description */,
-                            const OMUniqueObjectIdentification& /* type */,
-                            bool& /* isRequired */,
-                            const OMUniqueObjectIdentification& /* memberOf */)
+const OMPropertyDefinition* OMDictionary::newProperty(const OMUniqueObjectIdentification& /*id*/,
+                       const wchar_t* /*name*/,
+                       const wchar_t* /*description*/,
+                       OMPropertyId /*localId*/,
+                       const OMUniqueObjectIdentification& /*type*/,
+                       bool& /*isOptional*/,
+                       bool& /*isUniqueIdentifier*/,
+                       const OMUniqueObjectIdentification& /*memberOf*/)
 {
   TRACE("OMDictionary::newProperty");
 
   ASSERT("Unimplemented code not reached.", false);
+  return 0;
 }
 
 void OMDictionary::newIntegerType(const OMObjectIdentification& /* id */,
@@ -267,12 +269,19 @@ void OMDictionary::newStringType(
 void OMDictionary::newExtendibleEnumeratedType(
                              const OMObjectIdentification& /* id */,
                              const wchar_t* /* name */,
-                             const wchar_t* /* description */,
-                             const wchar_t** /* elementNames */,
-                             const OMObjectIdentification* /* elementValues */,
-                             OMUInt32 /* elementCount */)
+                             const wchar_t* /* description */)
 {
   TRACE("OMDictionary::newExtendibleEnumeratedType");
+
+  ASSERT("Unimplemented code not reached.", false);
+}
+
+void OMDictionary::newExtendibleEnumeratedTypeElement(
+                             const OMObjectIdentification& /* elementOf */,
+                             const wchar_t* /* name */,
+                             const OMObjectIdentification& /* value */)
+{
+  TRACE("OMDictionary::newExtendibleEnumeratedTypeElement");
 
   ASSERT("Unimplemented code not reached.", false);
 }

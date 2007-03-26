@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyDefinition.cpp,v 1.10 2007/02/06 15:46:14 wschilp Exp $ $Name:  $
+// $Id: OMPropertyDefinition.cpp,v 1.11 2007/03/26 16:00:55 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,6 +125,13 @@ OMClassDefinition* OMBuiltinPropertyDefinition::containingClass(void) const
 bool OMBuiltinPropertyDefinition::isPredefined(void) const
 {
   TRACE("OMBuiltinPropertyDefinition::isPredefined");
+  ASSERT("Unimplemented code not reached", false);
+  return true;
+}
+
+bool OMBuiltinPropertyDefinition::isUniqueIdentifier(void) const
+{
+  TRACE("OMBuiltinPropertyDefinition::isUniqueIdentifier");
   ASSERT("Unimplemented code not reached", false);
   return true;
 }

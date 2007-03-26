@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.42 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.43 2007/03/26 16:00:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1267,6 +1267,34 @@ OMInt64 ImplAAFTypeDefEnum::elementValue( aafUInt32 index ) const
 
   return static_cast<OMUInt64>(v);
 }
+
+wchar_t* ImplAAFTypeDefEnum::elementNameFromValue(OMInt64 value) const
+{
+    ImplAAFTypeDefEnum* pNonConstThis = const_cast<ImplAAFTypeDefEnum*>(this);
+    
+    aafUInt32 len;
+    HRESULT hr = pNonConstThis->GetNameBufLenFromInteger(value, &len);
+    ASSERTU(AAFRESULT_SUCCEEDED(hr));
+    wchar_t* result = (wchar_t*)(new OMByte[len]);
+    hr = pNonConstThis->GetNameFromInteger(value, result, len);
+    ASSERTU(AAFRESULT_SUCCEEDED(hr));
+    
+    return result;
+}
+
+OMInt64 
+ImplAAFTypeDefEnum::elementValueFromName(const wchar_t* name) const
+{
+    ImplAAFTypeDefEnum* pNonConstThis = const_cast<ImplAAFTypeDefEnum*>(this);
+    
+    aafInt64 result;
+    HRESULT hr = pNonConstThis->LookupValByName(&result, static_cast<const aafCharacter*>(name));
+    ASSERTU(AAFRESULT_SUCCEEDED(hr));
+    
+    return result;
+}
+
+
 
 
 aafBool ImplAAFTypeDefEnum::IsFixedSize (void) const

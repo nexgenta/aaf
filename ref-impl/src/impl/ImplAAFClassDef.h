@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.h,v 1.41 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
+// $Id: ImplAAFClassDef.h,v 1.42 2007/03/26 16:00:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -208,8 +208,18 @@ public:
 			     const OMStorable* pDstStorable,
 				 const OMPropertyDefinition* pSrcPropertyDef );
 
-   virtual PropertyDefinitionsIterator* propertyDefinitions(void) const;
+  virtual PropertyDefinitionsIterator* propertyDefinitions(void) const;
 
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+  virtual const wchar_t* name(void) const;
+  virtual bool hasDescription(void) const;
+  virtual const wchar_t* description(void) const;
+  virtual bool isPredefined(void) const;
+
+  virtual bool omIsConcrete(void) const;
+  virtual OMClassDefinition* omParentClass(void) const;
+  virtual bool omRegisterExtPropertyDef(OMPropertyDefinition* propertyDef);
+    
 public:
 
 	bool

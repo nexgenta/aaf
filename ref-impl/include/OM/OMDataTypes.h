@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.51 2007/02/23 00:41:29 akharkev Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.52 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -285,5 +285,15 @@ const OMStoredObjectEncoding nullOMStoredObjectEncoding = {0,0,0,{0}};
 typedef OMUInt16 OMPropertyTag;
 
 const OMPropertyTag nullOMPropertyTag = (OMPropertyTag)(~(OMPropertyTag)0);
+
+// wide string format
+//
+#if defined(_MSC_VER)
+#define OMWFMT64 L"I64"
+#elif defined(__x86_64__)
+#define OMWFMT64 L"l"
+#else			// all 32bit platforms using POSIX compilers
+#define OMWFMT64 L"ll"
+#endif
 
 #endif

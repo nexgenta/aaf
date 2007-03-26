@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefCharacter.h,v 1.9 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefCharacter.h,v 1.10 2007/03/26 16:00:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -151,7 +151,7 @@ public:
                            OMByteOrder byteOrder) const;
 
   virtual void accept(OMTypeVisitor& visitor) const;  
-  
+
   //
   // ImplAAFTypeDef methods
   //

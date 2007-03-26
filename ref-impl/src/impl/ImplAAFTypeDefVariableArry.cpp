@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.68 2007/02/24 02:56:50 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.69 2007/03/26 16:00:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -540,6 +540,7 @@ void ImplAAFTypeDefVariableArray::accept(OMTypeVisitor& visitor) const
   visitor.visitVaryingArrayType(this);
   elementType()->accept(visitor);
 }
+
 
 aafUInt32 ImplAAFTypeDefVariableArray::pvtCount
 (

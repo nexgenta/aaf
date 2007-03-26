@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.cpp,v 1.9 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.cpp,v 1.10 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -655,6 +655,28 @@ void ImplAAFTypeDefOpaque::accept(OMTypeVisitor& visitor) const
   visitor.visitOpaqueType(this);
   // We don't visit the opaque type here // tjb !!!
 }
+
+OMUniqueObjectIdentification ImplAAFTypeDefOpaque::actualTypeId(
+    const OMByte* externalBytes, OMUInt32 externalSize) const
+{
+    return ImplAAFTypeDefIndirect::actualTypeId(externalBytes, externalSize);
+}
+
+OMByteOrder ImplAAFTypeDefOpaque::byteOrder(const OMByte* externalBytes,
+    OMUInt32 externalSize) const
+{
+    return ImplAAFTypeDefIndirect::byteOrder(externalBytes, externalSize);
+}
+
+void ImplAAFTypeDefOpaque::externalData(const OMByte* externalBytes, OMUInt32 externalSize,
+    const OMByte*& externalDataBytes, OMUInt32& externalDataSize) const
+{
+    ImplAAFTypeDefIndirect::externalData(externalBytes, externalSize, externalDataBytes, 
+        externalDataSize);
+}
+
+
+
 
 // override from OMStorable.
 const OMClassId& ImplAAFTypeDefOpaque::classId(void) const

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMClassDefinition.h,v 1.11 2005/08/19 23:55:06 tbingham Exp $ $Name:  $
+// $Id: OMClassDefinition.h,v 1.12 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 #define OMCLASSDEFINITION_H
 
 #include "OMDataTypes.h"
+#include "OMDefinition.h"
 
 class OMPropertyDefinition;
 class OMStorable;
@@ -37,7 +38,7 @@ typedef OMReferenceContainerIterator PropertyDefinitionsIterator;
   // @class Abstract base class used to define persistent classes
   //        supported by the Object Manager.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMClassDefinition {
+class OMClassDefinition : public OMDefinition {
 public:
 
   virtual ~OMClassDefinition(void) {}
@@ -55,6 +56,9 @@ public:
 
   virtual PropertyDefinitionsIterator* propertyDefinitions(void) const = 0;
 
+  virtual bool omIsConcrete(void) const = 0;
+  virtual OMClassDefinition* omParentClass(void) const = 0;
+  virtual bool omRegisterExtPropertyDef(OMPropertyDefinition* propertyDef) = 0;
 };
 
 #endif

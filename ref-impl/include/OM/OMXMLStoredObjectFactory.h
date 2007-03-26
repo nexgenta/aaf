@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObjectFactory.h,v 1.10 2004/11/30 19:29:35 akharkev Exp $ $Name:  $
+// $Id: OMXMLStoredObjectFactory.h,v 1.11 2007/03/26 16:00:57 philipn Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -125,7 +125,7 @@ private:
     // @cmember Read the signature from the given raw storage.
   static bool readSignature(OMRawStorage* rawStorage,
                             char* signature,
-                            size_t signatureSize);
+                            OMUInt32 signatureSize);
 
 };
 

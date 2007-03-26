@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMIndirectType.h,v 1.2 2007/02/06 15:46:08 wschilp Exp $ $Name:  $
+// $Id: OMIndirectType.h,v 1.3 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,24 @@ public:
 
   virtual OMType::Tag tag(void) const;
 
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      OMUInt32 externalSize) const = 0;
+  
+  virtual OMType* actualType(const OMByte* externalBytes, OMUInt32 externalSize) const = 0;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, OMUInt32 externalSize) const = 0;
+
+  virtual void actualSize(const OMByte* externalBytes, OMUInt32 externalSize, 
+    OMUInt32& actualSize) const = 0;
+    
+  virtual void actualData(const OMByte* externalBytes, OMUInt32 externalSize,
+    OMByte* actualBytes, OMUInt32& actualSize) const = 0;
+  
+  virtual OMType* actualType(OMUniqueObjectIdentification id) const = 0;
+
+  virtual void externalData(const OMByte* externalBytes, OMUInt32 externalSize, 
+        const OMByte*& externalDataBytes, OMUInt32& externalDataBytesSize) const = 0;
+        
 };
 
 #endif

@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.h,v 1.30 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.h,v 1.31 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -159,7 +159,6 @@ public:
   //*************************************************************
 
   virtual OMType* renamedType(void) const;
-
 
   // overrides from ImplAAFTypeDef
   //

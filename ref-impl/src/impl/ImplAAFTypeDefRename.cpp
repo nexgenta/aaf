@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRename.cpp,v 1.37 2007/02/06 15:46:18 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRename.cpp,v 1.38 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -324,6 +324,7 @@ OMType* ImplAAFTypeDefRename::renamedType(void) const
 
   return type->type();
 }
+
 
 
 aafBool ImplAAFTypeDefRename::IsFixedSize() const

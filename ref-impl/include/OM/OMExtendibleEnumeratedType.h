@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMExtendibleEnumeratedType.h,v 1.1 2007/02/06 15:46:08 wschilp Exp $ $Name:  $
+// $Id: OMExtendibleEnumeratedType.h,v 1.2 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,6 +41,14 @@ public:
 
   virtual OMUniqueObjectIdentification elementValue(OMUInt32 index) const = 0;
 
+  virtual wchar_t* elementNameFromValue(OMUniqueObjectIdentification value) const = 0;
+
+  virtual OMUniqueObjectIdentification elementValueFromName(const wchar_t* name) const = 0;
+
+  virtual bool isValidValue(OMUniqueObjectIdentification value) const = 0;
+
+  virtual bool registerElement(const wchar_t* name, OMUniqueObjectIdentification value) = 0;
+    
 };
 
 #endif

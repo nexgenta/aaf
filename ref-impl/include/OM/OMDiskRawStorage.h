@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDiskRawStorage.h,v 1.29 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMDiskRawStorage.h,v 1.30 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -172,17 +172,22 @@ public:
     //          representation.
   virtual void synchronize(void);
 
+  
+    // @cmember Get the file name for this <c OMDiskRawStorage>
+  const wchar_t* fileName(void) const;
+  
 protected:
   // @access Protected members.
 
     // @cmember Constructor.
-  OMDiskRawStorage(OMStream* file, OMFile::OMAccessMode accessMode);
+  OMDiskRawStorage(OMStream* file, OMFile::OMAccessMode accessMode, const wchar_t* fileName);
 
 private:
   // @access Private members.
 
   OMStream* _file;
   OMFile::OMAccessMode _mode;
+  wchar_t* _fileName;
 
 };
 

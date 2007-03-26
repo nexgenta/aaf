@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArray.h,v 1.38 2007/02/06 15:46:19 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArray.h,v 1.39 2007/03/26 16:00:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -156,11 +156,18 @@ public:
                            OMUInt32 internalBytesSize,
                            OMByteOrder byteOrder) const;
 
-  virtual OMType* elementType(void) const;
-
-
   virtual void accept(OMTypeVisitor& visitor) const;
 
+
+  //*************************************************************
+  //
+  // Overrides from OMArrayType
+  //
+  //*************************************************************
+
+  virtual OMType* elementType(void) const;
+
+  
   //****************
   // pvtInitialize()
   //

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFClassDef.cpp,v 1.63 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
+// $Id: ImplAAFClassDef.cpp,v 1.64 2007/03/26 16:00:50 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -720,6 +720,84 @@ PropertyDefinitionsIterator* ImplAAFClassDef::propertyDefinitions(void) const
 {
   return _Properties.createIterator();
 }
+
+const OMUniqueObjectIdentification&
+ImplAAFClassDef::identification(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::identification();
+}
+
+const wchar_t* ImplAAFClassDef::name(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::name();
+}
+
+bool ImplAAFClassDef::hasDescription(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::hasDescription();
+}
+
+const wchar_t* ImplAAFClassDef::description(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::description();
+}
+
+bool ImplAAFClassDef::isPredefined(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::isPredefined();
+}
+
+bool ImplAAFClassDef::omIsConcrete(void) const
+{
+    return _IsConcrete == kAAFTrue;
+}
+  
+OMClassDefinition* ImplAAFClassDef::omParentClass(void) const
+{
+    ImplAAFClassDef* pParentClassDef = 0;
+    
+    ImplAAFClassDef* nonConstThis = const_cast<ImplAAFClassDef*>(this);
+    
+    aafBoolean_t isRoot = kAAFFalse;
+    nonConstThis->IsRoot(&isRoot);
+    if (isRoot == kAAFFalse)
+    {
+        HRESULT hr = nonConstThis->GetParent(&pParentClassDef);
+        if (AAFRESULT_SUCCESS == hr)
+        {
+            // This method does not increment the reference count
+            // of the returned class definition.
+            pParentClassDef->ReleaseReference();
+        }
+        else
+        {
+            pParentClassDef = 0;
+        }
+    }
+    
+    return pParentClassDef;
+}
+
+bool ImplAAFClassDef::omRegisterExtPropertyDef(OMPropertyDefinition* propertyDef)
+{
+    if (PvtIsPropertyDefRegistered(*(reinterpret_cast<const aafUID_t*>(
+        &(propertyDef->identification())))))
+    {
+        return false;
+    }
+    
+    HRESULT result = pvtRegisterExistingPropertyDef(dynamic_cast<ImplAAFPropertyDef*>(
+        propertyDef));
+        
+    return AAFRESULT_SUCCEEDED(result);
+}
+
+
 
 // Find the unique identifier property defintion for this class or any parent class
 // (RECURSIVE)

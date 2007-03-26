@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPlainStreamData.cpp,v 1.4 2007/03/16 18:00:26 akharkev Exp $ $Name:  $
+// $Id: ImplAAFPlainStreamData.cpp,v 1.5 2007/03/26 16:00:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -253,7 +253,6 @@ AAFRESULT ImplAAFPlainStreamData::GetStreamPropertyValue(
   pPropertyValue->GetType(&pPropertyValueType);
   eAAFTypeCategory_t propertyTypeCategory = kAAFTypeCatUnknown;
   pPropertyValueType->GetTypeCategory(&propertyTypeCategory);
-  eAAFTypeCategory_t thisTypeCategory = kAAFTypeCatUnknown;
   if (propertyTypeCategory != kAAFTypeCatStream)
     return AAFRESULT_INVALID_PARAM;
   

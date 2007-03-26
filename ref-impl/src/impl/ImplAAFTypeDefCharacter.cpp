@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefCharacter.cpp,v 1.15 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefCharacter.cpp,v 1.16 2007/03/26 16:00:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -349,6 +349,7 @@ void ImplAAFTypeDefCharacter::accept(OMTypeVisitor& visitor) const
 {
   visitor.visitCharacterType(this);
 }
+
 
 
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOpaqueType.h,v 1.2 2007/02/06 15:46:09 wschilp Exp $ $Name:  $
+// $Id: OMOpaqueType.h,v 1.3 2007/03/26 16:00:57 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,14 @@ public:
 
   virtual OMType::Tag tag(void) const;
 
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      OMUInt32 externalSize) const = 0;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, OMUInt32 externalSize) const = 0;
+
+  virtual void externalData(const OMByte* externalBytes, OMUInt32 externalSize, 
+        const OMByte*& externalDataBytes, OMUInt32& externalDataSize) const = 0;
+        
 };
 
 #endif

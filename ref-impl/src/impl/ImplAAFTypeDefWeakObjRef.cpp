@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.44 2007/02/18 04:05:10 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefWeakObjRef.cpp,v 1.45 2007/03/26 16:00:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -215,7 +215,7 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 	}
 
-	if (0 != _uniqueIdentifierPid)
+	if (0 != uniqueIdentifierPid)
 	{
 		_uniqueIdentifierPid = uniqueIdentifierPid;
 	}
@@ -817,6 +817,18 @@ ImplAAFTypeDefWeakObjRef::referencedType(void) const
   return _referencedType.identification();
 }
 
+OMClassDefinition* ImplAAFTypeDefWeakObjRef::referencedClass(void) const
+{
+    ImplAAFTypeDefWeakObjRef* pNonConstThis = const_cast<ImplAAFTypeDefWeakObjRef*>(this);
+    
+    ImplAAFClassDef* pClassDef = 0;
+    HRESULT hr = pNonConstThis->GetObjectType(&pClassDef);
+    ASSERTU(AAFRESULT_SUCCEEDED(hr));
+    pClassDef->ReleaseReference();
+    
+    return pClassDef;
+}
+
 OMUInt32 ImplAAFTypeDefWeakObjRef::targetPathElementCount(void) const
 {
   TRACE("ImplAAFTypeDefWeakObjRef::targetPathElementCount");
@@ -832,6 +844,11 @@ ImplAAFTypeDefWeakObjRef::targetPathElement(OMUInt32 index) const
 
   const aafUID_t& element = _targetSet.getAt(index);
   return reinterpret_cast<const OMUniqueObjectIdentification&>(element);
+}
+
+const OMPropertyId* ImplAAFTypeDefWeakObjRef::targetPath(void) const
+{
+    return GetTargetPids();
 }
 
 aafBool ImplAAFTypeDefWeakObjRef::IsFixedSize (void) const
@@ -918,7 +935,6 @@ OMProperty * ImplAAFTypeDefWeakObjRef::pvtCreateOMProperty
   ASSERTU (result);
   return result;
 }
-
 
 
 

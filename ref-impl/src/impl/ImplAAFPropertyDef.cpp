@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFPropertyDef.cpp,v 1.37 2007/02/06 15:46:16 wschilp Exp $ $Name:  $
+// $Id: ImplAAFPropertyDef.cpp,v 1.38 2007/03/26 16:00:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -312,6 +312,25 @@ bool ImplAAFPropertyDef::isOptional(void) const
 {
   return (kAAFTrue == _IsOptional) ? true : false;
 }
+
+OMUniqueObjectIdentification ImplAAFPropertyDef::typeId(void) const
+{
+    aafUID_t tid = _Type;
+    return *(reinterpret_cast<OMUniqueObjectIdentification*>(&tid));
+}
+
+bool ImplAAFPropertyDef::isUniqueIdentifier(void) const
+{
+  if (!_IsUniqueIdentifier.isPresent())
+  {
+      return false;
+  }
+  else
+  {
+      return _IsUniqueIdentifier == kAAFTrue;
+  }
+}
+
 
 
 OMProperty * ImplAAFPropertyDef::CreateOMProperty () const

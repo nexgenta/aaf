@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMArrayType.h,v 1.6 2007/02/06 15:46:07 wschilp Exp $ $Name:  $
+// $Id: OMArrayType.h,v 1.7 2007/03/26 16:00:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -50,7 +50,6 @@ class OMVaryingArrayType : public OMArrayType {
 public:
 
   virtual OMType::Tag tag(void) const;
-
 
 };
 

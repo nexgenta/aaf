@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.28 2007/02/06 15:46:19 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStrongObjRef.h,v 1.29 2007/03/26 16:00:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -163,6 +163,8 @@ public:
   //*************************************************************
 
   virtual const OMUniqueObjectIdentification& referencedType(void) const;
+
+  virtual OMClassDefinition* referencedClass(void) const;
 
 
   // overrides from ImplAAFTypeDef

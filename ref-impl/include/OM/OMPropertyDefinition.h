@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertyDefinition.h,v 1.14 2007/02/06 15:46:10 wschilp Exp $ $Name:  $
+// $Id: OMPropertyDefinition.h,v 1.15 2007/03/26 16:00:57 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,6 +58,10 @@ public:
 
   virtual OMClassDefinition* containingClass(void) const = 0;
 
+    // @cmember Does the Is the <c OMProperty> defined by this
+    //          <c OMPropertyDefinition> uniquely identify the object?
+  virtual bool isUniqueIdentifier(void) const = 0;
+  
 
 };
 
@@ -116,6 +120,10 @@ public:
     //          with respect to a well known baseline?
   virtual bool isPredefined(void) const;
 
+    // @cmember Does the <c OMProperty> defined by this
+    //          <c OMBuiltinPropertyDefinition> unique identify an object?
+  virtual bool isUniqueIdentifier(void) const;
+  
 private:
   // @access Private members.
 

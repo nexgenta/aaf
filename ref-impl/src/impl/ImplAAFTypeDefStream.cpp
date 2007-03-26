@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.29 2007/03/21 19:36:18 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.30 2007/03/26 16:00:46 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -625,6 +625,7 @@ OMProperty * ImplAAFTypeDefStream::pvtCreateOMProperty
   // until new non-template typed-stream class is available.
   return new OMDataStreamProperty(pid, name);
 }
+
 
 
 

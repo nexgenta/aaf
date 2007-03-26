@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefIndirect.h,v 1.11 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefIndirect.h,v 1.12 2007/03/26 16:00:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -192,6 +192,30 @@ public:
 
   virtual void accept(OMTypeVisitor& visitor) const;
 
+  
+  //
+  // OMIndirectType methods
+  //
+  
+  virtual OMUniqueObjectIdentification actualTypeId(const OMByte* externalBytes, 
+      OMUInt32 externalSize) const;
+  
+  virtual OMType* actualType(const OMByte* externalBytes, OMUInt32 externalSize) const;
+  
+  virtual OMByteOrder byteOrder(const OMByte* externalBytes, OMUInt32 externalSize) const;
+
+  virtual void actualSize(const OMByte* externalBytes, OMUInt32 externalSize, 
+    OMUInt32& actualSize) const;
+    
+  virtual void actualData(const OMByte* externalBytes, OMUInt32 externalSize,
+    OMByte* actualBytes, OMUInt32& actualSize) const;
+  
+  virtual OMType* actualType(OMUniqueObjectIdentification id) const;
+
+  virtual void externalData(const OMByte* externalBytes, OMUInt32 externalSize, 
+        const OMByte*& externalDataBytes, OMUInt32& externalDataBytesSize) const;
+        
+  
   //****************
   // Initialize() 
   //   Called when we initialize as one of the "builtin" types.
