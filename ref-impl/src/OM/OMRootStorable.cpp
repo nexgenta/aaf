@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMRootStorable.cpp,v 1.20 2007/03/26 16:00:55 philipn Exp $ $Name:  $
+// $Id: OMRootStorable.cpp,v 1.21 2007/03/30 18:03:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -74,7 +74,11 @@ void OMRootStorable::close(void)
   TRACE("OMRootStorable::close");
 
   _clientRoot->close();
-  _dictionary->close();
+  // HACK4MEIP2
+  OMStorable* d = _dictionary;
+  if (d != 0) {
+    d->close();
+  }
 }
 
   // @mfunc Restore the contents of an <c OMRootStorable>.
