@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkdict.awk,v 1.57 2007/04/04 19:02:25 terabrit Exp $ $Name:  $
+# $Id: mkdict.awk,v 1.58 2007/04/04 19:04:28 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -865,8 +865,9 @@ BEGIN {
 	if( APPVER!="" )
 	{
 		# parse appver x.y to tgtver
-		# assert( 3==length(APPVER) )
-		tgtver = 10*substr(APPVER,1,1)+substr(APPVER,3,1);
+		# allow 1.1.2, written 1.12
+		# assert( 3>=length(APPVER) )
+		tgtver = 100*substr(APPVER,1,1)+substr(APPVER,3);
 
 		# substr from r_app
 		ver = substr( CC["r_app"], index(CC["r_app"], APP)+length(APP) );
@@ -885,8 +886,9 @@ BEGIN {
 		# if no valid relation, never discard
 		if( rel!="" )
 		{
-			# assert 3==length(ver)
-			relver = 10*substr(ver,1,1)+substr(ver,3,1);
+			# allow 1.1.2, written 1.12
+			# assert 3>=length(ver)
+			relver = 100*substr(ver,1,1)+substr(ver,3);
 
 			# diagnostics
 			# printf( "%d %s %d \n", tgtver, rel, relver);
