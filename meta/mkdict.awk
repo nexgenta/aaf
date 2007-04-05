@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: mkdict.awk,v 1.59 2007/04/05 00:14:34 terabrit Exp $ $Name:  $
+# $Id: mkdict.awk,v 1.60 2007/04/05 00:49:10 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -1220,7 +1220,8 @@ BEGIN {
       if (kind == "enumeration" )
 	  {
 		if( CC["s_type_sym"]==etype || CC["s_type_sym"]=="member" ) # "member" is old-style, etype is new-style (!)
-			printf("  AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(%s,\n    %s, %s)\n", memberName, CC["r_value"], parentTypeName);
+			# note concatenate with "" to force string typing and deal with vanishing 0 ?
+			printf("  AAF_TYPE_DEFINITION_ENUMERATION_MEMBER(%s,\n    %s, %s)\n", memberName, CC["r_value"] "", parentTypeName);
 		else
 		{
 			printError( "Invalid type of member of Enumeration");
