@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.25 2006/06/27 19:53:39 heydowns Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.26 2007/04/11 14:30:02 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -322,16 +322,16 @@ const int PID_BWFImportDescriptor_QltyQualityParameter           = 0x3D26;
 const int PID_BWFImportDescriptor_QltyOperatorComment            = 0x3D27;
 const int PID_BWFImportDescriptor_QltyCueSheet                   = 0x3D28;
 const int PID_BWFImportDescriptor_UnknownBWFChunks               = 0x3D33;
-const int PID_MPEGVideoDescriptor_SingleSequence                 = 0xFF01;
-const int PID_MPEGVideoDescriptor_ConstantBPictureCount          = 0xFF02;
-const int PID_MPEGVideoDescriptor_CodedContentScanning           = 0xFF03;
-const int PID_MPEGVideoDescriptor_LowDelay                       = 0xFF04;
-const int PID_MPEGVideoDescriptor_ClosedGOP                      = 0xFF05;
-const int PID_MPEGVideoDescriptor_IdenticalGOP                   = 0xFF06;
-const int PID_MPEGVideoDescriptor_MaxGOP                         = 0xFF07;
-const int PID_MPEGVideoDescriptor_MaxBPictureCount               = 0xFF08;
-const int PID_MPEGVideoDescriptor_BitRate                        = 0xFF09;
-const int PID_MPEGVideoDescriptor_ProfileAndLevel                = 0xFF10;
+const int PID_MPEGVideoDescriptor_SingleSequence                 = 0x0000;
+const int PID_MPEGVideoDescriptor_ConstantBPictureCount          = 0x0000;
+const int PID_MPEGVideoDescriptor_CodedContentScanning           = 0x0000;
+const int PID_MPEGVideoDescriptor_LowDelay                       = 0x0000;
+const int PID_MPEGVideoDescriptor_ClosedGOP                      = 0x0000;
+const int PID_MPEGVideoDescriptor_IdenticalGOP                   = 0x0000;
+const int PID_MPEGVideoDescriptor_MaxGOP                         = 0x0000;
+const int PID_MPEGVideoDescriptor_MaxBPictureCount               = 0x0000;
+const int PID_MPEGVideoDescriptor_BitRate                        = 0x0000;
+const int PID_MPEGVideoDescriptor_ProfileAndLevel                = 0x0000;
 const int PID_ClassDefinition_ParentClass                        = 0x0008;
 const int PID_ClassDefinition_Properties                         = 0x0009;
 const int PID_ClassDefinition_IsConcrete                         = 0x000A;
