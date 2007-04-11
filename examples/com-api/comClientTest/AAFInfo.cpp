@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.45 2004/11/17 18:09:18 phil_tudor Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.46 2007/04/11 16:27:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -476,12 +476,16 @@ static void ReadAAFFile(aafWChar * pFileName)
         printf("Filekind             = 512-byte SS (reading with Schemasoft)\n");
       else if (memcmp( &fileKind, &kAAFFileKind_AafG512Binary, sizeof(fileKind)) == 0)
         printf("Filekind             = 512-byte SS (reading with GSF)\n");
+      else if (memcmp( &fileKind, &kAAFFileKind_Aaf512Binary, sizeof(fileKind)) == 0)
+        printf("Filekind             = 512-byte SS (reading with default implementation)\n");
       else if (memcmp( &fileKind, &kAAFFileKind_AafM4KBinary, sizeof(fileKind)) == 0)
         printf("Filekind             = 4096-byte SS (reading with Microsoft)\n");
       else if (memcmp( &fileKind, &kAAFFileKind_AafS4KBinary, sizeof(fileKind)) == 0)
         printf("Filekind             = 4096-byte SS (reading with Schemasoft)\n");
       else if (memcmp( &fileKind, &kAAFFileKind_AafG4KBinary, sizeof(fileKind)) == 0)
         printf("Filekind             = 4096-byte SS (reading with GSF)\n");
+      else if (memcmp( &fileKind, &kAAFFileKind_Aaf4KBinary, sizeof(fileKind)) == 0)
+        printf("Filekind             = 4096-byte SS (reading with default implementation)\n");
       else
         printf("Filekind             = Recognized by SDK but unknown to AAFInfo\n");
     }
