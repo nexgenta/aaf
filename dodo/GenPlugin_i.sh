@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GenPlugin_i.sh,v 1.5 2004/10/25 17:32:17 stuart_hc Exp $ $Name:  $
+# $Id: GenPlugin_i.sh,v 1.6 2007/04/12 13:03:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -35,24 +35,6 @@ echo \#ifdef __cplusplus
 echo "extern \"C\"{"
 echo \#endif
 echo ""
-echo ""
-echo \#ifndef __IID_DEFINED__
-echo \#define __IID_DEFINED__
-echo ""
-echo "typedef struct _IID"
-echo "{"
-echo "    unsigned int x;"
-echo "    unsigned short s1;"
-echo "    unsigned short s2;"
-echo "    unsigned char  c[8];"
-echo "} IID;"
-echo ""
-echo \#endif "// __IID_DEFINED__"
-echo ""
-echo \#ifndef CLSID_DEFINED
-echo \#define CLSID_DEFINED
-echo "typedef IID CLSID;"
-echo \#endif "// CLSID_DEFINED"
 echo ""
 for class in ${PLUGIN_OBJECTS} ; do \
 	awk -f dod2iid.awk C=$class $class.dod

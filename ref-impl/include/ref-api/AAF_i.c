@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF_i.c,v 1.30 2007/02/02 19:28:47 akharkev Exp $ $Name:  $
+// $Id: AAF_i.c,v 1.31 2007/04/12 13:03:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,24 +37,6 @@
 extern "C"{
 #endif
 
-
-#ifndef __IID_DEFINED__
-#define __IID_DEFINED__
-
-typedef struct _IID
-{
-    unsigned int x;
-    unsigned short s1;
-    unsigned short s2;
-    unsigned char  c[8];
-} IID;
-
-#endif // __IID_DEFINED__
-
-#ifndef CLSID_DEFINED
-#define CLSID_DEFINED
-typedef IID CLSID;
-#endif // CLSID_DEFINED
 
 const IID IID_IAAFAES3PCMDescriptor = {0x2EBFFDE0,0x5997,0x414D,{0x80,0x8B,0x6B,0xAA,0x4A,0x74,0xF4,0x0F}};
 

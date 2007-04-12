@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOMPlatformTypes.h,v 1.13 2004/11/04 16:36:58 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOMPlatformTypes.h,v 1.14 2007/04/12 13:03:15 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -73,15 +73,8 @@
       BYTE  Data4[8];
   } GUID;
 
-# ifndef CLSID_DEFINED
-# define CLSID_DEFINED
-    typedef GUID CLSID;
-# endif /* ! CLSID_DEFINED */
-
-# ifndef __IID_DEFINED__
-# define __IID_DEFINED__
-    typedef GUID IID;
-# endif /* ! __IID_DEFINED__ */
+  typedef GUID CLSID;
+  typedef GUID IID;
 
 # define REFGUID             const GUID &
 # define REFIID              const IID &
