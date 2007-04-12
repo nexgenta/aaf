@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.16 2007/03/26 16:00:59 philipn Exp $ $Name:  $
+# $Id: common.mk,v 1.17 2007/04/12 17:11:42 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -93,17 +93,6 @@ endif
 ifndef USE_SS
     ADD_CFLAGS += -DOM_NO_STRUCTURED_STORAGE
 endif
-
-
-#--------------------------------------------------------------------------
-# AAF-XML stored format support can be turned on using e.g.
-# make LIBEXPAT_PATH=/usr/local
-#--------------------------------------------------------------------------
-ifdef LIBEXPAT_PATH
-    PLATFORMLIBS += -L$(LIBEXPAT_PATH)/lib -lexpat
-    ADD_CFLAGS += -I$(LIBEXPAT_PATH)/include -DHAVE_EXPAT
-endif
-
 
 
 #--------------------------------------------------------------------------

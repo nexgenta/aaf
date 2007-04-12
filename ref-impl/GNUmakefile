@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2007/04/12 11:38:26 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2007/04/12 17:11:41 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,6 +26,7 @@
 all :
 	cd aaflib && $(MAKE)
 	cd aafiid && $(MAKE)
+	cd expat && $(MAKE)
 	cd src && $(MAKE)
 	cd libjpeg && $(MAKE)
 	cd plugins && $(MAKE)
