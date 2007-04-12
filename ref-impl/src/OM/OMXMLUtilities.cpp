@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.cpp,v 1.2 2007/03/26 16:00:51 philipn Exp $
+// $Id: OMXMLUtilities.cpp,v 1.3 2007/04/12 12:59:47 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,7 @@
 #include "wchar.h"
 
 // includes for function wmkdir()
-#if defined(_MSC_VER)
+#if defined(_WIN32)
 #include <direct.h>
 #else
 #include <sys/stat.h>
@@ -1774,7 +1774,7 @@ int
 wmkdir(const wchar_t* dirpath)
 {
     char* u8Dirpath = utf16ToUTF8(dirpath);
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     int status = _mkdir(u8Dirpath);
 #else
     int status = mkdir(u8Dirpath, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);

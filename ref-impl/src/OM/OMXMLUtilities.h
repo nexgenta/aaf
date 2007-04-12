@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.2 2007/03/26 16:00:51 philipn Exp $
+// $Id: OMXMLUtilities.h,v 1.3 2007/04/12 12:59:48 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,14 +43,16 @@
 #define XML_MAX_VERSIONTYPE_STRING_SIZE         10
 
 
-#if defined (_MSC_VER)
+// MS Run-Time Library doesn't have swprintf but does have _snwprintf
+#if defined (_WIN32)
 #define std_swprintf _snwprintf
 #else
 #define std_swprintf swprintf
 #endif
 
 
-#ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strncasecmp
+// MS Run-Time dosen't have POSIX strncasecmp, but provides stricmp
+#if defined (_WIN32)
 #define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
 #else
 #include <strings.h>	// strncasecmp()
