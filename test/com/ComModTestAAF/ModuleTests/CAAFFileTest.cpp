@@ -1,6 +1,6 @@
 //=------------------------------------------------ -*- tab-width:4 -*- =
 //
-// $Id: CAAFFileTest.cpp,v 1.51 2007/02/26 07:37:27 bmdurksen Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.52 2007/04/12 11:12:44 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -101,7 +101,7 @@ isSSFileKind(const aafUID_t& fileKind)
 static aafUID_t
 getSS4KFileKind(const aafUID_t& fileKind)
 {
-	aafUID_t ss4KFileKind=kAAFFileKind_Pathological_Value;
+	aafUID_t ss4KFileKind=kAAFFileKind_Pathological;
 	if (equalUID(fileKind, testFileKindDefault)) {
 		ss4KFileKind=kAAFFileKind_Aaf4KBinary;
 	} else if (equalUID(fileKind, kAAFFileKind_AafM4KBinary)) {
