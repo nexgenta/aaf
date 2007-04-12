@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibwin32.cpp,v 1.12 2006/06/15 19:53:19 tbingham Exp $ $Name:  $
+// $Id: aaflibwin32.cpp,v 1.13 2007/04/12 12:49:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,7 @@
 
 // Win32 specific header files.
 #include "windows.h"
+#include "ctype.h"
 
 // AAF header files.
 #include "AAFResult.h"
