@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2004/07/08 17:43:39 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2007/04/12 11:38:26 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -25,8 +25,8 @@
 .PHONY : all
 all :
 	cd aaflib && $(MAKE)
-	cd src && $(MAKE)
 	cd aafiid && $(MAKE)
+	cd src && $(MAKE)
 	cd libjpeg && $(MAKE)
 	cd plugins && $(MAKE)
 
