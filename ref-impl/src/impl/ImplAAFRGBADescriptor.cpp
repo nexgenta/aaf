@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRGBADescriptor.cpp,v 1.11 2006/06/15 19:52:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFRGBADescriptor.cpp,v 1.12 2007/04/12 12:57:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -104,7 +104,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-HRESULT STDMETHODCALLTYPE
+AAFRESULT STDMETHODCALLTYPE
     ImplAAFRGBADescriptor::CountPixelLayoutElements (aafUInt32 *  pResult)
 {
 	aafUInt32			n, result;
@@ -217,7 +217,7 @@ AAFRESULT STDMETHODCALLTYPE
 	return AAFRESULT_SUCCESS;
 }
 
-HRESULT STDMETHODCALLTYPE
+AAFRESULT STDMETHODCALLTYPE
     ImplAAFRGBADescriptor::CountPaletteLayoutElements (aafUInt32 *  pResult)
 {
 	aafUInt32			n, result;

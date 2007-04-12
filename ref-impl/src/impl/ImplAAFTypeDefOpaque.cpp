@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefOpaque.cpp,v 1.10 2007/03/26 16:00:46 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefOpaque.cpp,v 1.11 2007/04/12 12:57:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -468,7 +468,7 @@ AAFRESULT ImplAAFTypeDefOpaque::SetHandle (
   // AAFRESULT_ILLEGAL_VALUE
   //   - initDataSize indicates pInitData is of the wrong size.
   // 
-  HRESULT ImplAAFTypeDefOpaque::CreateValueFromHandle (
+  AAFRESULT ImplAAFTypeDefOpaque::CreateValueFromHandle (
     // pointer to buffer containing handle to use
      aafMemPtr_t  pInitData,
 
