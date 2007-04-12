@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.66 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.67 2007/04/12 12:58:01 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -835,7 +835,9 @@ static WindowsKind getWindowsKind(void)
 
   DWORD version = GetVersion();
   BYTE majorVersion = (BYTE)(version        & 0x000000ff);
-  BYTE minorVersion = (BYTE)((version >> 8) & 0x000000ff);
+  // If minorVersion is needed use:
+  // minorVersion = (BYTE)((version >> 8) & 0x000000ff);
+
   if (version < 0x80000000) {
     result = wkProfessional;
   } else if (majorVersion < 4) {

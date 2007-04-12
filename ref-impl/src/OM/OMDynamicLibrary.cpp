@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDynamicLibrary.cpp,v 1.8 2004/10/27 14:07:18 stuart_hc Exp $ $Name:  $
+// $Id: OMDynamicLibrary.cpp,v 1.9 2007/04/12 12:57:57 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -123,7 +123,7 @@ void* OMWindowsDynamicLibrary::findSymbol(const char* symbolName)
           << " \"" << error << "\"." << endl;
   }
 #endif
-  result = address;
+  result = (void *)address;
   return result;
 }
 
@@ -172,7 +172,10 @@ void OMWindowsDynamicLibrary::unload(void)
   TRACE("OMWindowsDynamicLibrary::unload");
 
   if (_library != 0) {
-    BOOL freed = FreeLibrary((HINSTANCE)_library);
+#if defined(OM_DYNAMIC_LIBRARY_DEBUG)
+    BOOL freed =
+#endif
+    FreeLibrary((HINSTANCE)_library);
 #if defined(OM_DYNAMIC_LIBRARY_DEBUG)
     if (!freed) {
       OMUInt32 error = GetLastError();
