@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFUnknown.h,v 1.9 2004/12/14 20:40:33 tbingham Exp $ $Name:  $
+// $Id: CAAFUnknown.h,v 1.10 2007/04/12 12:56:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -342,7 +342,7 @@ private:
 	// Member data:
 
 	//@cmember Current reference count for this object.
-  ULONG m_cRef;
+  aafUInt32 m_cRef;
 
   //@cmember Outer controlling Unknown
   IUnknown *m_pUnkOuter;
