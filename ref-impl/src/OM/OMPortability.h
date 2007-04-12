@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPortability.h,v 1.37 2006/06/14 19:55:51 tbingham Exp $ $Name:  $
+// $Id: OMPortability.h,v 1.38 2007/04/12 12:47:41 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,6 +71,9 @@
 #elif defined(__GNUC__) && defined(__i386__) && defined(__OpenBSD__)
 #define OM_COMPILER_GCC_INTEL_OPENBSD
 #define OM_OS_UNIX
+#elif defined(__GNUC__) && defined(__i386__) && defined(_WIN32)
+#define OM_COMPILER_GCC_INTEL_WINDOWS
+#define OM_OS_WINDOWS
 #elif defined(__GNUC__) && defined(__i386__) && defined(__CYGWIN__)
 #define OM_COMPILER_GCC_INTEL_CYGWIN
 #define OM_OS_UNIX

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataTypes.h,v 1.52 2007/03/26 16:00:58 philipn Exp $ $Name:  $
+// $Id: OMDataTypes.h,v 1.53 2007/04/12 12:47:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,8 +58,9 @@ typedef unsigned __int64       OMUInt64;
    || defined(OM_COMPILER_GCC_PPC64_LINUX) \
    || defined(OM_COMPILER_GCC_PPC_MACOSX) || defined(OM_COMPILER_GCC_INTEL_MACOSX) || defined(OM_COMPILER_MWERKS_PPC_MACOSX) \
    || defined(OM_COMPILER_SGICC_MIPS_SGI) || defined(OM_COMPILER_GCC_MIPS_SGI) \
-   || defined(OM_COMPILER_GCC_SPARC_SUNOS) || defined(OM_COMPILER_GCC_INTEL_FREEBSD) \
-   || defined(OM_COMPILER_GCC_INTEL_OPENBSD) || defined(OM_COMPILER_GCC_INTEL_CYGWIN)
+   || defined(OM_COMPILER_GCC_SPARC_SUNOS) \
+   || defined(OM_COMPILER_GCC_INTEL_FREEBSD) || defined(OM_COMPILER_GCC_INTEL_OPENBSD) \
+   || defined(OM_COMPILER_GCC_INTEL_WINDOWS) || defined(OM_COMPILER_GCC_INTEL_CYGWIN)
 
 // Use ISO C99 (also ANSI and POSIX) fixed size integers
 

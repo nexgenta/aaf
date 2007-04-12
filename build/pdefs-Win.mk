@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-Win.mk,v 1.4 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
+# $Id: pdefs-Win.mk,v 1.5 2007/04/12 12:47:40 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,8 @@
 #
 # pdefs-Win.mk
 #
-#	This file contains makefile definitions for the WinNT/Cygwin platform.
+#	This file contains makefile definitions for the WinNT platform family,
+#	and is intended to support native g++ (MinGW) and MSVC builds.
 #
 #
 # Uses:
@@ -47,7 +48,7 @@
 # Include common Unix definitions.
 #------------------------------------------------------------------------------
 include $(AAFBASE)/build/pdefs-Unix.mk
-SHELL = /bin/bash
+SHELL = /bin/sh
 
 #------------------------------------------------------------------------------
 # Compiler-specific definitions
@@ -59,7 +60,7 @@ include $(AAFBASE)/build/cdefs-$(COMPILER).mk
 #------------------------------------------------------------------------------
 # Platform specific compiler options
 #------------------------------------------------------------------------------
-PLATFORM_CFLAGS = 
+PLATFORM_CFLAGS = -DUNICODE
 
 
 #------------------------------------------------------------------------------
