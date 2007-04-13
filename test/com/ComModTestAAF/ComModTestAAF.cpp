@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComModTestAAF.cpp,v 1.31 2005/10/14 19:59:34 rodrigc Exp $ $Name:  $
+// $Id: ComModTestAAF.cpp,v 1.32 2007/04/13 15:39:06 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -367,8 +367,14 @@ main(int argc, char* argv[])
 				std::wcerr << L"ERROR: Failed to find the specified file encoding -- " << encodingName << std::endl;
 				return EXIT_FAILURE;
 			}
-			// Always use disk raw storage if file encoding is specified.
-			rawStorageType = kAAFDiskRawStorage;
+            if (fileKind != aafFileKindAafXmlText)
+            {
+                // Always use disk raw storage if file encoding is specified and is 
+                // not the XML file encoding
+                // The XML file encoding is a multi-file format and does not support the
+                // "single file" raw storage type
+                rawStorageType = kAAFDiskRawStorage;
+            }
 		}
 
 		if (startArg >= argc)
