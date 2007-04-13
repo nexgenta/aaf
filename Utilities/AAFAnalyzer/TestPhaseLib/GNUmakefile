@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2006/01/30 20:03:19 jlow Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,10 +47,10 @@ gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
 gcov :	TestPhase
 
 .PHONY : TestPhase
-TestPhase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libTestPhase$(LIB)
+TestPhase : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libTestPhase$(LIBEXT)
 
 
-$(LIBDIR)/libTestPhase$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libTestPhase$(LIBEXT) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -58,7 +58,7 @@ $(LIBDIR)/libTestPhase$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libTestPhase$(LIB)
+	@$(RM) $(LIBDIR)/libTestPhase$(LIBEXT)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean

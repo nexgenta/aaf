@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.16 2005/03/07 16:55:59 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.17 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,7 @@ CXXFILES2 = AafOmfMain.$(CPP_EXTENSION)
 LIBCXXOBJS = $(filter-out $(OBJDIR)/AafOmfMain$(OBJ), $(CXXOBJS))
 
 
-LIBTARGET = $(AAFSDKLIBDIR)/libAAFConverterLib$(LIB)
+LIBTARGET = $(AAFSDKLIBDIR)/libAAFConverterLib$(LIBEXT)
 BINTARGET = $(AAFSDKBINDIR)/AafOmf$(EXE)
 
 

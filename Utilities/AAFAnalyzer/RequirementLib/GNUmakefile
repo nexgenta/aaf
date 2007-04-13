@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2006/01/30 20:03:20 jlow Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -47,10 +47,10 @@ gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
 gcov :	Requirement
 
 .PHONY : Requirement
-Requirement : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libRequirement$(LIB)
+Requirement : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libRequirement$(LIBEXT)
 
 
-$(LIBDIR)/libRequirement$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libRequirement$(LIBEXT) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -58,7 +58,7 @@ $(LIBDIR)/libRequirement$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libRequirement$(LIB)
+	@$(RM) $(LIBDIR)/libRequirement$(LIBEXT)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean

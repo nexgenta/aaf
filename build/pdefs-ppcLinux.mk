@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-ppcLinux.mk,v 1.1 2006/06/08 17:06:30 tbingham Exp $ $Name:  $
+# $Id: pdefs-ppcLinux.mk,v 1.2 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@
 #
 # Sets:
 #	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIBEXT, DLL,
 #
 #------------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-Win.mk,v 1.5 2007/04/12 12:47:40 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-Win.mk,v 1.6 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@
 #
 # Sets:
 #	MIPS_ABI, COMPILER, PLATFORM_CFLAGS, RPATH_OPT, 
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIBEXT, DLL,
 #	UUIDLIB
 #
 #------------------------------------------------------------------------------
@@ -102,7 +102,7 @@ U_OPTS=no_unicode
 #------------------------------------------------------------------------------
 OBJ ?= .o
 EXE ?= 
-LIB ?= .a
+LIBEXT ?= .a
 DLL ?= .so
 
 

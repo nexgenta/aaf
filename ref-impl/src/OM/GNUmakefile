@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.18 2007/04/13 16:12:40 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.19 2007/04/13 17:09:15 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -69,10 +69,10 @@ all : om
 
 
 .PHONY : om
-om : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libom$(LIB)
+om : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libom$(LIBEXT)
 
 
-$(LIBDIR)/libom$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libom$(LIBEXT) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -80,7 +80,7 @@ $(LIBDIR)/libom$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libom$(LIB)
+	@$(RM) $(LIBDIR)/libom$(LIBEXT)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 

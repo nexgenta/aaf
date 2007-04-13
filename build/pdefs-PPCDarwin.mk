@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-PPCDarwin.mk,v 1.8 2006/02/23 16:10:20 tbingham Exp $ $Name:  $
+# $Id: pdefs-PPCDarwin.mk,v 1.9 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@
 #
 # Sets:
 #	COMPILER, PLATFORM_CFLAGS, RPATH_OPT,
-#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIB, DLL,
+#	LD, LD_STAT_LIB, LD_DYN_LIB, U_OPTS, OBJ, EXE, LIBEXT, DLL,
 #	UUIDLIB, PLATFORMLIBS
 #
 #------------------------------------------------------------------------------
@@ -104,7 +104,7 @@ U_OPTS=no_unicode
 #------------------------------------------------------------------------------
 OBJ ?= .o
 EXE ?=
-LIB ?= .a
+LIBEXT ?= .a
 DLL ?= .dylib
 
 

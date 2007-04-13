@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -44,10 +44,10 @@ all : axFileGenOps
 
 
 .PHONY : axFileGenOps
-axFileGenOps : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaxFileGenOps$(LIB)
+axFileGenOps : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaxFileGenOps$(LIBEXT)
 
 
-$(LIBDIR)/libaxFileGenOps$(LIB) : $(CXXOBJS)
+$(LIBDIR)/libaxFileGenOps$(LIBEXT) : $(CXXOBJS)
 	$(LD_STAT_LIB) $@ $(CXXOBJS)
 
 
@@ -55,7 +55,7 @@ $(LIBDIR)/libaxFileGenOps$(LIB) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libaxFileGenOps$(LIB)
+	@$(RM) $(LIBDIR)/libaxFileGenOps$(LIBEXT)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean
