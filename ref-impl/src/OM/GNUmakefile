@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.17 2007/04/12 17:11:41 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.18 2007/04/13 16:12:40 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -59,10 +59,8 @@ CFLAGS += -DOM_STACK_TRACE_ON_ASSERT
 # then set EXPAT_ROOT to point to the location of lib/libexpat.a and include/expat.h
 # E.g. make EXPAT_ROOT=/usr
 ifdef EXPAT_ROOT
-	CFLAGS += -DHAVE_EXPAT
 	INCLUDES += -I$(EXPAT_ROOT)/include
 else
-	CFLAGS += -DHAVE_EXPAT
 	INCLUDES += -I../../expat
 endif
 

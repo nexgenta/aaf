@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLReader.h,v 1.2 2007/03/26 16:00:53 philipn Exp $
+// $Id: OMXMLReader.h,v 1.3 2007/04/13 16:12:41 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -98,8 +98,6 @@ public:
 };
 
 
-
-#if defined(HAVE_EXPAT)
 
 #include <expat.h>
 
@@ -206,9 +204,6 @@ void expat_EndNamespaceDeclHandler(void* userData, const XML_Char *prefix);
 void expat_StartElementHandler(void* userData, const XML_Char* name, const XML_Char** atts);
 void expat_EndElementHandler(void* userData, const XML_Char* name);
 void expat_CharacterDataHandler(void* userData, const XML_Char* s, int len);
-
-
-#endif // HAVE_EXPAT
 
 
 #endif
