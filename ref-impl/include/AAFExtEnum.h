@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFExtEnum.h,v 1.14 2007/02/06 15:46:03 wschilp Exp $ $Name:  $
+// $Id: AAFExtEnum.h,v 1.15 2007/04/13 15:59:18 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,6 +52,10 @@ const aafUID_t kAAFTransferCharacteristic_ITU709 =
 //{04010101-0103-0000-060e-2b3404010101}
 const aafUID_t kAAFTransferCharacteristic_SMPTE240M =
 {0x04010101, 0x0103, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+//{04010101-0104-0000-060e-2b3404010101}
+const aafUID_t kAAFTransferCharacteristic_274M_296M =
+{0x04010101, 0x0104, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 //{04010101-0105-0000-060e-2b3404010101}
 const aafUID_t kAAFTransferCharacteristic_ITU1361 =
