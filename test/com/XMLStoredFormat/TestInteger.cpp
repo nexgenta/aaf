@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestInteger.cpp,v 1.1 2007/03/26 15:57:23 philipn Exp $ $Name:  $
+// $Id: TestInteger.cpp,v 1.2 2007/04/16 10:13:18 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -385,7 +385,7 @@ static bool testRestore(wchar_t* fileName)
             bool localPassed = true;
             aafInt32 value;
             aafUInt32 maxValue;
-            memset(&maxValue, 0xFF, sizeof(aafUInt64));
+            memset(&maxValue, 0xFF, sizeof(aafUInt32));
 
             checkResult(pVarArrayType->GetElementValue(pPropertyValue, 0, &pIntValue));
             checkResult(pIntType->GetInteger(pIntValue, (aafUInt8*)&value, 4));
