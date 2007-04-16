@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.23 2007/04/13 17:09:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.24 2007/04/16 16:08:49 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -64,14 +64,8 @@ PLATFORMLIBS += -framework CoreFoundation
 endif
 
 # AAF-XML stored format support requires the expat library which is
-# bundled with the AAF SDK.  If you wish to use a different library
-# then set EXPAT_ROOT to point to the location of lib/libexpat.a and include/expat.h
-# E.g. make EXPAT_ROOT=/usr
-ifdef EXPAT_ROOT
-	EXPAT_LIB = -L$(EXPAT_ROOT)/lib -lexpat
-else
-	EXPAT_LIB = $(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)/libexpat$(LIBEXT)
-endif
+# bundled with the AAF SDK.
+EXPAT_LIB = $(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)/libexpat$(LIBEXT)
 
 
 # The following two lines initialize CXXFILES2 to contain the list
