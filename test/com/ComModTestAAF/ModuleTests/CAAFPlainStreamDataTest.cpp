@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFPlainStreamData
 //=---------------------------------------------------------------------=
 //
-// $$ $Name:  $
+// $Id: CAAFPlainStreamDataTest.cpp,v 1.2 2007/04/17 12:47:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
