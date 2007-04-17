@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.26 2007/04/11 14:30:02 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.27 2007/04/17 17:32:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -284,7 +284,7 @@ const int PID_SoundDescriptor_DialNorm                           = 0x3D0C;
 const int PID_SoundDescriptor_Compression                        = 0x3D06;
 const int PID_DataEssenceDescriptor_DataEssenceCoding            = 0x3E01;
 const int PID_MultipleDescriptor_FileDescriptors                 = 0x3F01;
-const int PID_DescriptiveClip_SourceTrackIDs                     = 0x6103;
+const int PID_DescriptiveClip_DescribedSlotIDs                   = 0x6103;
 const int PID_AES3PCMDescriptor_Emphasis                         = 0x3D0D;
 const int PID_AES3PCMDescriptor_BlockStartOffset                 = 0x3D0F;
 const int PID_AES3PCMDescriptor_AuxBitsMode                      = 0x3D08;

@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.21 2006/06/27 19:53:39 heydowns Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.22 2007/04/17 17:32:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1010,7 +1010,7 @@ const aafUID_t kAAFPropID_MultipleDescriptor_FileDescriptors =
 {0x06010104, 0x060b, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
 
 //{01070106-0000-0000-060e-2b3401010105}
-const aafUID_t kAAFPropID_DescriptiveClip_SourceTrackIDs =
+const aafUID_t kAAFPropID_DescriptiveClip_DescribedSlotIDs =
 {0x01070106, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x05}};
 
 //{04020501-0600-0000-060e-2b3401010105}

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveClip.cpp,v 1.4 2006/11/08 16:21:27 bmdurksen Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.cpp,v 1.5 2007/04/17 17:32:51 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -145,7 +145,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::CountSourceTrackIDs (aafUInt32*  pCount)
+    CAAFDescriptiveClip::CountDescribedSlotIDs (aafUInt32*  pCount)
 {
   HRESULT hr;
 
@@ -159,7 +159,7 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->CountSourceTrackIDs
+      hr = ptr->CountDescribedSlotIDs
        (pCount);
     }
   catch (OMException& e)
@@ -197,8 +197,8 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::GetSourceTrackIDs (aafUInt32  maxSourceTrackIDCount,
-        aafUInt32 *  pSourceTrackIDs)
+    CAAFDescriptiveClip::GetDescribedSlotIDs (aafUInt32  maxDescribedSlotIDCount,
+        aafUInt32 *  pDescribedSlotIDs)
 {
   HRESULT hr;
 
@@ -212,9 +212,9 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->GetSourceTrackIDs
-       (maxSourceTrackIDCount,
-        pSourceTrackIDs);
+      hr = ptr->GetDescribedSlotIDs
+       (maxDescribedSlotIDCount,
+        pDescribedSlotIDs);
     }
   catch (OMException& e)
     {
@@ -251,7 +251,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::IsSourceTrackIDPresent (aafUInt32  sourceTrackID,
+    CAAFDescriptiveClip::IsDescribedSlotIDPresent (aafUInt32  describedSlotID,
         aafBoolean_t*  pIsPresent)
 {
   HRESULT hr;
@@ -266,8 +266,8 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->IsSourceTrackIDPresent
-       (sourceTrackID,
+      hr = ptr->IsDescribedSlotIDPresent
+       (describedSlotID,
         pIsPresent);
     }
   catch (OMException& e)
@@ -305,7 +305,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::AddSourceTrackID (aafUInt32  sourceTrackID)
+    CAAFDescriptiveClip::AddDescribedSlotID (aafUInt32  describedSlotID)
 {
   HRESULT hr;
 
@@ -319,8 +319,8 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->AddSourceTrackID
-       (sourceTrackID);
+      hr = ptr->AddDescribedSlotID
+       (describedSlotID);
     }
   catch (OMException& e)
     {
@@ -357,7 +357,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::RemoveSourceTrackID (aafUInt32  sourceTrackID)
+    CAAFDescriptiveClip::RemoveDescribedSlotID (aafUInt32  describedSlotID)
 {
   HRESULT hr;
 
@@ -371,8 +371,8 @@ HRESULT STDMETHODCALLTYPE
 
   try
     {
-      hr = ptr->RemoveSourceTrackID
-       (sourceTrackID);
+      hr = ptr->RemoveDescribedSlotID
+       (describedSlotID);
     }
   catch (OMException& e)
     {

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFMetaDictionary.h,v 1.134 2007/04/13 16:45:51 phil_tudor Exp $ $Name:  $
+// $Id: AAFMetaDictionary.h,v 1.135 2007/04/17 17:32:47 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -4729,7 +4729,7 @@ AAF_CLASS(DescriptiveClip,
     0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
   SourceClip,
   true)
-  AAF_PROPERTY(SourceTrackIDs,
+  AAF_PROPERTY(DescribedSlotIDs,
     // {01070106-0000-0000-060E-2B3401010105}
     // 06.0E.2B.34.01.01.01.05.01.07.01.06.00.00.00.00
     AAF_LITERAL_AUID(0x01070106,
