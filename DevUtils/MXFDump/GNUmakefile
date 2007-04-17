@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2005/09/21 16:48:05 tbingham Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2007/04/17 14:37:12 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,8 @@ AAFBASE ?= ../..
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
-ifeq ($(AAFPLATFORM),PPCDarwin)
+# Add -framework linker arg for all Darwin platforms (intel, ppc, universal)
+ifneq (,$(findstring Darwin,$(AAFPLATFORM)))
 PLATFORMLIBS += -framework CoreServices
 endif
 
@@ -40,7 +41,7 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 all : $(OBJDIR) $(AAFSDKBINDIR)/MXFDump$(EXE)
 
 $(AAFSDKBINDIR)/MXFDump$(EXE) : $(CXXOBJS)
-	$(LD) $(PLATFORMLIBS) $(CXXOBJS) $(RPATH_OPT) $(LIBCIO) -o $@
+	$(LD) $(PLATFORMLIBS) $(CXXOBJS) $(LIBCIO) -o $@
 
 .PHONY : clean
 clean :
