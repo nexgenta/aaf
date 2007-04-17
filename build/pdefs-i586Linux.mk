@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.12 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.13 2007/04/17 13:16:38 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -101,11 +101,12 @@ ifndef LD_DYN_LIB
     LD_DYN_LIB = $(CC) -shared
 endif
 
-# For GNU/Linux the UUID library is provided by e2fsprogs
+# For GNU/Linux the UUID library is provided by e2fsprogs-devel (.rpm based systems)
+# or uuid-dev (.deb based systems).
 ifndef UUIDLIB
     UUIDLIB_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libuuid.a && echo $$f && break; done)
     ifeq "$(UUIDLIB_PATH)" ""
-        $(error Required library libuuid.a not found - install the e2fsprogs development libraries)
+        $(error Required library libuuid.a not found - install e2fsprogs-devel .rpm or uuid-dev .deb)
     endif
 
     UUIDLIB = -luuid
