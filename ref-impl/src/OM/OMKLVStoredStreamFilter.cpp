@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredStreamFilter.cpp,v 1.5 2007/02/22 23:15:10 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredStreamFilter.cpp,v 1.6 2007/04/20 16:50:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -126,7 +126,7 @@ void OMKLVStoredStreamFilter::write(const OMByte* data,
     OMKLVStoredStream::writeKLVKey(*_stream, key);
     _keyWritten = true;
 
-    const OMUInt64 lengthPosition =
+    ARESULT(const OMUInt64 lengthPosition)
                                  OMKLVStoredStream::reserveKLVLength(*_stream);
     ASSERT("Valid KLV length offset", _klvLengthOffset == lengthPosition);
     ASSERT("Valid KLV value offset", _klvValueOffset == _stream->position());
