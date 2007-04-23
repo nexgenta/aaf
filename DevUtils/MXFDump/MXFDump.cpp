@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MXFDump.cpp,v 1.782 2007/04/17 14:37:13 stuart_hc Exp $ $Name:  $
+// $Id: MXFDump.cpp,v 1.783 2007/04/23 22:00:14 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -5215,7 +5215,7 @@ void checkRandomIndex(mxfRandomIndex& rip, PartitionList& partitions)
   // Check that the partitions in the random index are in the correct order.
   //
   RandomIndex::const_iterator rit;
-  mxfUInt64 previous;
+  mxfUInt64 previous = 0;
   for (rit = rip._index.begin(); rit != rip._index.end(); ++rit) {
     if ((rit != rip._index.begin()) && (rit->_offset <= previous)) {
       mxfError("Invalid random index - partitions out of order"
