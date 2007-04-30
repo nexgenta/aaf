@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: rules.mk,v 1.10 2007/04/30 15:46:14 stuart_hc Exp $ $Name:  $
+# $Id: rules.mk,v 1.11 2007/04/30 15:49:43 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,8 +53,9 @@ ifeq ($(CC),g++)
   MAKE_DEPS_FLAG=-MM
 endif
 
-# To avoid "-M options are not allowed with multiple -arch flags" when building
-# UniversalDarwin, remove of the arches from "-arch ppp -arch intel".
+# To avoid g++ error "-M options are not allowed with multiple -arch flags"
+# when building UniversalDarwin, remove one of the arches from CFLAGS
+# which contains "-arch ppp -arch intel" for UniversalDarwin.
 DEPS_CFLAGS = $(CFLAGS)
 ifeq ($(AAFPLATFORM),UniversalDarwin)
   DEPS_CFLAGS = $(subst -arch ppc,,$(CFLAGS))
