@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestStream.cpp,v 1.1 2007/03/26 15:57:22 philipn Exp $ $Name:  $
+// $Id: TestStream.cpp,v 1.2 2007/05/15 16:47:23 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -92,7 +92,7 @@ static bool testRestore(wchar_t* fileName)
             
             aafUInt8 value[256];
             aafUInt32 numRead;
-            checkResult(pStreamType->Read(pPropertyValue, size, value, &numRead));
+            checkResult(pStreamType->Read(pPropertyValue, static_cast<aafUInt32>(size), value, &numRead));
 
             if (byteOrderValue == testByteOrderValue &&
                 size == 8 &&
