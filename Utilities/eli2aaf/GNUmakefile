@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2007/05/15 16:30:25 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -49,17 +49,16 @@ AXLIBDIR = $(AAFBUILDDIR)/$(AXLIBPACKAGE)/$(AAFTARGETDIR)
 
 BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)
 
+LINK_AXLIB_APP = -L$(AXLIBDIR) -laxLib
+ifeq ($(COMPILER),cl)
+  LINK_AXLIB_APP = $(AXLIBDIR)/libaxLib$(LIBEXT)
+endif
+
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
-ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AXLIBDIR) -laxLib $(STATIC_LINK_LINE) -o $@
-else
-$(BINTARGET) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) \
-	-L$(AAFSDKLIBDIR) -L$(OBJDIR) -L$(AXLIBDIR) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AXLIB_APP) $(LINK_AAF_APP)
 
 .PHONY : clean
 clean ::
