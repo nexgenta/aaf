@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Timecode.cpp,v 1.2 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: Timecode.cpp,v 1.3 2007/05/15 16:39:34 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -87,7 +87,7 @@ void Timecode::Execute( const std::vector<AxString>& argv )
 	aafTimecode_t tc;
 	tc.startFrame = AxStringUtil::strtol( startFrame );
 	tc.drop       = DropTypeParams::GetInstance().Find( *this, dropType );
-	tc.fps        = AxStringUtil::strtol( fps );
+	tc.fps        = static_cast<aafUInt16>(AxStringUtil::strtol( fps ));
 	
 	axTC.Initialize( AxStringUtil::strtol( length ), tc ) ;
 
