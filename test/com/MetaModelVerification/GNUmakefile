@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2006/04/12 15:14:56 matt-beard Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,19 +38,13 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 .PHONY : all
 all : $(OBJDIR) $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
 
-
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/MetaModelVerification$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/MetaModelVerification$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 
 .PHONY : check
 check : $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
 
 
 .PHONY : clean

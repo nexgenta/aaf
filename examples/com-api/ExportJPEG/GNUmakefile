@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2006/03/11 14:36:10 stuart_hc Exp $
+# $Id: GNUmakefile,v 1.3 2007/05/15 17:47:18 stuart_hc Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@ EXAMPLE = ExportJPEG
 
 include ../comexamplerules.mk
 
-TEST_CMD = env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ExportJPEG$(EXE)
+TEST_CMD = $(APP_RUN_ENV) $(AAFSDKBINDIR)/ExportJPEG$(EXE)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ExportJPEG$(EXE)
 	@if [ -r 4frames.mjpeg ] ; then $(TEST_CMD) -res 15:1 -rawJPEG 4frames.mjpeg ; fi

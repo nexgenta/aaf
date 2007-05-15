@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2007/04/11 15:11:34 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@ EXAMPLE = InfoDumper
 
 include ../comexamplerules.mk
 
-TEST_CMD = env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/InfoDumper$(EXE)
+TEST_CMD = $(APP_RUN_ENV) $(AAFSDKBINDIR)/InfoDumper$(EXE)
 .PHONY : check
 check : $(AAFSDKBINDIR)/InfoDumper$(EXE)
 	for f in ../*/*.aaf ../../../test/com/*/*.aaf; do if echo $$f | grep UTF8FileNameTest > /dev/null; then echo "Skipping $$f until wctou8() et al are removed from the SDK"; else echo InfoDumper $$f; $(TEST_CMD) $$f > /dev/null || exit $$?; fi; done

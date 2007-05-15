@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2007/04/17 14:37:12 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2007/05/15 17:47:16 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,6 +34,12 @@ ifneq (,$(findstring Darwin,$(AAFPLATFORM)))
 PLATFORMLIBS += -framework CoreServices
 endif
 
+# For MSVC build turn off UNICODE define so that CreateFile() can be passed
+# the char * command line MXF filename (otherwise CreateFileW() is used).
+ifeq ($(COMPILER),cl)
+  CFLAGS:=$(filter-out %UNICODE,$(CFLAGS))
+endif
+
 # Include directories
 INCLUDES = -I$(AAFSDKINCLUDEDIR)
 
@@ -41,7 +47,7 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 all : $(OBJDIR) $(AAFSDKBINDIR)/MXFDump$(EXE)
 
 $(AAFSDKBINDIR)/MXFDump$(EXE) : $(CXXOBJS)
-	$(LD) $(PLATFORMLIBS) $(CXXOBJS) $(LIBCIO) -o $@
+	$(LD) $(CXXOBJS) $(PLATFORMLIBS) $(LIBCIO) $(LD_DYN_OUTPUT)
 
 .PHONY : clean
 clean :

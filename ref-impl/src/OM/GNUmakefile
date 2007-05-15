@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.20 2007/04/16 16:08:49 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.21 2007/05/15 17:47:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,6 +53,7 @@ CXXOBJS:=$(filter-out %/OMGSF_SSStoredObjectFactory.o,$(CXXOBJS))
 endif
 
 CFLAGS += -DOM_STACK_TRACE_ON_ASSERT
+CFLAGS += -DXML_STATIC
 
 # AAF-XML stored format support requires the expat library which is
 # bundled with the AAF SDK.
@@ -67,7 +68,7 @@ om : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libom$(LIBEXT)
 
 
 $(LIBDIR)/libom$(LIBEXT) : $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
+	$(LD_STAT_LIB) $(LD_STAT_OUTPUT) $(CXXOBJS)
 
 
 .PHONY : clean

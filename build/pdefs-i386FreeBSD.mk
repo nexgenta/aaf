@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i386FreeBSD.mk,v 1.3 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i386FreeBSD.mk,v 1.4 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -76,6 +76,8 @@ RPATH_OPT = $(XL)-rpath $(XL)$(RPATH)
 
 # Command to link executable.
 LD = $(CC) -rdynamic
+LD_STAT_OUTPUT = $@
+LD_DYN_OUTPUT = -o $@
 
 # Command to link static library
 ifndef LD_STAT_LIB

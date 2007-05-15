@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: comexamplerules.mk,v 1.11 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: comexamplerules.mk,v 1.12 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,14 +41,8 @@ BINTARGET = $(AAFSDKBINDIR)/$(EXAMPLE)$(EXE)
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
-ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
-else
-$(BINTARGET) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 
 .PHONY : clean

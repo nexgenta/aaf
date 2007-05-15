@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.1 2005/05/26 19:23:45 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.2 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@ all : $(OBJDIR) $(AAFSDKBINDIR)/aafembed$(EXE)
 #	gcc -c $(CFLAGS) -Wno-error $(INCLUDES) $< -o $@
 
 $(AAFSDKBINDIR)/aafembed$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(LIBCIO) $(PLATFORMLIBS) -o $@
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 .PHONY : clean
 clean :

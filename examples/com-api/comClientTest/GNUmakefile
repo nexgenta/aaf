@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,24 +41,14 @@ all : $(OBJDIR) $(AAFSDKBINDIR)/ComAAFInfo$(EXE) $(AAFSDKBINDIR)/ComClientAAF$(E
 
 CXXFILES = AAFInfo.cpp
 
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/ComAAFInfo$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/ComAAFInfo$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 CXXFILES2 = ComClientTestAAF.cpp
 
 
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/ComClientAAF$(EXE) : $(CXXOBJS2)
-	$(LD) $(CXXOBJS2) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/ComClientAAF$(EXE) : $(CXXOBJS2)
-	$(LD) $(CXXOBJS2) -L$(AAFSDKLIBDIR) -laaflib -laafiid -o $@
-endif
+	$(LD) $(CXXOBJS2) $(LINK_AAF_APP)
 
 
 .PHONY : clean

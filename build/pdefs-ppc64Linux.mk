@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-ppc64Linux.mk,v 1.5 2007/04/17 13:16:38 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-ppc64Linux.mk,v 1.6 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -91,6 +91,8 @@ RPATH_OPT = $(XL)-rpath $(XL)$(RPATH)
 
 # Command to link executable.
 LD = $(CC) -ldl -rdynamic
+LD_STAT_OUTPUT = $@
+LD_DYN_OUTPUT = -o $@
 
 # Command to link static library
 ifndef LD_STAT_LIB

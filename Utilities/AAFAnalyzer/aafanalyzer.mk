@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.8 2006/01/30 19:54:00 jlow Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.9 2007/05/15 17:47:16 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -61,14 +61,9 @@ all : $(OBJDIR) $(BINTARGET) $(LIBDIR)
 gcov : CFLAGS+= -fprofile-arcs -ftest-coverage
 gcov : $(OBJDIR) $(BINTARGET) $(LIBDIR)
 
-ifeq ($(AAFTARGET),Debug-static)
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS) $(LIBDIR)
-	$(LD) $(CXXOBJS) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib $(STATIC_LINK_LINE) -o $@
-else
-$(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS) $(LIBDIR)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) \
-	-L$(AAFSDKLIBDIR) -L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) \
+	-L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib $(LINK_AAF_APP)
 
 .PHONY : clean
 clean ::

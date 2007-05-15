@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/03/07 16:56:01 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -38,24 +38,18 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 .PHONY : all
 all : $(OBJDIR) $(AAFSDKBINDIR)/OpenExistingModify$(EXE)
 
-
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/OpenExistingModify$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@ 
-else
-$(AAFSDKBINDIR)/OpenExistingModify$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@ 
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 
 .PHONY : check
 check : $(AAFSDKBINDIR)/OpenExistingModify$(EXE)
 	@echo
 	@echo "*** Testing modification of current toolkit generated file"
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/OpenExistingModify$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/OpenExistingModify$(EXE)
 	@echo
 	@echo "*** Testing modification of v1.0.2 toolkit generated file"
-	cp AAFHeaderTest_v102.aaf Modify_v102.aaf && env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/OpenExistingModify$(EXE) Modify_v102.aaf
+	cp AAFHeaderTest_v102.aaf Modify_v102.aaf && $(APP_RUN_ENV) $(AAFSDKBINDIR)/OpenExistingModify$(EXE) Modify_v102.aaf
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2005/04/01 10:19:05 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2007/05/15 17:47:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -45,23 +45,17 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR)
 .PHONY : all
 all : $(OBJDIR) $(AAFSDKBINDIR)/ScaleTest$(EXE)
 
-
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/ScaleTest$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/ScaleTest$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 
 # Create a 30 minute DV clip (requires 6GB disk space!)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ScaleTest$(EXE)
 	@echo "*** Testing EssenceData API ***"
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -d
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -d
 	@echo "*** Testing EssenceAccess API (Plugin codecs) ***"
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -c -d
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ScaleTest$(EXE) -q -c -d
 
 
 .PHONY : clean

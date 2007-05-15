@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: axexamplerules.mk,v 1.7 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: axexamplerules.mk,v 1.8 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -45,14 +45,13 @@ BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET)
 
-ifeq ($(AAFTARGET),Debug-static)
-$(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
-	$(LD) $(CXXOBJS) -L$(OBJDIR) $(AXPROGRAM_LD_OPTIONS) -laxLib $(STATIC_LINK_LINE) -o $@
-else
-$(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) \
-	-L$(AAFSDKLIBDIR) -L$(OBJDIR) $(AXPROGRAM_LD_OPTIONS) -laxLib -laaflib -laafiid $(LIBCIO) -o $@
+LINK_AXLIB_APP = -L$(OBJDIR) $(AXPROGRAM_LD_OPTIONS) -laxLib
+ifeq ($(COMPILER),cl)
+  LINK_AXLIB_APP = $(OBJDIR)/libaxLib$(LIBEXT) $(AXPROGRAM_LD_OPTIONS)
 endif
+
+$(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS)
+	$(LD) $(CXXOBJS) $(LINK_AXLIB_APP) $(LINK_AAF_APP)
 
 .PHONY : clean
 clean ::
@@ -67,4 +66,3 @@ realclean :: clean
 
 
 include $(AAFBASE)/build/rules.mk
-

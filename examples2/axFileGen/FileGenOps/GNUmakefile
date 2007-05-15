@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,11 @@ include $(AAFBASE)/build/common.mk
 
 INCLUDES = -I../../axLib -I.. -I$(AAFSDKINCLUDEDIR)
 
+# Turn off warnings until code is fixed for truncation of values
+ifeq ($(COMPILER),cl)
+  CFLAGS:=$(filter-out %WX,$(CFLAGS))
+endif
+
 .PHONY : all
 all : axFileGenOps
 
@@ -48,7 +53,7 @@ axFileGenOps : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaxFileGenOps$(LIBEXT)
 
 
 $(LIBDIR)/libaxFileGenOps$(LIBEXT) : $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
+	$(LD_STAT_LIB) $(LD_STAT_OUTPUT) $(CXXOBJS)
 
 
 .PHONY : clean

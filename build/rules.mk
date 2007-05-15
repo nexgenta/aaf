@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: rules.mk,v 1.11 2007/04/30 15:49:43 stuart_hc Exp $ $Name:  $
+# $Id: rules.mk,v 1.12 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -34,11 +34,16 @@
 # Rules to compile the source files.
 #------------------------------------------------------------------------------
 
+COMPILER_OUTPUT=-o $@
+ifeq ($(COMPILER),cl)
+  COMPILER_OUTPUT=-Fo$@
+endif
+
 $(OBJDIR)/%$(OBJ): %.c
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) $(INCLUDES) $< $(COMPILER_OUTPUT)
 
 $(OBJDIR)/%$(OBJ): %.$(CPP_EXTENSION)
-	$(CC) -c $(CFLAGS) $(INCLUDES) $< -o $@
+	$(CC) -c $(CFLAGS) $(INCLUDES) $< $(COMPILER_OUTPUT)
 
 
 #------------------------------------------------------------------------------

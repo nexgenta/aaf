@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2005/01/05 13:24:26 philipn Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -55,7 +55,7 @@ else
 all : $(OBJDIR) $(AAFSDKBINDIR)/aafdump$(EXE)
 
 $(AAFSDKBINDIR)/aafdump$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(RPATH_OPT) $(LIBCIO) $(PLATFORMLIBS) -o $@
+	$(LD) $(CXXOBJS) $(PLATFORMLIBS) $(LD_DYN_OUTPUT)
 
 endif
 

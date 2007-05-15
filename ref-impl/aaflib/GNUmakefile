@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2007/04/13 17:09:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2007/05/15 17:47:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@ aaflib : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaaflib$(LIBEXT)
 
 
 $(LIBDIR)/libaaflib$(LIBEXT) : $(CXXOBJS)
-	$(LD_STAT_LIB) $@ $(CXXOBJS)
+	$(LD_STAT_LIB) $(LD_STAT_OUTPUT) $(CXXOBJS)
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: unixaafsdk.mak,v 1.17 2007/04/13 17:09:13 stuart_hc Exp $ $Name:  $
+# $Id: unixaafsdk.mak,v 1.18 2007/05/15 17:47:16 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -295,23 +295,33 @@ ifeq ($(CFG), FULL)
     TARGET_LIB_FILES = $(RELEASE_LIB_FILES) $(DEBUG_LIB_FILES)
 endif
 
-
+#
+# The names of the dynamic libraries vary for historical reasons
+#
+DYN_LIB_COMAPI=libcom-api
+DYN_LIB_AAFINTP=libaafintp
+DYN_LIB_AAFPGAPI=libaafpgapi
+ifeq ($(AAFPLATFORM),Win)
+    DYN_LIB_COMAPI=AAFCOAPI
+    DYN_LIB_AAFINTP=AAFINTP
+    DYN_LIB_AAFPGAPI=AAFPGAPI
+endif
 
 #
 # Release dynamic link libraries.
 #
 RELEASE_DLL_FILES = \
-	$(AAFSDK_BIN)/libcom-api$(DLL) \
-	$(AAFSDK_BIN_EXT)/libaafintp$(DLL) \
-	$(AAFSDK_BIN_EXT)/libaafpgapi$(DLL)
+	$(AAFSDK_BIN)/$(DYN_LIB_COMAPI)$(DLL) \
+	$(AAFSDK_BIN_EXT)/$(DYN_LIB_AAFINTP)$(DLL) \
+	$(AAFSDK_BIN_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL)
 
 #
 # Release dynamic link libraries.
 #
 DEBUG_DLL_FILES = \
-	$(AAFSDK_BIN_DEBUG)/libcom-api$(DLL) \
-	$(AAFSDK_BIN_DEBUG_EXT)/libaafintp$(DLL) \
-	$(AAFSDK_BIN_DEBUG_EXT)/libaafpgapi$(DLL)
+	$(AAFSDK_BIN_DEBUG)/$(DYN_LIB_COMAPI)$(DLL) \
+	$(AAFSDK_BIN_DEBUG_EXT)/$(DYN_LIB_AAFINTP)$(DLL) \
+	$(AAFSDK_BIN_DEBUG_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL)
 
 
 #
@@ -596,26 +606,26 @@ $(AAFSDK_LIB_DEBUG)/libaaflib$(LIBEXT) : $(TOOLKIT_AAFLIB_DEBUG)/libaaflib$(LIBE
 #
 # Dependency and build rules for the Release DLL targets.
 #
-$(AAFSDK_BIN)/libcom-api$(DLL) : $(TOOLKIT_COMAPI_RELEASE)/libcom-api$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_COMAPI_RELEASE)/libcom-api$(DLL) $@
+$(AAFSDK_BIN)/$(DYN_LIB_COMAPI)$(DLL) : $(TOOLKIT_COMAPI_RELEASE)/$(DYN_LIB_COMAPI)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMAPI_RELEASE)/$(DYN_LIB_COMAPI)$(DLL) $@
 
-$(AAFSDK_BIN_EXT)/libaafintp$(DLL) : $(TOOLKIT_REFIMPL_RELEASE_EXT)/libaafintp$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_RELEASE_EXT)/libaafintp$(DLL) $@
+$(AAFSDK_BIN_EXT)/$(DYN_LIB_AAFINTP)$(DLL) : $(TOOLKIT_REFIMPL_RELEASE_EXT)/$(DYN_LIB_AAFINTP)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_RELEASE_EXT)/$(DYN_LIB_AAFINTP)$(DLL) $@
 
-$(AAFSDK_BIN_EXT)/libaafpgapi$(DLL) : $(TOOLKIT_REFIMPL_RELEASE_EXT)/libaafpgapi$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_RELEASE_EXT)/libaafpgapi$(DLL) $@
+$(AAFSDK_BIN_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL) : $(TOOLKIT_REFIMPL_RELEASE_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_RELEASE_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL) $@
 
 #
 # Dependency and build rules for the Debug DLL targets.
 #
-$(AAFSDK_BIN_DEBUG)/libcom-api$(DLL) : $(TOOLKIT_COMAPI_DEBUG)/libcom-api$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_COMAPI_DEBUG)/libcom-api$(DLL) $@
+$(AAFSDK_BIN_DEBUG)/$(DYN_LIB_COMAPI)$(DLL) : $(TOOLKIT_COMAPI_DEBUG)/$(DYN_LIB_COMAPI)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_COMAPI_DEBUG)/$(DYN_LIB_COMAPI)$(DLL) $@
 
-$(AAFSDK_BIN_DEBUG_EXT)/libaafintp$(DLL) : $(TOOLKIT_REFIMPL_DEBUG_EXT)/libaafintp$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_DEBUG_EXT)/libaafintp$(DLL) $@
+$(AAFSDK_BIN_DEBUG_EXT)/$(DYN_LIB_AAFINTP)$(DLL) : $(TOOLKIT_REFIMPL_DEBUG_EXT)/$(DYN_LIB_AAFINTP)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_DEBUG_EXT)/$(DYN_LIB_AAFINTP)$(DLL) $@
 
-$(AAFSDK_BIN_DEBUG_EXT)/libaafpgapi$(DLL) : $(TOOLKIT_REFIMPL_DEBUG_EXT)/libaafpgapi$(DLL)
-	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_DEBUG_EXT)/libaafpgapi$(DLL) $@
+$(AAFSDK_BIN_DEBUG_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL) : $(TOOLKIT_REFIMPL_DEBUG_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL)
+	$(CP) $(CP_OPTS) $(TOOLKIT_REFIMPL_DEBUG_EXT)/$(DYN_LIB_AAFPGAPI)$(DLL) $@
 
 #
 # The cleanup rules for all targets created by this make file.

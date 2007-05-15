@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2007/05/15 17:47:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,25 +41,30 @@ INCLUDES = -I. \
 		-I../axLib \
 		-I$(AAFSDKINCLUDEDIR)
 
+LIBAXPLUGIN = libaxPlugin$(DLL)
+LINK_AXLIB_APP = -L$(OBJDIR) -laxLib
+
+ifeq ($(COMPILER),cl)
+  LIBAXPLUGIN = axPlugin$(DLL)
+  LINK_AXLIB_APP = $(OBJDIR)/libaxLib$(LIBEXT) /DEF:AxPluginWin.def
+endif
+
 .PHONY : all
 all : axPlugin
 
-
 .PHONY : axPlugin
-axPlugin : $(OBJDIR) $(LIBDIR) $(LIBDIR)/libaxPlugin$(DLL)
+axPlugin : $(OBJDIR) $(LIBDIR) $(LIBDIR)/$(LIBAXPLUGIN)
 
-
-$(LIBDIR)/libaxPlugin$(DLL) : $(CXXOBJS)
-	$(LD_DYN_LIB) -o $@ $(CXXOBJS) -L$(OBJDIR) -laxLib \
-	-L$(AAFBUILDDIR)/aafiid/$(AAFTARGETDIR) -laafiid \
-	-L$(AAFBUILDDIR)/aaflib/$(AAFTARGETDIR) -laaflib
+$(LIBDIR)/$(LIBAXPLUGIN) : $(CXXOBJS)
+	$(LD_DYN_LIB) $(CXXOBJS) $(LINK_AXLIB_APP) \
+	$(LINK_AAF_APP)
 
 
 .PHONY : clean
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(LIBDIR)/libaxPlugin$(DLL)
+	@$(RM) $(LIBDIR)/$(LIBAXPLUGIN)
 	@$(RMDIR) $(OBJDIR)/ii_files
 
 .PHONY : realclean

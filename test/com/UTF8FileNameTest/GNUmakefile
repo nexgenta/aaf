@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.6 2005/03/07 16:56:01 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.7 2007/05/15 17:47:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -41,19 +41,13 @@ INCLUDES = -I$(AAFSDKINCLUDEDIR) \
 .PHONY : all
 all : $(OBJDIR) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 
-
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/UTF8FileNameTest$(EXE) : $(CXXOBJS)
-	$(LD) $(CXXOBJS) -L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
 
 .PHONY : check
 check : $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 
 
 .PHONY : clean

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.14 2005/03/07 16:56:00 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.15 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -51,15 +51,8 @@ CXXFILES2 = $(CXXFILES_TMP:ModuleTests/%=%)
 .PHONY : all
 all : ModuleTests $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
-
-ifeq ($(AAFTARGET),Debug-static)
 $(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) $(CXXOBJS2)
-	$(LD) $(CXXOBJS) $(CXXOBJS2) $(STATIC_LINK_LINE) -o $@
-else
-$(AAFSDKBINDIR)/ComModAAF$(EXE) : $(CXXOBJS) $(CXXOBJS2)
-	$(LD) $(CXXOBJS) $(CXXOBJS2) \
-	-L$(AAFSDKLIBDIR) -laaflib -laafiid $(PLATFORMLIBS) $(LIBCIO) -o $@
-endif
+	$(LD) $(CXXOBJS) $(CXXOBJS2) $(LINK_AAF_APP)
 
 .PHONY : ModuleTests
 ModuleTests :
@@ -83,7 +76,7 @@ realclean : clean
 
 .PHONY : check
 check : $(AAFSDKBINDIR)/ComModAAF$(EXE)
-	env LD_LIBRARY_PATH=$(AAFSDKBINDIR):$(LD_LIBRARY_PATH) $(AAFSDKBINDIR)/ComModAAF$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
 
 include $(AAFBASE)/build/rules.mk
