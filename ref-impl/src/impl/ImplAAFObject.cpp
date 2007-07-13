@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFObject.cpp,v 1.84 2007/03/01 19:51:17 akharkev Exp $ $Name:  $
+// $Id: ImplAAFObject.cpp,v 1.85 2007/07/13 18:15:49 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1244,6 +1244,26 @@ OMProperty * ImplAAFObject::InitOMProperty(ImplAAFPropertyDef * pPropertyDef, OM
   OMPropertyId defPid = pPropertyDef->OmPid ();
   // ASSERTU (ps->isAllowed (defPid));
   OMProperty * pProp = 0;
+
+  if (ps->dynamicBuiltinIsPresent(pPropertyDef->identification()))
+  {
+    // the property is a built-in dynamic property
+    
+    // the property id of the built-in property definition needs to be set to 
+    // the correct value if the property definition originated from a file
+    ASSERTU(defPid != 0);
+    HRESULT hr;
+    ImplAAFDictionary* pDictionary = 0;
+    hr = GetDictionary(&pDictionary);
+    ASSERTU(AAFRESULT_SUCCEEDED(hr) && pDictionary != 0);
+    pDictionary->associate(*reinterpret_cast<const aafUID_t*>(&pPropertyDef->identification()), 
+      defPid);
+    pDictionary->ReleaseReference();
+    
+    // the dynamic built-in property needs to be finalised with the property id
+    ps->finaliseDynamicBuiltin(pPropertyDef->identification(), defPid);
+  }
+
   if (ps->isPresent (defPid))
 	{
 	  // Defined property was already in property set.  (Most

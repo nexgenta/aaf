@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.cpp,v 1.95 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMProperty.cpp,v 1.96 2007/07/13 18:15:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -480,6 +480,14 @@ OMStoredForm OMProperty::storedForm(void) const
 
   return _storedForm;
 }
+
+void OMProperty::setPropertyId(OMPropertyId propertyId)
+{
+  TRACE("OMProperty::setPropertyId");
+  
+  _propertyId = propertyId;
+}
+
 
   // @mfunc The size of the raw bits of this
   //        <c OMSimpleProperty>. The size is given in bytes.

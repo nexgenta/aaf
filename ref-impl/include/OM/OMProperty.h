@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.h,v 1.76 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMProperty.h,v 1.77 2007/07/13 18:15:45 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -168,6 +168,12 @@ public:
     // @cmember Clear the bit that indicates that this optional <c OMProperty>
     //          is present.
   void clearPresent(void);
+  
+    // @cmember Reset the <p propertyId> of the <c OMProperty>.
+    //          This function is used to set the property id of a built-in 
+    //          property with a dynamic property id that is initially
+    //          set to 0.
+  void setPropertyId(OMPropertyId propertyId);
 
 protected:
   // @access Protected members.

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySet.cpp,v 1.34 2006/06/15 03:23:24 tbingham Exp $ $Name:  $
+// $Id: OMPropertySet.cpp,v 1.35 2007/07/13 18:15:47 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -220,6 +220,59 @@ OMStorable* OMPropertySet::container(void) const
   TRACE("OMPropertySet::container");
   return const_cast<OMStorable*>(_container);
 }
+
+OMProperty* OMPropertySet::getDynamicBuiltin(const OMUniqueObjectIdentification& propertyUId) const
+{
+  TRACE("OMPropertySet::getDynamicBuiltin");
+  OMProperty* result = 0;
+
+#if defined(OM_DEBUG)
+  bool status = 
+#endif
+  _dynamicSet.find(propertyUId, result);
+  ASSERT("Property found", status);
+  
+  POSTCONDITION("Valid result", result != 0);
+  return result;
+}
+
+void OMPropertySet::putDynamicBuiltin(const OMUniqueObjectIdentification& propertyUId, OMProperty* property)
+{
+  TRACE("OMPropertySet::putDynamicBuiltin");
+
+  PRECONDITION("Valid property", property != 0);
+
+  _dynamicSet.insert(propertyUId, property);
+
+  POSTCONDITION("Dynamic property installed", dynamicBuiltinIsPresent(propertyUId));
+}
+
+void OMPropertySet::finaliseDynamicBuiltin(const OMUniqueObjectIdentification& propertyUId, const OMPropertyId propertyId)
+{
+  TRACE("OMPropertySet::finaliseDynamicBuiltin");
+
+  OMProperty* property = getDynamicBuiltin(propertyUId);
+  
+#if defined(OM_DEBUG)
+  bool result = 
+#endif
+  _dynamicSet.remove(propertyUId);
+  ASSERT("Property found for removal", result);
+  
+  property->setPropertyId(propertyId);
+  put(property);
+}
+
+bool OMPropertySet::dynamicBuiltinIsPresent(const OMUniqueObjectIdentification& propertyUId) const
+{
+  TRACE("OMPropertySet::dynamicBuiltinIsPresent");
+
+  OMProperty* p;
+  bool result = _dynamicSet.find(propertyUId, p);
+  return result;
+}
+
+
 
 OMProperty* OMPropertySet::find(const wchar_t* propertyName) const
 {

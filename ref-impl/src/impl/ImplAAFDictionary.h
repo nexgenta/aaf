@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.72 2007/02/27 22:25:10 akharkev Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.73 2007/07/13 18:15:48 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -933,7 +933,20 @@ private:
   ImplAAFBuiltinTypes   * _pBuiltinTypes;
   ImplAAFBuiltinDefs    * _pBuiltinDefs;
 
-  aafInt16 _lastGeneratedPid;	// must be signed!
+  // records a sequence of dynamic property ids starting with firstPid and ending with lastPid
+  class PIDSegment
+  {
+  public:
+      bool operator==(const PIDSegment& r);
+      
+      OMPropertyId firstPid;
+      OMPropertyId lastPid;
+  };
+    
+  // maps the use of dynamic property pids to allow the generation of new values
+  // no matter what generation method was used before
+  OMVector<PIDSegment> _pidSegments;
+  bool _pidSegmentsInitialised;
 
   static const aafUID_t * sAxiomaticTypeGuids[];
   static const aafUID_t * sAxiomaticClassGuids[];
