@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.cpp,v 1.134 2007/07/13 18:15:47 philipn Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp,v 1.135 2007/07/16 09:05:17 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3083,7 +3083,7 @@ AAFRESULT ImplAAFDictionary::PvtIsPropertyDefDuplicate(
 }
 
 
-bool ImplAAFDictionary::PIDSegment::operator==(const ImplAAFDictionary::PIDSegment::PIDSegment& r)
+bool ImplAAFDictionary::PIDSegment::operator==(const ImplAAFDictionary::PIDSegment& r)
 {
     return firstPid == r.firstPid && lastPid == r.lastPid;
 }
