@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2007/04/13 17:09:14 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2007/07/18 05:42:59 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,11 @@ endif
 # Common definitions
 include $(AAFBASE)/build/common.mk
 
-INCLUDES = -I. -I$(AAFSDKINCLUDEDIR) -I$(AAFBASE)/examples2/axLib -I../AnalyzerBase
+INCLUDES = -I. \
+	   -I$(AAFSDKINCLUDEDIR) \
+           -I $(AAFBASE)/ref-impl/expat \
+           -I$(AAFBASE)/examples2/axLib \
+           -I../AnalyzerBase
 
 .PHONY : all
 all : Requirement

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.h,v 1.4 2005/12/20 18:43:31 ajakowpa Exp $ $Name:  $
+// $Id: RequirementLoader.h,v 1.5 2007/07/18 05:42:59 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,9 @@ public:
 
     wstring _currentId;
     Requirement::RequirementType _currentType;
+    wstring _currentTypeAsString;
     Requirement::Category _currentCategory;
+    wstring _currentCategoryAsString;
     wstring _currentName;
     wstring _currentDesc;
     wstring _currentDocument;

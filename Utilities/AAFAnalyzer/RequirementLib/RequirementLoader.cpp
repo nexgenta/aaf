@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.cpp,v 1.5 2005/12/20 18:43:31 ajakowpa Exp $
+// $Id: RequirementLoader.cpp,v 1.6 2007/07/18 05:42:59 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,7 +114,7 @@ void RequirementLoader::ParseXML( const char* filename ) const
 
         done = len < sizeof(buffer);
 
-        if ( !XML_Parse(parser, buffer, len, done) )
+        if ( !XML_Parse(parser, buffer, static_cast<int>(len), done) )
         {
             wostringstream msg;
             msg << L"expat error: " << XML_ErrorString(XML_GetErrorCode(parser));
@@ -147,7 +147,7 @@ void RequirementLoader::StartElement(const wstring& name, const char** attribs)
         {
             _currentType = Requirement::FILE;
         }
-        else if ( type == L"definition" )
+        else if ( type == L"def" )
         {
             _currentType = Requirement::DEFINITION;
         }
@@ -157,10 +157,12 @@ void RequirementLoader::StartElement(const wstring& name, const char** attribs)
             msg << L"Unknown requirement type: " << type;
             throw RequirementXMLException(msg.str().c_str() );
         }
+	_currentTypeAsString = type;
 
         if ( _categoryMap.find( category ) != _categoryMap.end() )
         {
             _currentCategory = _categoryMap[category];
+	    _currentCategoryAsString = category;
         }
         else
         {
@@ -225,7 +227,9 @@ void RequirementLoader::EndElement(const wstring& name)
     if ( name == L"requirement" )
     {
         shared_ptr<const Requirement> req(new Requirement(
-            _currentId, _currentType, _currentCategory, _currentName,
+	    _currentId, _currentType, _currentTypeAsString,
+            _currentCategory, _currentCategoryAsString,
+            _currentName,
             _currentDesc, _currentDocument, _currentVersion, _currentSection ));
         RequirementRegistry::GetInstance().Register( req );
     }

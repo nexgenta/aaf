@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.cpp,v 1.3 2005/11/02 20:55:38 ajakowpa Exp $
+// $Id: TestRegistry.cpp,v 1.4 2007/07/18 05:42:59 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,6 +84,7 @@ void TestRegistry::Register( const TestInfo& info )
         //exception is thrown if the requirement is not registered.
         const shared_ptr<const vector<wstring> > spRequirements = info.GetRequirementIds();
         vector<wstring>::const_iterator iter;
+
         for ( iter = spRequirements->begin(); iter != spRequirements->end(); iter++)
         {
             wstring id = *iter;
@@ -111,9 +112,11 @@ void TestRegistry::Register( const TestInfo& info )
                 if ( _useUnsafeRequirements )
                 {
                     shared_ptr<const Requirement> unsafeReq(
-                        new Requirement(id, 
-                                        Requirement::FILE, 
-                                        Requirement::ADHOC, 
+                        new Requirement(id,
+                                        Requirement::FILE,
+										L"file",
+                                        Requirement::ADHOC,
+										L"adhoc",
                                         L"Unsafe Requirement",
                                         L"This Requirement ID does not exist in the requirements file",
                                         L"None",

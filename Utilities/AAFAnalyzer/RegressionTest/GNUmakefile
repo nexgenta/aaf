@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2006/01/30 19:54:00 jlow Exp $
+# $Id: GNUmakefile,v 1.11 2007/07/18 05:42:58 jptrainor Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -32,11 +32,11 @@ all:
 gcov :	
 	cd TestFiles && $(MAKE) gcov
 	cd TestStructure && $(MAKE) gcov
-	
+
 .PHONY : RegressionTestStructure
 RegressionTestStructure :
 	cd TestStructure && $(MAKE)
-	
+
 .PHONY : RegressionTestFiles
 RegressionTestFiles :
 	cd TestFiles && $(MAKE)

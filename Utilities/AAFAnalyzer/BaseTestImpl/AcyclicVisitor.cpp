@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.cpp,v 1.10 2006/01/18 15:54:14 jlow Exp $
+// $Id: AcyclicVisitor.cpp,v 1.11 2007/07/18 05:42:58 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,7 +107,6 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
 
   // a cycle was detected
   
-  AxStringUtil au;
   wstring newl=wstring(L"\n");
   wstring cycle=wstring(L"Nodes of the cycle:") + newl ;
 
@@ -115,7 +114,7 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
   
   for(unsigned int i = 0; i < _Vector.size(); i++)
   {
-  	cycle+=wstring(L"Node: ") + wstring(au.int2Str(_Vector.at(i)->GetLID())) + wstring(L"  Object - ") + wstring( _Vector.at(i)->GetName()) +newl;
+	  cycle+=wstring(L"Node: ") + wstring(AxStringUtil::int2Str(_Vector.at(i)->GetLID())) + wstring(L"  Object - ") + wstring( _Vector.at(i)->GetName()) +newl;
     //_os <<"Node: "<< _Vector.at(i)->GetLID() <<"  Object - "<< _Vector.at(i)->GetName()<<endl;
   	AAFObjNode& a=static_cast<AAFObjNode&>(*(_Vector.at(i)));
   	AxObject axObj( a.GetAAFObject() );
@@ -126,19 +125,19 @@ bool AcyclicVisitor::PreOrderVisit(Node& node)
 	
 	if (AxIsA(axObj, spMobS)){
 		AxMobSlot axMobS(spMobS);
-		cycle+= wstring(L"         SlotID - ") + wstring(au.int2Str(axMobS.GetSlotID())) + newl;
+		cycle+= wstring(L"         SlotID - ") + wstring(AxStringUtil::int2Str(axMobS.GetSlotID())) + newl;
 		//_os<<"         SlotID - "<<axMobS.GetSlotID()<<endl;
 	}
   	else if(AxIsA(axObj, spMob)){
     	AxMob axMob(spMob);
     	cycle += wstring( L"           Name - ") + wstring(axMob.GetName()) + newl;
-    	cycle +=wstring( L"          MobID - " + au.mobid2Str(axMob.GetMobID())) + newl;
+		cycle +=wstring( L"          MobID - " + AxStringUtil::mobid2Str(axMob.GetMobID())) + newl;
     	//_os<<"           Name - "<<axMob.GetName()<<endl;
     	//_os<<"          MobID - "<<au.mobid2Str(axMob.GetMobID())<<endl;
   	}
   	else if (AxIsA(axObj,spSR)){
   		AxSourceReference axSR(spSR);
-  		cycle+= wstring(L"       SourceID - " + au.mobid2Str(axSR.GetSourceID())) +newl;
+		cycle+= wstring(L"       SourceID - " + AxStringUtil::mobid2Str(axSR.GetSourceID())) +newl;
   		//_os<<"       SourceID - "<<au.mobid2Str(axSR.GetSourceID())<<endl;
 	}
   

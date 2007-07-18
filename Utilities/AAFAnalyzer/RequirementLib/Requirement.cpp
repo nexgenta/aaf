@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Requirement.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: Requirement.cpp,v 1.3 2007/07/18 05:42:59 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,6 +21,8 @@
 //Requirement files
 #include "Requirement.h"
 
+#include <assert.h>
+
 namespace {
 
 using namespace aafanalyzer;
@@ -37,12 +39,19 @@ namespace aafanalyzer
 
 Requirement::Requirement(const wstring& id,
                          const RequirementType requirementType,
-                         const Category category, const wstring& name,
-                         const wstring& desc, const wstring& document,
-                         const wstring& version, const wstring& section):
+			 const wstring& requirementTypeAsString,
+                         const Category category,
+			 const wstring& categoryAsString,
+			 const wstring& name,
+                         const wstring& desc,
+			 const wstring& document,
+                         const wstring& version,
+			 const wstring& section):
     _id( id ),
     _requirementType( requirementType ),
+    _requirementTypeAsString( requirementTypeAsString ),
     _category( category ),
+    _categoryAsString( categoryAsString ),
     _name( name ),
     _description( desc ),
     _document( document ),
@@ -91,6 +100,16 @@ const wstring& Requirement::GetVersion() const
 const wstring& Requirement::GetSection() const
 {
     return _section;
+}
+
+const wstring& Requirement::GetRequirementTypeAsString() const
+{
+  return _requirementTypeAsString;
+}
+
+const wstring& Requirement::GetCategoryAsString() const
+{
+  return _categoryAsString;
 }
 
 } // end of namespace diskstream

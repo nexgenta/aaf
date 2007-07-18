@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafanalyzer.mk,v 1.9 2007/05/15 17:47:16 stuart_hc Exp $ $Name:  $
+# $Id: aafanalyzer.mk,v 1.10 2007/07/18 05:42:58 jptrainor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,9 +42,10 @@ INCLUDES ?= -I$(AAFSDKINCLUDEDIR) \
 	   -I../AAFAnalyzerBase \
 	   -I../EPAnalyzerBase \
 	   -I../RequirementLib \
-   	   -I../TestPhaseLib \
+	   -I../TestPhaseLib \
 	   -I../BaseTestImpl \
 	   -I../EditProtocolTestImpl \
+	   -I$(AAFBASE)/ref-impl/expat \
 	   -I$(AAFBASE)/examples2/axLib
 
 
@@ -53,6 +54,9 @@ BINTARGET = $(AAFSDKBINDIR)/$(PROGNAME)$(EXE)
 # AxLib lib directory
 AXLIBPACKAGE = axExamples
 AXLIBDIR = $(AAFBUILDDIR)/$(AXLIBPACKAGE)/$(AAFTARGETDIR)
+
+# expat static library location
+EXPATLIBDIR = $(AAFBUILDDIR)/ref-impl/$(AAFTARGETDIR)
 
 .PHONY : all
 all : $(OBJDIR) $(BINTARGET) $(LIBDIR)
@@ -63,7 +67,7 @@ gcov : $(OBJDIR) $(BINTARGET) $(LIBDIR)
 
 $(BINTARGET) : $(CXXOBJS) $(AXPROGRAM_ADDITIONAL_DEPENDS) $(LIBDIR)
 	$(LD) $(CXXOBJS) \
-	-L$(OBJDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib $(LINK_AAF_APP)
+	-L$(OBJDIR) -L$(EXPATLIBDIR) -L$(AXLIBDIR) $(AXPROGRAM_LD_OPTIONS) $(PROGLIBS) -laxLib $(LINK_AAF_APP)
 
 .PHONY : clean
 clean ::
