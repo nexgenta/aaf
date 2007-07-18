@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.h,v 1.17 2005/09/05 00:28:44 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.h,v 1.18 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 #include <utility>
 
 #include <map>
+#include <set>
 
 // Useful constants that appear over and over again.
 class AxConstants
@@ -66,12 +67,19 @@ public:
 	// Get index of option "opt" at or after argv[n].  True if found.
 	std::pair<bool,int> get( const char* opt, int n=0 );
 
-	// Return argv[n].  True if m <= n < argc
+	// Return argv[n].  True if m <= n < argc.
 	std::pair<bool,const char*> get( int n, int m=0 );
 	
+	// Return true if n < m or if n is an argument that has been
+	// fetched by one of the get methods.
+	bool IsFetched( int n, int m=0 );
+
+	void MarkFetched( int n );	
+
 private:
 	int _argc;
 	char** _argv;
+	std::set<int> _fetchSet;
 };
 
 // Useful collection of string processing functions.

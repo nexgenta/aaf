@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.24 2005/11/22 21:12:08 ajakowpa Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.25 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -358,6 +358,53 @@ private:
 	AxScopeReference& operator=( const AxScopeReference& );
 
 	IAAFScopeReferenceSP _spIaafScopeReference;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxEssenceGroup : public AxSegment {
+
+public:
+	AxEssenceGroup( IAAFEssenceGroupSP spIaafEssenceGroup );
+	virtual ~AxEssenceGroup();
+
+	// Get methods only for now.
+	IAAFSourceClipSP GetStillFrame();
+	aafUInt32 CountChoices();
+	IAAFSegmentSP GetChoiceAt( aafUInt32 index );
+
+	operator IAAFEssenceGroupSP ()
+	{ return _spIaafEssenceGroup; }
+
+private:
+	AxEssenceGroup();
+	AxEssenceGroup( const AxEssenceGroup& );
+	AxEssenceGroup& operator=( const AxEssenceGroup& );
+
+	IAAFEssenceGroupSP _spIaafEssenceGroup;
+};
+
+//=---------------------------------------------------------------------=
+
+class AxSelector : public AxSegment {
+
+public:
+	AxSelector( IAAFSelectorSP spIaafSelector );
+	virtual ~AxSelector();
+
+	// Get methods only for now.
+	IAAFSegmentSP GetSelectedSegment();
+	IEnumAAFSegmentsSP EnumAlternateSegments();
+
+	operator IAAFSelectorSP ()
+	{ return _spIaafSelector; }
+
+private:
+	AxSelector();
+	AxSelector( const AxSelector& );
+	AxSelector& operator=( const AxSelector& );
+
+	IAAFSelectorSP _spIaafSelector;
 };
 
 //=---------------------------------------------------------------------=

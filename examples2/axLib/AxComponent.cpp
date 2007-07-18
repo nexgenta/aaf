@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.25 2005/11/22 21:12:08 ajakowpa Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.26 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -692,6 +692,71 @@ aafUInt32 AxScopeReference::GetRelativeSlot()
 	CHECK_HRESULT( _spIaafScopeReference->GetRelativeSlot( &relSlot ) );
 
 	return relSlot;
+}
+
+//=---------------------------------------------------------------------=
+
+AxEssenceGroup::AxEssenceGroup( IAAFEssenceGroupSP spIaafEssenceGroup )
+:	AxSegment( AxQueryInterface<IAAFEssenceGroup, IAAFSegment>(spIaafEssenceGroup) ),
+	_spIaafEssenceGroup( spIaafEssenceGroup )
+{}
+
+AxEssenceGroup::~AxEssenceGroup()
+{}
+
+IAAFSourceClipSP AxEssenceGroup::GetStillFrame()
+{
+  IAAFSourceClipSP spStillFrame;
+
+  CHECK_HRESULT( _spIaafEssenceGroup->GetStillFrame( &spStillFrame ) );
+
+  return spStillFrame;
+}
+
+aafUInt32 AxEssenceGroup::CountChoices()
+{
+  aafUInt32 count = 0;
+
+  CHECK_HRESULT( _spIaafEssenceGroup->CountChoices( &count ) );
+
+  return count;
+}
+
+IAAFSegmentSP AxEssenceGroup::GetChoiceAt( aafUInt32 index )
+{
+  IAAFSegmentSP spChoice;
+
+  CHECK_HRESULT( _spIaafEssenceGroup->GetChoiceAt( index, &spChoice ) );
+
+  return spChoice;
+}
+
+//=---------------------------------------------------------------------=
+
+AxSelector::AxSelector( IAAFSelectorSP spIaafSelector )
+:	AxSegment( AxQueryInterface<IAAFSelector, IAAFSegment>(spIaafSelector) ),
+	_spIaafSelector( spIaafSelector )
+{}
+
+AxSelector::~AxSelector()
+{}
+
+IAAFSegmentSP AxSelector::GetSelectedSegment()
+{
+  IAAFSegmentSP spSelectedSegment;
+
+  CHECK_HRESULT( _spIaafSelector->GetSelectedSegment( &spSelectedSegment ) );
+
+  return spSelectedSegment;
+}
+
+IEnumAAFSegmentsSP AxSelector::EnumAlternateSegments()
+{
+  IEnumAAFSegmentsSP spEnumSegments;
+
+  CHECK_HRESULT( _spIaafSelector->EnumAlternateSegments( &spEnumSegments  ) );
+
+  return spEnumSegments;
 }
 
 //=---------------------------------------------------------------------=
