@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2007/07/19 11:39:43 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -79,9 +79,9 @@ realclean : clean
 # NOTE: MultiGenTest is designed to be run across multiple
 # platforms and SDK versions - this test merely checks that
 # MultiGenTest is in good working order.
-TEST_LIB_NAME = libcom-api.so
-ifneq (,$(findstring Darwin,$(AAFPLATFORM)))
-  TEST_LIB_NAME = libcom-api.dylib
+TEST_LIB_NAME = libcom-api$(DLL)
+ifeq ($(AAFPLATFORM),Win)
+  TEST_LIB_NAME = AAFCOAPI$(DLL)
 endif
 
 .PHONY : check
