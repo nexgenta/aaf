@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aafdump.cpp,v 1.2 2005/05/10 16:18:15 philipn Exp $ $Name:  $
+// $Id: aafdump.cpp,v 1.3 2007/07/19 17:16:31 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -758,7 +758,11 @@ static char* readName(IStream* stream,
       swapOMString((OMCharacter*)buffer, characterCount);
     }
     char* name = new char[characterCount];
+#ifdef OM_UNICODE_APIS
+    convert(name, characterCount, (wchar_t*)buffer);
+#else
     convert(name, characterCount, (OMCharacter*)buffer);
+#endif
     delete [] buffer;
     result = name;
   }
