@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.28 2007/07/19 14:10:16 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.29 2007/07/20 20:50:02 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -504,7 +504,7 @@ int main( int argc, char** argv )
   try
   {
     // Figure out where the install location.
-    fs::path argvzero( argv[0] );
+    fs::path argvzero( argv[0], fs::no_check );
     fs::path installPath = argvzero.branch_path();
 
     //
@@ -622,7 +622,8 @@ int main( int argc, char** argv )
       // Assume it is the same directory where the program is      
       // executing from.
       fs::path path = installPath / "AAFRequirements.xml";
-	  loader.ParseXML( path.string().c_str() );
+      cout << "loading requirements: " << path.string() << endl;
+      loader.ParseXML( path.string().c_str() );
     }
 
     // If a report is requested, but it is not a test coverage report,
