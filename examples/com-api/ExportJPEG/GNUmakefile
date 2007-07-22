@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2007/05/15 17:47:18 stuart_hc Exp $
+# $Id: GNUmakefile,v 1.4 2007/07/22 14:32:25 stuart_hc Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -31,7 +31,7 @@ TEST_CMD = $(APP_RUN_ENV) $(AAFSDKBINDIR)/ExportJPEG$(EXE)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ExportJPEG$(EXE)
 	@if [ -r 4frames.mjpeg ] ; then $(TEST_CMD) -res 15:1 -rawJPEG 4frames.mjpeg ; fi
-	@if [ -r sdlake_inst.uyvy ] ; then for resid in 2:1 3:1 10:1 20:1 15:1 ; do $(TEST_CMD) -res $$resid -rawUYVY sdlake_inst.uyvy -o sdlake_uyvy_$$resid.aaf || exit $$?; done ; fi
-	@if [ -r sdlake_inst.uyvy ] ; then for resid in 2:1 3:1 10:1 20:1 15:1 ; do $(TEST_CMD) -ntsc -res $$resid -rawUYVY sdlake_inst.uyvy -o sdlake_uyvy_ntsc_$$resid.aaf || exit $$?; done ; fi
-	for resid in 2:1 3:1 10:1 20:1 15:1 ; do $(TEST_CMD) -res $$resid -o colorbars_$$resid.aaf || exit $$?; done
-	for resid in 2:1 3:1 10:1 20:1 15:1 ; do $(TEST_CMD) -ntsc -res $$resid -o colorbars_ntsc_$$resid.aaf || exit $$?; done
+	@if [ -r sdlake_inst.uyvy ] ; then for resid in 2:1 3:1 10:1 20:1 15:1 ; do resname=`echo $$resid | sed 's/:/_/g'`; $(TEST_CMD) -res $$resid -rawUYVY sdlake_inst.uyvy -o sdlake_uyvy_$$resname.aaf || exit $$?; done ; fi
+	@if [ -r sdlake_inst.uyvy ] ; then for resid in 2:1 3:1 10:1 20:1 15:1 ; do resname=`echo $$resid | sed 's/:/_/g'`; $(TEST_CMD) -ntsc -res $$resid -rawUYVY sdlake_inst.uyvy -o sdlake_uyvy_ntsc_$$resname.aaf || exit $$?; done ; fi
+	for resid in 2:1 3:1 10:1 20:1 15:1 ; do resname=`echo $$resid | sed 's/:/_/g'`; $(TEST_CMD) -res $$resid -o colorbars_$$resname.aaf || exit $$?; done
+	for resid in 2:1 3:1 10:1 20:1 15:1 ; do resname=`echo $$resid | sed 's/:/_/g'`; $(TEST_CMD) -ntsc -res $$resid -o colorbars_ntsc_$$resname.aaf || exit $$?; done

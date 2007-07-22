@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2007/05/15 17:47:18 stuart_hc Exp $
+# $Id: GNUmakefile,v 1.4 2007/07/22 14:32:25 stuart_hc Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@ include ../comexamplerules.mk
 TEST_CMD = $(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportJPEG$(EXE)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ImportJPEG$(EXE)
-	@for f in 2:1 3:1 10:1 20:1 15:1 ; do if [ -r ../ExportJPEG/sdlake_uyvy_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/sdlake_uyvy_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/sdlake_uyvy_$$f.aaf || exit $$? ; fi ; done
-	@for f in 2:1 3:1 10:1 20:1 15:1 ; do if [ -r ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf || exit $$? ; fi ; done
-	@for f in 2:1 3:1 10:1 20:1 15:1 ; do if [ -r ../ExportJPEG/colorbars_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/colorbars_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/colorbars_$$f.aaf || exit $$? ; fi ; done
-	@for f in 2:1 3:1 10:1 20:1 15:1 ; do if [ -r ../ExportJPEG/colorbars_ntsc_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/colorbars_ntsc_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/colorbars_ntsc_$$f.aaf || exit $$? ; fi ; done
+	@for f in 2_1 3_1 10_1 20_1 15_1 ; do if [ -r ../ExportJPEG/sdlake_uyvy_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/sdlake_uyvy_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/sdlake_uyvy_$$f.aaf || exit $$? ; fi ; done
+	@for f in 2_1 3_1 10_1 20_1 15_1 ; do if [ -r ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/sdlake_uyvy_ntsc_$$f.aaf || exit $$? ; fi ; done
+	@for f in 2_1 3_1 10_1 20_1 15_1 ; do if [ -r ../ExportJPEG/colorbars_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/colorbars_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/colorbars_$$f.aaf || exit $$? ; fi ; done
+	@for f in 2_1 3_1 10_1 20_1 15_1 ; do if [ -r ../ExportJPEG/colorbars_ntsc_$$f.aaf ] ; then $(TEST_CMD) -d ../ExportJPEG/colorbars_ntsc_$$f.aaf || exit $$? ; $(TEST_CMD) ../ExportJPEG/colorbars_ntsc_$$f.aaf || exit $$? ; fi ; done
