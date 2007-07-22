@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-cl.mk,v 1.1 2007/07/18 17:54:14 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-cl.mk,v 1.2 2007/07/22 14:34:51 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ DBG_FLAGS = /nologo /EHsc /RTC1 /MDd /W3 /WX /Z7 /Gs /GR /D "_DEBUG" /D "OM_DEBU
 #------------------------------------------------------------------------------
 # Optimisation flags when building a Release
 #------------------------------------------------------------------------------
-REL_FLAGS = /nologo /EHsc /RTC1 /MD /O2 /W3 /WX /Z7 /Gs /GR /D "NDEBUG" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H"
+REL_FLAGS = /nologo /EHsc /MD /O2 /W3 /WX /Z7 /Gs /GR /D "NDEBUG" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H"
 
 #------------------------------------------------------------------------------
 # Compiler flags
