@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDictionary.h,v 1.73 2007/07/13 18:15:48 philipn Exp $ $Name:  $
+// $Id: ImplAAFDictionary.h,v 1.74 2007/07/23 15:15:07 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -908,11 +908,11 @@ bool PvtIsTypePresent (
   virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
 
 private:
-  void InitDataDef(const aafUID_t & dataDefinitionID,
+  void InitDataDefinition(const aafUID_t & dataDefinitionID,
                    const aafCharacter *name,
 				   const aafCharacter *description);
 
-  void InitContainerDef(const aafUID_t & defID,
+  void InitContainerDefinition(const aafUID_t & defID,
                         const aafCharacter *name,
 				        const aafCharacter *description);
 
