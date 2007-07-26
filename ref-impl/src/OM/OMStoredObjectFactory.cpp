@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStoredObjectFactory.cpp,v 1.8 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStoredObjectFactory.cpp,v 1.9 2007/07/26 03:11:03 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,8 +39,7 @@ OMStoredObjectFactory::OMStoredObjectFactory(
 : _encoding(encoding),
   _signature(signature),
   _name(saveWideString(name)),
-  _description(saveWideString(description)),
-	_better(0)
+  _description(saveWideString(description))
 {
   TRACE("OMStoredObjectFactory::OMStoredObjectFactory");
 
@@ -94,22 +93,5 @@ const wchar_t* OMStoredObjectFactory::description(void) const
 {
   TRACE("OMStoredObjectFactory::description");
   return _description;
-}
-
-    // @mfunc A previouslyregistered implementation   of 
-    //          <c OMStoredObject>s created by this <c OMStoredObjectFactory>.
-  //   @rdesc a pointer to any "better" factories.
-const OMStoredObjectFactory* OMStoredObjectFactory::better(void) const
-{
-  TRACE("OMStoredObjectFactory::better");
-  return _better;
-}
-
-    // @mfunc Indicate a previously registered implementation of 
-    //          <c OMStoredObject>s created by this <c OMStoredObjectFactory>.
-void OMStoredObjectFactory::setBetter( OMStoredObjectFactory* const better )
-{
-  TRACE("OMStoredObjectFactory::setBetter");
-	_better = better;
 }
 

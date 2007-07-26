@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStoredObjectFactory.h,v 1.9 2004/02/27 14:26:44 stuart_hc Exp $ $Name:  $
+// $Id: OMStoredObjectFactory.h,v 1.10 2007/07/26 03:11:03 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,14 +70,6 @@ public:
     // @cmember The description of the encoding of
     //         <c OMStoredObject>s created by this <c OMStoredObjectFactory>.
   virtual const wchar_t* description(void) const;
-
-    // @cmember A previouslyregistered implementation of 
-    //          <c OMStoredObject>s created by this <c OMStoredObjectFactory>.
-  virtual const OMStoredObjectFactory* better(void) const;
-
-    // @cmember Indicate a previously registered implementation of 
-    //          <c OMStoredObject>s created by this <c OMStoredObjectFactory>.
-  virtual void setBetter( OMStoredObjectFactory* const better );
 
     // @cmember Open the root <c OMStoredObject> in the raw storage
     //          <p rawStorage> for reading only.
@@ -152,8 +144,6 @@ private:
   OMUniqueObjectIdentification _signature;
   wchar_t* _name;
   wchar_t* _description;
-	OMStoredObjectFactory* _better;
-
 };
 
 #endif

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.44 2007/03/26 16:00:48 philipn Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.45 2007/07/26 03:11:03 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -89,8 +89,6 @@ extern "C" const aafClassID_t CLSID_AAFCachePageAllocator;
 #if USE_RAW_STORAGE
 #include "AAF.h"
 #endif
-
-extern const aafUID_t *mapStructuredStorageFileKind_DefaultToActual(const aafUID_t *);
 
 //***********************************************************
 //
@@ -893,13 +891,12 @@ STDAPI ImplAAFRawStorageIsAAFFile (
 //
 STDAPI ImplAAFFileIsAAFFileKind (
   aafCharacter_constptr  pFileName,
-  aafUID_constptr pAAFFileKind_in,
+  aafUID_constptr pAAFFileKind,
   aafBool *  pFileIsAAFFile)
 {
   if (pFileName == 0)
     return AAFRESULT_NULL_PARAM;
 
-  const aafUID_t *pAAFFileKind = mapStructuredStorageFileKind_DefaultToActual(pAAFFileKind_in);
   if (pAAFFileKind == 0)
     return AAFRESULT_NULL_PARAM;
 
