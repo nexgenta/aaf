@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.20 2006/06/14 20:40:25 tbingham Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.21 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,12 +35,12 @@
 
 #if defined(OM_OS_WINDOWS)
 #define LINKAGE __stdcall
-wchar_t* ssLibraryName = L"ole32.dll";
-wchar_t* coLibraryName = L"ole32.dll";
+const wchar_t* ssLibraryName = L"ole32.dll";
+const wchar_t* coLibraryName = L"ole32.dll";
 #elif defined(OM_OS_UNIX)
 #define LINKAGE
-wchar_t* ssLibraryName = L"librefstg.so";
-wchar_t* coLibraryName = L"librefstg.so";
+const wchar_t* ssLibraryName = L"librefstg.so";
+const wchar_t* coLibraryName = L"librefstg.so";
 #endif
 
 typedef OMInt32 (LINKAGE *pStgCreateDocfile_t)(const SSCHAR*,

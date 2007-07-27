@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDictionary.cpp,v 1.22 2007/03/26 16:00:56 philipn Exp $ $Name:  $
+// $Id: OMDictionary.cpp,v 1.23 2007/07/27 21:19:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -313,8 +313,8 @@ void OMDictionary::resolve(void)
 
 struct _properties_t {
   OMPropertyId _pid;
-  wchar_t* _name;
-  wchar_t* _description;
+  const wchar_t* _name;
+  const wchar_t* _description;
 
 } _properties[] = {
   {0x0001, L"MetaDictionary", L"MetaDictionary"},

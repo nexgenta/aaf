@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFObjectModelProcs.cpp,v 1.10 2007/02/06 15:46:15 wschilp Exp $ $Name:  $
+// $Id: AAFObjectModelProcs.cpp,v 1.11 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -419,7 +419,7 @@ static bool InitializeTypeDefinitionEnumeration(
     result = pType->Initialize (*typeDefinitionEnumeration->id(),
         pElementType,
         memberValues,
-        const_cast<aafCharacter **>(memberNames), // THIS CAST SHOULD NOT BE NECESSARY!
+        memberNames,
         typeDefinitionEnumeration->memberCount(),
         typeDefinitionEnumeration->name());
     ASSERTU (AAFRESULT_SUCCEEDED(result));
@@ -649,7 +649,7 @@ static bool InitializeTypeDefinitionRecord(
     // Used the "high-level" Initialize method since the pvtInitialize is obsolete.
     result = pType->Initialize (*typeDefinitionRecord->id(),
                                 memberTypes,
-        const_cast<aafCharacter **>(memberNames), // THIS CAST SHOULD NOT BE NECESSARY!
+                                memberNames,
                                 typeDefinitionRecord->fieldCount(),
                                 typeDefinitionRecord->name());
     ASSERTU (AAFRESULT_SUCCEEDED(result));

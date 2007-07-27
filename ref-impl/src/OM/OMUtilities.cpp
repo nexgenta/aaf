@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMUtilities.cpp,v 1.67 2007/04/12 12:58:01 stuart_hc Exp $ $Name:  $
+// $Id: OMUtilities.cpp,v 1.68 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -401,7 +401,7 @@ void toWideString(OMUInt32 i, wchar_t* result, size_t ANAME(resultSize))
 
   // Convert remaining digits to hex characters
   //
-  wchar_t* hexDigits = L"0123456789abcdef";
+  const wchar_t* hexDigits = L"0123456789abcdef";
   wchar_t* p = result;
   while (digits > 0) {
     ASSERT("Valid nibble", ((nibble >= 0) && (nibble <= 15)));

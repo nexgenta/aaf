@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.h,v 1.32 2007/02/24 00:31:59 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.h,v 1.33 2007/07/27 21:19:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ public:
 
          // @parm [in, size_is(numMembers)] array of member names to
 		 // be represented in this enumerated  type
-         aafString_t *  pMemberNames,
+         const aafCharacter* *  pMemberNames,
 
          // @parm [in] number of members in pMemberInfo array
          aafUInt32  numMembers,

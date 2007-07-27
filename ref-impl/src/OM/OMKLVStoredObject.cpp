@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.233 2007/03/20 18:36:14 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.234 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -352,7 +352,7 @@ OMByteOrder OMKLVStoredObject::byteOrder(void) const
 static struct {
   OMPropertyTag _tag;
   OMUInt16 _pids[4];
-  wchar_t* _path;
+  const wchar_t* _path;
 } map [] = {
   {0xffff,
    {0x0001, 0x0003},         L"/MetaDictionary/ClassDefinitions"},

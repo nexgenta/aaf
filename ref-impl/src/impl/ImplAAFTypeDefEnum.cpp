@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.cpp,v 1.43 2007/03/26 16:00:47 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.cpp,v 1.44 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -95,7 +95,7 @@ ImplAAFTypeDefEnum::Initialize (
 								const aafUID_t & id,
 								ImplAAFTypeDef * pType,
 								aafInt64 * pElementValues,
-								aafString_t * pElementNames,
+								aafCharacter_constptr * pElementNames,
 								aafUInt32 numElements,
 								const wchar_t * pTypeName)
 {
@@ -127,7 +127,7 @@ ImplAAFTypeDefEnum::pvtInitialize (
 								   const aafUID_t & id,
 								   const ImplAAFTypeDef * pType,
 								   aafInt64 * pElementValues,
-								   aafString_t * pElementNames,
+								   aafCharacter_constptr * pElementNames,
 								   aafUInt32 numElements,
 								   const wchar_t * pTypeName)
 {

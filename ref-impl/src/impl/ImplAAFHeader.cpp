@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.99 2007/02/27 18:46:12 akharkev Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.100 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -580,8 +580,8 @@ AAFRESULT
 	{		
 		if(pIdent == (aafProductIdentification_t *)NULL)
 		{
-			ident.companyName = L"Unknown";
-			ident.productName = L"Unknown";
+			ident.companyName = const_cast<aafCharacter *>(L"Unknown");
+			ident.productName = const_cast<aafCharacter *>(L"Unknown");
 			ident.productVersionString = (aafWChar*)NULL;
 			ident.productID = NIL_UID;
 			ident.platform = (aafWChar*)NULL;
@@ -595,7 +595,7 @@ AAFRESULT
 	XASSERT(pIdent != NULL, AAFRESULT_NEED_PRODUCT_IDENT);
 
     if (ident.productVersionString == 0) {
-      ident.productVersionString = L"Unknown version";
+      ident.productVersionString = const_cast<aafCharacter *>(L"Unknown version");
     }
 
     // Get the dictionary so that we can use the factory

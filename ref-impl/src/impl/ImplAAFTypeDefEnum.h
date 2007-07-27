@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefEnum.h,v 1.35 2007/03/26 16:00:47 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefEnum.h,v 1.36 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ public:
 
          // @parm [in, size_is(numElems)] array of element names to be represented in this enumerated
     // type
-         aafString_t *  pElementNames,
+         aafCharacter_constptr *  pElementNames,
 
          // @parm [in] number of members in pElementValues and pElementNames arrays
          aafUInt32  numElems,
@@ -339,7 +339,7 @@ public:
 
          // @parm [in, size_is(numElems)] array of element names to be represented in this enumerated
     // type
-         aafString_t *  pElementNames,
+         aafCharacter_constptr *  pElementNames,
 
          // @parm [in] number of members in pElementValues and pElementNames arrays
          aafUInt32  numElems,

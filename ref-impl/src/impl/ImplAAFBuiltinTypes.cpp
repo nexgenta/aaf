@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFBuiltinTypes.cpp,v 1.31 2006/05/24 18:01:50 tbingham Exp $ $Name:  $
+// $Id: ImplAAFBuiltinTypes.cpp,v 1.32 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -249,8 +249,8 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 		  aafInt64 * memberValues =	new aafInt64 [numMembers];
 		  ASSERTU (memberValues);
 	  
-		  aafString_t * memberNames = 
-			new aafString_t[numMembers];
+		  const aafCharacter* * memberNames = 
+			new const aafCharacter*[numMembers];
 		  ASSERTU (memberNames);
 
 		  // fill the types and names arrays.
@@ -459,8 +459,8 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 			new ImplAAFTypeDef * [numMembers];
 		  ASSERTU (memberTypes);
 	  
-		  aafString_t * memberNames = 
-			new aafString_t[numMembers];
+		  const aafCharacter* * memberNames = 
+			new const aafCharacter*[numMembers];
 		  ASSERTU (memberNames);
 
 		  aafUInt32 * memberOffsets =

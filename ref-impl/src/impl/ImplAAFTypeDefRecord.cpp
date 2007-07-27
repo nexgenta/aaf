@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.50 2007/07/27 18:13:15 terabrit Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.51 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -121,7 +121,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::Initialize (
       const aafUID_t & id,
       ImplAAFTypeDef ** ppMemberTypes,
-      aafString_t * pMemberNames,
+      aafCharacter_constptr * pMemberNames,
       aafUInt32 numMembers,
       const aafCharacter * pTypeName)
 {

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefsGen.h,v 1.18 2006/06/15 19:53:16 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTypeDefsGen.h,v 1.19 2007/07/27 21:19:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,7 +40,7 @@
 #define AAF_TYPE_TABLE_BEGIN()  \
 struct TypeInteger              \
 {                               \
-  wchar_t * typeName;           \
+  const wchar_t * typeName;           \
   aafUID_t  typeID;             \
   aafUInt8  size;               \
   aafBool   isSigned;           \
@@ -68,7 +68,7 @@ static TypeInteger s_AAFAllTypeIntegers [] = {
                                            \
 struct TypeEnumerationMember               \
 {                                          \
-  wchar_t *        memberName;             \
+  const wchar_t *        memberName;             \
   aafInt64         memberValue;            \
 };                                         \
                                            \
@@ -167,7 +167,7 @@ static TypeEnumeration * s_AAFAllTypeEnumerations [] = {
 struct TypeRecordMember             \
 {                                   \
   const aafUID_t *   pMemberTypeId; \
-  wchar_t *          memberName;    \
+  const wchar_t *          memberName;    \
   aafUInt32          memberOffset;  \
   eAAFTypeCategory_t typeCat;       \
 };                                  \
@@ -175,7 +175,7 @@ struct TypeRecordMember             \
 struct TypeRecord                   \
 {                                   \
   aafUID_t   typeID;                \
-  wchar_t *  typeName;              \
+  const wchar_t *  typeName;              \
   aafUInt32  size;                  \
   TypeRecordMember ** members;      \
 };
@@ -549,7 +549,7 @@ static TypeWeakRefVector s_AAFAllTypeWeakRefVectors [] = {
                                            \
 struct TypeExtEnumerationMember            \
 {                                          \
-  wchar_t *        memberName;             \
+  const wchar_t *        memberName;             \
   aafUID_t         memberValue;            \
 };                                         \
                                            \

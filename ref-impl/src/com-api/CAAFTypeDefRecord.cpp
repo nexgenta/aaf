@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefRecord.cpp,v 1.9 2006/07/07 15:16:39 tbingham Exp $ $Name:  $
+// $Id: CAAFTypeDefRecord.cpp,v 1.10 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -118,7 +118,7 @@ HRESULT STDMETHODCALLTYPE
       hr = ptr->Initialize
        (id,
         internalppMemberTypes,
-        pMemberNames,
+        const_cast<aafCharacter_constptr*>(pMemberNames),
         numMembers,
         pTypeName);
     }

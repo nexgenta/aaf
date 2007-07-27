@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.18 2006/06/06 17:14:13 tbingham Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.19 2007/07/27 21:19:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -170,12 +170,12 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 		return AAFRESULT_SUCCESS;
 }
 
-static wchar_t *manufURL = L"http://www.avid.com";
-static wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
+static const wchar_t *manufURL = L"http://www.avid.com";
+static const wchar_t *downloadURL = L"ftp://ftp.avid.com/pub/";
 const aafUID_t MANUF_JEFFS_PLUGINS = { 0xA6487F21, 0xE78F, 0x11d2, { 0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
-static wchar_t *manufName = L"Avid Technology, Inc.";
-static wchar_t *manufRev = L"Rev 0.1";
+static const wchar_t *manufName = L"Avid Technology, Inc.";
+static const wchar_t *manufRev = L"Rev 0.1";
 
 HRESULT STDMETHODCALLTYPE
 CAAFAIFCCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)

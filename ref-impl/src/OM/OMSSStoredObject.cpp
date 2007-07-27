@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.15 2007/02/23 23:53:00 akharkev Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.16 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3139,7 +3139,7 @@ wchar_t* OMSSStoredObject::collectionIndexStreamName(
   TRACE("OMSSStoredObject::collectionIndexStreamName");
   PRECONDITION("Valid collection name", validWideString(collectionName));
 
-  wchar_t* suffix = L" index";
+  const wchar_t* suffix = L" index";
   size_t length = lengthOfWideString(collectionName) +
                   lengthOfWideString(suffix) + 1;
   wchar_t* indexName = new wchar_t[length];

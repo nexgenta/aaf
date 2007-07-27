@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMetaDictionary.cpp,v 1.39 2007/03/26 16:00:49 philipn Exp $ $Name:  $
+// $Id: ImplAAFMetaDictionary.cpp,v 1.40 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -881,7 +881,7 @@ void ImplAAFMetaDictionary::newEnumeratedType(const OMObjectIdentification& id,
     ImplAAFTypeDefEnum* pTypeDef = dynamic_cast<ImplAAFTypeDefEnum*>(pMetaDef);
     ASSERT("Meta def is a enum type def", pTypeDef != 0);
     hr = pTypeDef->Initialize(*typeDefAUID, spElementTypeDef, elementValues, 
-        const_cast<wchar_t**>(elementNames), elementCount, name);
+        elementNames, elementCount, name);
     if (!AAFRESULT_SUCCEEDED(hr))
     {
         // TODO: should throw an exception here
@@ -1189,7 +1189,7 @@ void ImplAAFMetaDictionary::newRecordType(const OMObjectIdentification& id,
     ImplAAFTypeDefRecord* pTypeDef = dynamic_cast<ImplAAFTypeDefRecord*>(pMetaDef);
     ASSERT("Meta def is a record type def", pTypeDef != 0);
     hr = pTypeDef->Initialize(*typeDefAUID, &memberTypeDefs.getAt(0), 
-        const_cast<wchar_t**>(memberNames), memberCount, name);
+        memberNames, memberCount, name);
     if (!AAFRESULT_SUCCEEDED(hr))
     {
         // TODO: should throw an exception here

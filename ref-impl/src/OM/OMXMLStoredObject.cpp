@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.44 2007/03/26 16:00:52 philipn Exp $
+// $Id: OMXMLStoredObject.cpp,v 1.45 2007/07/27 21:19:04 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3026,8 +3026,8 @@ OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute
         
         if (data == 0)
         {
-            wchar_t* nullData = L"\0";    
-            bytes.append(reinterpret_cast<OMByte*>(nullData), sizeof(wchar_t));
+            const wchar_t* nullData = L"\0";    
+            bytes.append(reinterpret_cast<const OMByte*>(nullData), sizeof(wchar_t));
         }
         else
         {

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMAssertions.cpp,v 1.30 2004/02/27 14:26:42 stuart_hc Exp $ $Name:  $
+// $Id: OMAssertions.cpp,v 1.31 2007/07/27 21:19:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,11 +37,11 @@
 #endif
 
 
-void reportAssertionViolation(char* assertionKind,
-                              char* assertionName,
-                              char* expressionString,
-                              char* routineName,
-                              char* fileName,
+void reportAssertionViolation(const char* assertionKind,
+                              const char* assertionName,
+                              const char* expressionString,
+                              const char* routineName,
+                              const char* fileName,
                               OMUInt32 lineNumber)
 {
   omlog << assertionKind
@@ -52,11 +52,11 @@ void reportAssertionViolation(char* assertionKind,
   omlog << "The condition \"" << expressionString << "\" was false." << endl;
 }
 
-void assertionViolation(char* assertionKind,
-                        char* assertionName,
-                        char* expressionString,
-                        char* routineName,
-                        char* fileName,
+void assertionViolation(const char* assertionKind,
+                        const char* assertionName,
+                        const char* expressionString,
+                        const char* routineName,
+                        const char* fileName,
                         OMUInt32 lineNumber)
 {
   reportAssertionViolation(assertionKind,
