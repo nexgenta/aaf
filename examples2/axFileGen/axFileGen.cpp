@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axFileGen.cpp,v 1.17 2004/11/26 17:20:28 stuart_hc Exp $ $Name:  $
+// $Id: axFileGen.cpp,v 1.18 2007/07/28 19:56:59 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -776,7 +776,7 @@ void ProcessCommandLineArgs( int argc, char** argv )
 
   // Verify that each option has the required minumum number of arguments.
   optionIndices.push_back( argc );
-  for(i = 0; i < optionIndices.size()-1; i++ ) {
+  for(i = 0; i < (int)optionIndices.size()-1; i++ ) {
 
     if ( optionIndices[i] + optionCmdFuncs[i]->GetMinArgs() >= optionIndices[i+1] ) {
       AxString anError( L"not enough arguments for command: " +
@@ -789,12 +789,12 @@ void ProcessCommandLineArgs( int argc, char** argv )
     }
   }
 
-  for(i = 0; i < optionCmdFuncs.size(); i++ ) {
+  for(i = 0; i < (int)optionCmdFuncs.size(); i++ ) {
       CmdFunc* cmd = optionCmdFuncs[i];
 	  cmd->Prepare();
   }
 
-  for(i = 0; i < optionCmdFuncs.size(); i++ ) {
+  for(i = 0; i < (int)optionCmdFuncs.size(); i++ ) {
 	  optionCmdFuncs[i]->Execute();
   }
 
