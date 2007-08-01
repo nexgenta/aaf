@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFControlPointsTest.cpp,v 1.38 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFControlPointsTest.cpp,v 1.39 2007/08/01 15:15:42 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,7 +46,7 @@ using namespace std;
 
 static aafMobID_t	zeroMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
 				     {0,0,0,{0,0,0,0,0,0,0,0}}};
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+static const aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

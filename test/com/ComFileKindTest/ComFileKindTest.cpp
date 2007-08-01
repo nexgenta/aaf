@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.28 2005/05/07 09:44:19 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.29 2007/08/01 15:15:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -525,15 +525,17 @@ static HRESULT CreateAAFFile(api_info_t info, bool testLargeNames)
 	return hr;
 }
 
+static aafCharacter companyName[] = L"AMW Association";
+static aafCharacter productName[] = L"ComFileKindTest";
 
 int main(void)
 {
-	TestProductID.companyName = L"AAF Developers Desk";
-	TestProductID.productName = L"ComFileKindTest";
+	TestProductID.companyName = companyName;
+	TestProductID.productName = productName;
 	TestProductID.productVersion = &TestVersion;
 	TestProductID.productVersionString = NULL;
 	TestProductID.productID = UnitTestProductID;
-	TestProductID.platform = L"Test OS";
+	TestProductID.platform = NULL;
 
 	try
 	{

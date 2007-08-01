@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDefObjectTest.cpp,v 1.32 2006/10/10 18:58:33 akharkev Exp $ $Name:  $
+// $Id: CAAFDefObjectTest.cpp,v 1.33 2007/08/01 15:15:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -96,8 +96,8 @@ inline void checkExpression(bool expression, HRESULT r)
     throw r;
 }
 
-static wchar_t *sName = L"Test Descriptor Name";
-static wchar_t *sDescription = L"Test Descriptor Description";
+static const wchar_t *sName = L"Test Descriptor Name";
+static const wchar_t *sDescription = L"Test Descriptor Description";
 
 
 static HRESULT CreateAAFFile(

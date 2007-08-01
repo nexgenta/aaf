@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionWrite.cpp,v 1.20 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: extensionWrite.cpp,v 1.21 2007/08/01 15:15:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -103,7 +103,8 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
-
+static aafCharacter companyName[] = L"AMW Association";
+static aafCharacter productName[] = L"extensionWrite";
 
 
 //
@@ -143,8 +144,8 @@ void extensionWrite (const aafCharacter * filename)
 	v.tertiary = 0;
 	v.patchLevel = 0;
 	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-    ProductInfo.productName = L"AAF extension example";
+	ProductInfo.companyName = companyName;
+    ProductInfo.productName = productName;
     ProductInfo.productVersion = &v;
     ProductInfo.productVersionString = 0;
     ProductInfo.productID = NULL_UID;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCDescriptorTest.cpp,v 1.32 2006/10/10 18:58:33 akharkev Exp $ $Name:  $
+// $Id: CAAFAIFCDescriptorTest.cpp,v 1.33 2007/08/01 15:15:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -151,7 +151,7 @@ static HRESULT CreateAAFFile(
 		unsigned char	writeBuf[SUMMARY_SIZE], *writePtr;
 		aafUInt32		longVal, lZero = 0, n;
 		aafUInt16		shortVal;
-		static char *compressionName = "Not compressed";
+		static const char *compressionName = "Not compressed";
 		// Form Header
 		// typedef struct tAIFCFORMATCHUNK
 		// {

@@ -1,7 +1,7 @@
 //=---------------------------------------------------------------------=
 //
 //
-// $Id: CAAFDescriptiveClipTest.cpp,v 1.6 2007/04/17 17:32:51 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDescriptiveClipTest.cpp,v 1.7 2007/08/01 15:15:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,7 +46,7 @@ static aafUInt32 TestDescribedSlotIDsVector[] = { 1, 3, 5, 7, 11 };
 static const aafUInt32 TestDescribedSlotIDsVectorSize = 5;
 
 static aafSourceRef_t sourceRef; 
-static aafWChar *slotName = L"SLOT1";
+static const aafWChar *slotName = L"SLOT1";
 
 static const	aafMobID_t	TEST_referencedMobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},

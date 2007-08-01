@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.19 2005/11/03 22:21:36 tbingham Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.20 2007/08/01 15:15:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,7 +71,7 @@ bool formatMXF = false;
 #define aaf_assert(b, msg) \
 	if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
-static void LogError(HRESULT errcode, int line, char *file)
+static void LogError(HRESULT errcode, int line, const char *file)
 {
 	printf("Error '%0x' returned at line %d in %s\n", errcode, line, file);
 }
@@ -153,6 +153,8 @@ static void create_colour_bars(unsigned char *video_buffer, bool convert_to_YUY2
 }
 
 const aafUID_t NIL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
+static aafCharacter companyName[] = L"AMW Association";
+static aafCharacter productName[] = L"ExportDV";
 
 static char *input_video = NULL;
 static FILE *input;
@@ -185,10 +187,10 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 		(comp_enable ? "CompressionEnable" : "CompressionDisable") << endl;
 
 	aafProductVersion_t ver = {1, 0, 0, 0, kAAFVersionBeta};
-	ProductInfo.companyName = L"none";
-	ProductInfo.productName = L"AAF SDK";
+	ProductInfo.companyName = companyName;
+	ProductInfo.productName = productName;
 	ProductInfo.productVersion = &ver;
-	ProductInfo.productVersionString = L"1.0.0.0 Beta";
+	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = NIL_UID;
 	ProductInfo.platform = NULL;		// Set by SDK when saving
 

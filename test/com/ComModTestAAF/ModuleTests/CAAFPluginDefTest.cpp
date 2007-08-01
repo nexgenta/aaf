@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPluginDefTest.cpp,v 1.43 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CAAFPluginDefTest.cpp,v 1.44 2007/08/01 15:15:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,9 +26,9 @@
 #include "AAF.h"
 #include "AAFPluginDefs.h"
 
-static wchar_t *manuf1URL = L"www.microsoft.com";
-static wchar_t *manuf2URL = L"www.avid.com";
-static wchar_t *manuf3URL = L"www.softimage.com";
+static const wchar_t *manuf1URL = L"www.microsoft.com";
+static const wchar_t *manuf2URL = L"www.avid.com";
+static const wchar_t *manuf3URL = L"www.softimage.com";
 
 #include <iostream>
 using namespace std;
@@ -62,8 +62,8 @@ aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kAAFVersionBeta };
 #define	MobName			L"MasterMOBTest"
 #define	NumMobSlots		3
 
-static wchar_t *manufName = L"Jeff's Plugin-O-Rama";
-static wchar_t *manufRev = L"Rev0.0.0a0";
+static const wchar_t *manufName = L"Jeff's Plugin-O-Rama";
+static const wchar_t *manufRev = L"Rev0.0.0a0";
 
 static aafBool	EqualVersion(aafVersionType_t *vers1, aafVersionType_t *vers2)
 {

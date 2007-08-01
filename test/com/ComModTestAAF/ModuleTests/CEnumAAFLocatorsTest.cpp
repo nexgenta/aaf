@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFLocatorsTest.cpp,v 1.31 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFLocatorsTest.cpp,v 1.32 2007/08/01 15:15:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,8 +43,8 @@ static const 	aafMobID_t	TEST_MobID =
 {0x53c55746, 0x0406, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
-wchar_t *locator1 = L"First Locator";
-wchar_t *locator2 = L"Second Locator";
+static const wchar_t *locator1 = L"First Locator";
+static const wchar_t *locator2 = L"Second Locator";
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

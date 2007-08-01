@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFKLVDataTest.cpp,v 1.16 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFKLVDataTest.cpp,v 1.17 2007/08/01 15:15:35 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,7 @@ typedef IAAFSmartPointer<IAAFTypeDef> IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefOpaque> IAAFTypeDefOpaqueSP;
 typedef IAAFSmartPointer<IAAFKLVData> IAAFKLVDataSP;
 
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+static const aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 static const aafUID_t *	slotDDefs[5] = {&kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Sound, &kAAFDataDef_Picture, &kAAFDataDef_Picture};
 static aafLength_t	slotsLength[5] = { 297, 44100, 44100, 44100, 44100};
 

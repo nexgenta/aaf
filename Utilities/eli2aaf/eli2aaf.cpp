@@ -1,5 +1,5 @@
 //
-// $Id: eli2aaf.cpp,v 1.21 2007/05/15 16:30:25 stuart_hc Exp $ $Name:  $
+// $Id: eli2aaf.cpp,v 1.22 2007/08/01 15:15:11 stuart_hc Exp $ $Name:  $
 //
 // eli2aaf.cpp -	Create an AAF file with embedded media from a lavtools
 //					(mjpegtools) ELI format file.  Such a format is created
@@ -913,11 +913,15 @@ static bool createAAFFileForEditDecisions(const char *output_aaf_file,
 			v.patchLevel = 1;
 			v.type = kAAFVersionReleased;
 
-			ProductInfo.companyName = L"This property intentionally left blank";
-			ProductInfo.productName = L"Kino";
+			aafWChar companyName[] = L"This property intentionally left blank";
+			aafWChar productName[] = L"Kino";
+			aafWChar productVersionString[] = L"0.6.4 BBC R&D patch 1";
+
+			ProductInfo.companyName = companyName;
+			ProductInfo.productName = productName;
 			ProductInfo.productVersion = &v;
-			ProductInfo.productVersionString = L"0.6.4 BBC R&D patch 1";
-			ProductInfo.platform = L"i386-redhat-linux";		// has no effect
+			ProductInfo.productVersionString = productVersionString;
+			ProductInfo.platform = NULL;
 
 			// Remove existing file if any
 			if (remove(output_aaf_file) == 0)

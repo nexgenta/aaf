@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFClassDefTest.cpp,v 1.27 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFClassDefTest.cpp,v 1.28 2007/08/01 15:15:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -179,7 +179,7 @@ enum IAAFClassDefMethodsEnum
 
 // Array of names of methods in IAFFClassDef -- constants in enum IAFFClassDefMethodsEnum are indices
 // into this array.
-char *ppIAAFMethodNames[NUM_IAAFCLASSDEF_METHODS]=
+const char *ppIAAFMethodNames[NUM_IAAFCLASSDEF_METHODS]=
 {
 	"RegisterNewPropertyDef",
 	"RegisterOptionalPropertyDef",
@@ -414,8 +414,10 @@ static void CreateAAFFile(
 	v.tertiary = 0;
 	v.patchLevel = 0;
 	v.type = kAAFVersionUnknown;
-	ProductInfo.companyName = L"AAF Developers Desk";
-	ProductInfo.productName = L"AAFClassDef Test";
+	aafCharacter companyName[] = L"AMW Association";
+	aafCharacter productName[] = L"CAAFClassDefTest";
+	ProductInfo.companyName = companyName;
+	ProductInfo.productName = productName;
 	ProductInfo.productVersion = &v;
 	ProductInfo.productVersionString = NULL;
 	ProductInfo.productID = UnitTestProductID;

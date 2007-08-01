@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.46 2007/04/11 16:27:18 phil_tudor Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.47 2007/08/01 15:15:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,7 @@ typedef IAAFSmartPointer<IAAFTypeDefInt> IAAFTypeDefIntSP;
 typedef IAAFSmartPointer<IEnumAAFDataDefs> IEnumAAFDataDefsSP;
 typedef IAAFSmartPointer<IEnumAAFTypeDefs> IEnumAAFTypeDefsSP;
 
-static void     FatalErrorCode(HRESULT errcode, int line, char *file)
+static void     FatalErrorCode(HRESULT errcode, int line, const char *file)
 {
   printf("Error '%0x' returned at line %d in %s\n", errcode, line, file);
   // we don't need to exit on failure
@@ -117,7 +117,7 @@ static void printProductVersion(aafProductVersion_t* pProductVersion)
                         pProductVersion->minor,
                         pProductVersion->tertiary,
                         pProductVersion->patchLevel);
-  char* releaseType;
+  const char* releaseType;
   switch (pProductVersion->type) {
     case kAAFVersionUnknown:
       releaseType = "Unknown";

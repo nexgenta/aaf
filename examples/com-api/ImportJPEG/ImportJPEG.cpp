@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImportJPEG.cpp,v 1.2 2006/03/11 11:47:26 stuart_hc Exp $ $Name:  $
+// $Id: ImportJPEG.cpp,v 1.3 2007/08/01 15:15:25 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,7 @@ using namespace std;
 #define aaf_assert(b, msg) \
 	if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
 
-static void LogError(HRESULT errcode, int line, char *file)
+static void LogError(HRESULT errcode, int line, const char *file)
 {
 	printf("Error '%0x' returned at line %d in %s\n", errcode, line, file);
 }

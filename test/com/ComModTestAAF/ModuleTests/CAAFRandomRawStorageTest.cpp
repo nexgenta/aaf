@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFRandomRawStorageTest.cpp,v 1.27 2005/10/13 03:11:26 rodrigc Exp $ $Name:  $
+// $Id: CAAFRandomRawStorageTest.cpp,v 1.28 2007/08/01 15:15:37 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -865,12 +865,12 @@ struct fileInfo_t
 	, kStgTypeCustomStg
 	, kStgTypeCachedCustomStg
   }              storageType;
-  wchar_t *      fileName;
-  char *         description;
-  fileCrtnFunc_t openWriteFunc;
-  fileMgmtFunc_t openReadFunc;
-  fileMgmtFunc_t closeWriteFunc;
-  fileMgmtFunc_t closeReadFunc;
+  const wchar_t * fileName;
+  const char *    description;
+  fileCrtnFunc_t  openWriteFunc;
+  fileMgmtFunc_t  openReadFunc;
+  fileMgmtFunc_t  closeWriteFunc;
+  fileMgmtFunc_t  closeReadFunc;
 
 };
 //

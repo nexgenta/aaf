@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestExampleFiles.cpp,v 1.1 2007/03/26 15:57:24 philipn Exp $ $Name:  $
+// $Id: TestExampleFiles.cpp,v 1.2 2007/08/01 15:15:56 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,7 +30,7 @@ bool testExampleFiles()
 {
     printf("\nExample Files:\n\n");
     
-    wchar_t* exampleFiles[2] = 
+    const wchar_t* exampleFiles[2] = 
     {
         L"input/axExample.xml",
         L"input/AVID_Newscutter_sequence.xml"

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFOperationDefsTest.cpp,v 1.34 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFOperationDefsTest.cpp,v 1.35 2007/08/01 15:15:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -90,8 +90,8 @@ static const aafUID_t TEST_CATEGORY =
 #define TEST_BYPASS			1
 #define TEST_PARAM_NAME		L"A TestEffect parameter"
 #define TEST_PARAM_DESC		L"A longer description of the TestEffect parameter"
-static wchar_t *sName[2] = { L"Test Descriptor Name1", L"Test Descriptor Name2" };
-static wchar_t *sDescription[2] = { L"Test Descriptor Description1", L"Test Descriptor Description2" };
+static const wchar_t *sName[2] = { L"Test Descriptor Name1", L"Test Descriptor Name2" };
+static const wchar_t *sDescription[2] = { L"Test Descriptor Description1", L"Test Descriptor Description2" };
 
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"

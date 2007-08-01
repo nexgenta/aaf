@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFTaggedValuesTest.cpp,v 1.32 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFTaggedValuesTest.cpp,v 1.33 2007/08/01 15:15:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,9 +40,9 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
-static aafWChar* TagNames[3] = { L"TAG01", L"TAG02", L"TAG03" };
-static aafWChar* Comments[3] = { L"Comment 1", L"Comment 2", L"Comment 3"};	
+static const aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+static const aafWChar* TagNames[3] = { L"TAG01", L"TAG02", L"TAG03" };
+static const aafWChar* Comments[3] = { L"Comment 1", L"Comment 2", L"Comment 3"};	
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -108,7 +108,7 @@ static HRESULT CreateAAFFile(
 		// append some comments to this mob !!
 	  for (test = 0; test < 3; test++)
 	  {
-		  checkResult(pMob->AppendComment(TagNames[test], Comments[test]));
+		  checkResult(pMob->AppendComment(const_cast<aafWChar*>(TagNames[test]), Comments[test]));
 	  }
 	  // Add some slots
 	  for(test = 0; test < 5; test++)

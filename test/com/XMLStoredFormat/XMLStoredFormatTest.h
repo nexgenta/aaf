@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLStoredFormatTest.h,v 1.1 2007/03/26 15:57:21 philipn Exp $ $Name:  $
+// $Id: XMLStoredFormatTest.h,v 1.2 2007/08/01 15:16:01 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,11 +57,11 @@ if (p != 0) \
 
 
 void report(bool passed);
-IAAFFile* openFileForReading(aafCharacter* fileName);
+IAAFFile* openFileForReading(const aafCharacter* fileName);
 void replaceCharacter(wchar_t* str, wchar_t c, wchar_t r);
-void saveCopy(aafCharacter* inFileName, aafCharacter* outFileName);
-void copyAndTouch(aafCharacter* inFileName, aafCharacter* outFileName);
-bool diff(aafCharacter* fileNameA, aafCharacter* fileNameB);
+void saveCopy(const aafCharacter* inFileName, const aafCharacter* outFileName);
+void copyAndTouch(const aafCharacter* inFileName, const aafCharacter* outFileName);
+bool diff(const aafCharacter* fileNameA, const aafCharacter* fileNameB);
 
 
 // the tests

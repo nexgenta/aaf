@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFFilmDescriptorTest.cpp,v 1.25 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFFilmDescriptorTest.cpp,v 1.26 2007/08/01 15:15:34 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,8 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafWChar* Manufacturer = L"Sony";
-static aafWChar* Model = L"MyModel";
+static const aafWChar* Manufacturer = L"Sony";
+static const aafWChar* Model = L"MyModel";
 static aafFilmType_t FilmFormat = kAAFFt35MM;
 static aafUInt32 FrameRate = 24;
 static aafUInt8 PerfPerFrame = 4;

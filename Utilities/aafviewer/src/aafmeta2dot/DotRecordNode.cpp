@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.6 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.7 2007/08/01 15:15:06 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -38,8 +38,8 @@ using namespace std;
 #include <DotLogging.h>
 
 
-char* nullMobID = "00000000000000000000000000000000-00000000-0000-0000-0000000000000000";
-char* nullUID = "00000000-0000-0000-0000000000000000";
+const char* nullMobID = "00000000000000000000000000000000-00000000-0000-0000-0000000000000000";
+const char* nullUID = "00000000-0000-0000-0000000000000000";
 
 
 //-----------------------------------------------------------------------------

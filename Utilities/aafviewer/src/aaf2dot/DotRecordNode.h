@@ -2,7 +2,7 @@
 #define __DOTRECORDNODE_H__
 
 /*
- * $Id: DotRecordNode.h,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.h,v 1.4 2007/08/01 15:15:04 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -83,8 +83,8 @@ class DotRecordNode : public DotElement, public DotThingWithID
 typedef std::vector< DotRecordNode* > DotRecordNodeVector;
 
 
-extern char* nullMobID;
-extern char* nullUID;
+extern const char* nullMobID;
+extern const char* nullUID;
 
 
 #endif	//__DOTRECORDNODE_H__

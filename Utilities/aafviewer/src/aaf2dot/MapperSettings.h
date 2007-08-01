@@ -2,7 +2,7 @@
 #define __MAPPERSETTINGS_H__
 
 /*
- * $Id: MapperSettings.h,v 1.3 2004/02/27 16:41:24 stuart_hc Exp $ $Name:  $
+ * $Id: MapperSettings.h,v 1.4 2007/08/01 15:15:06 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -28,8 +28,8 @@
 
 typedef struct
 {
-      char *objectName;
-      char *propertyName;
+      const char *objectName;
+      const char *propertyName;
       bool displayHex;
 } IntegerMapSetting;
 

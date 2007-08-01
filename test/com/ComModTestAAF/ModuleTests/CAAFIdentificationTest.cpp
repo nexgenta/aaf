@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFIdentificationTest.cpp,v 1.28 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFIdentificationTest.cpp,v 1.29 2007/08/01 15:15:34 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -157,10 +157,10 @@ static HRESULT CreateAAFFile(
 	aafUInt32 					bufSize2 = 0;
 
 	aafProductIdentification_t	ProductInfo;
-  memset(&ProductInfo, 0, sizeof(ProductInfo));
-	ProductInfo.companyName = COMPANY_NAME;
-	ProductInfo.productName = PRODUCT_NAME;
-	ProductInfo.productVersionString = TEST_VERSION;
+	memset(&ProductInfo, 0, sizeof(ProductInfo));
+	ProductInfo.companyName = const_cast<aafWChar*>(COMPANY_NAME);
+	ProductInfo.productName = const_cast<aafWChar*>(PRODUCT_NAME);
+	ProductInfo.productVersionString = const_cast<aafWChar*>(TEST_VERSION);
 	ProductInfo.productID = UnitTestProductID;
 	ProductInfo.productVersion = &testVersion;
 	hr = S_OK;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRenameTest.cpp,v 1.20 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefRenameTest.cpp,v 1.21 2007/08/01 15:15:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,7 +59,7 @@ static const aafUID_t AUID_WordProperty =
 { 0x70acbb80, 0x3b18, 0x11d4, { 0x92, 0x12, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d } };
 
 // Name of the alias (instance of IAAFTypeDefRename) that we will create
-static aafWChar *gpAliasName=L"Word";
+static const aafWChar *gpAliasName=L"Word";
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

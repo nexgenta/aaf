@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axMasterMobEx.cpp,v 1.17 2005/08/23 21:42:41 jptrainor Exp $ $Name:  $
+// $Id: axMasterMobEx.cpp,v 1.18 2007/08/01 15:15:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -472,7 +472,7 @@ private:
 	std::string _source;
 
 	int _multiplier;
-	char* _symbol;
+	const char* _symbol;
 };
 
 CmdLineParser::CmdLineParser( AxCmdLineArgs& args )
@@ -795,7 +795,7 @@ void open_mastermob_and_read_essence( AxHeader& axHeader,
 	aafLength_t maxSize = axEssenceAccess.GetLargestSampleSize( axDataDef );
 
 	unsigned int divisor;
-	char* symbol;
+	const char* symbol;
 	if ( maxSize > 1024*1024 ) {
 		symbol = "M";
 		divisor = 1024/1024;

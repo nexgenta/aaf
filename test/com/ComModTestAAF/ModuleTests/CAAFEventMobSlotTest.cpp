@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEventMobSlotTest.cpp,v 1.33 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFEventMobSlotTest.cpp,v 1.34 2007/08/01 15:15:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,7 +70,7 @@ public:
   void Close();
 
   IAAFEvent *CreateAnEvent(aafPosition_t* position, 
-                           wchar_t *comment, 
+                           const wchar_t *comment, 
                            IAAFSequence *pSequence = NULL);
 
   void CreateEventMobSlot();
@@ -260,7 +260,7 @@ void EventMobSlotTest::Close()
 
 
 IAAFEvent *EventMobSlotTest::CreateAnEvent(aafPosition_t* position,
-                                           wchar_t *comment,
+                                           const wchar_t *comment,
                                            IAAFSequence *pSequence)
 {
   assert(_pHeader && _pDictionary);

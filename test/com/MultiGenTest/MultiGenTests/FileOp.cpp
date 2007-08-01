@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileOp.cpp,v 1.15 2005/03/15 02:43:25 jptrainor Exp $ $Name:  $
+// $Id: FileOp.cpp,v 1.16 2007/08/01 15:15:51 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -160,6 +160,9 @@ IAAFSmartPointer<IAAFFile> CreateFileOfKind( const std::string& fileName,
 }
 #endif
 
+static aafCharacter companyName[] = L"AMW Association";
+static aafCharacter productName[] = L"FileOp";
+
 void FileOp::RunTest( CmdState& state, int argc, char** argv )
 {
   using namespace std;
@@ -173,8 +176,8 @@ void FileOp::RunTest( CmdState& state, int argc, char** argv )
   v.tertiary = 0;
   v.patchLevel = 0;
   v.type = kAAFVersionUnknown;
-  productInfo.companyName = L"AAF Developers Desk";
-  productInfo.productName = L"AAF MultiGenTest";
+  productInfo.companyName = companyName;
+  productInfo.productName = productName;
   productInfo.productVersion = &v;
   productInfo.productVersionString = NULL;
   productInfo.productID = UnitTestProductID;

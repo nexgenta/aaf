@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.37 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.38 2007/08/01 15:15:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@ using namespace std;
 
 #include <assert.h>
 
-static aafWChar *slotName = L"SLOT1";
+static const aafWChar *slotName = L"SLOT1";
 
 static const	aafMobID_t	TEST_MobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},

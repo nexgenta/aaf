@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTapeDescriptorTest.cpp,v 1.32 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFTapeDescriptorTest.cpp,v 1.33 2007/08/01 15:15:39 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,8 +37,8 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafWChar* Manufacturer = L"Sony";
-static aafWChar* Model = L"MyModel";
+static const aafWChar* Manufacturer = L"Sony";
+static const aafWChar* Model = L"MyModel";
 static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
 static aafVideoSignalType_t VideoSignalType = kAAFPALSignal;
 static aafTapeFormatType_t TapeFormat = kAAFVHSFormat;

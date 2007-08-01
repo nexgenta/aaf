@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTestsCommon.cpp,v 1.7 2005/09/07 20:15:32 montrowe Exp $ $Name:  $
+// $Id: ModuleTestsCommon.cpp,v 1.8 2007/08/01 15:15:48 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@ namespace mtc {
 
 //======================================================================
 
-aafWChar *slotName = L"SLOT1";
+const aafWChar *slotName = L"SLOT1";
 
 //======================================================================
 

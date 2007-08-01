@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceClipTest.cpp,v 1.42 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFSourceClipTest.cpp,v 1.43 2007/08/01 15:15:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,7 +37,7 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafWChar *slotName = L"SLOT1";
+static const aafWChar *slotName = L"SLOT1";
 static aafInt32 fadeInLen  = 1000;
 static aafInt32 fadeOutLen = 2000;
 static aafFadeType_t fadeInType = kAAFFadeLinearAmp;

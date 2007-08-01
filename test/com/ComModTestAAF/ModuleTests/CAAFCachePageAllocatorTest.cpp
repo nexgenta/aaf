@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCachePageAllocatorTest.cpp,v 1.2 2005/09/07 20:15:31 montrowe Exp $ $Name:  $
+// $Id: CAAFCachePageAllocatorTest.cpp,v 1.3 2007/08/01 15:15:30 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -162,7 +162,7 @@ HRESULT CAAFCachePageAllocator_test(testMode_t /* mode */,
     testRawStorageType_t /* rawStorageType */,
     aafProductIdentification_t productID)
 {
-  aafCharacter * pFileName = L"CAAFCachePageAllocatorTest.aaf";
+  const aafCharacter * pFileName = L"CAAFCachePageAllocatorTest.aaf";
 
   (void)RemoveTestFile(pFileName );
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EssenceWrite.cpp,v 1.5 2004/02/27 14:26:38 stuart_hc Exp $ $Name:  $
+// $Id: EssenceWrite.cpp,v 1.6 2007/08/01 15:15:27 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,7 +47,7 @@ void WriteEssence::Execute( const std::vector<AxString>& argv )
 	AxString essenceSrcName    = argv[1];
 	AxString essenceAccessName = argv[2];
 
-	char *busy[4] = { "-", "\\", "|", "/" };
+	const char *busy[4] = { "-", "\\", "|", "/" };
 
 	IAAFEssenceAccessSP spAccess;
 	GetInstance( essenceAccessName ).GetCOM( spAccess );

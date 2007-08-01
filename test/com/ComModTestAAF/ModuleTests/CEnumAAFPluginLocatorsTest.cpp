@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFPluginLocatorsTest.cpp,v 1.30 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFPluginLocatorsTest.cpp,v 1.31 2007/08/01 15:15:47 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,8 +30,8 @@
 using namespace std;
 
 
-static wchar_t *manuf1URL = L"www.microsoft.com";
-static wchar_t *manuf2URL = L"www.avid.com";
+static const wchar_t *manuf1URL = L"www.microsoft.com";
+static const wchar_t *manuf2URL = L"www.avid.com";
 
 #include <iostream>
 using namespace std;
@@ -63,8 +63,8 @@ static aafVersionType_t sampleMaxAPIVersion = { 40, 41 };//, 42, 43, kAAFVersion
 #define	MobName			L"MasterMOBTest"
 #define	NumMobSlots		3
 
-static wchar_t *manufName = L"Jeff's Plugin-O-Rama";
-static wchar_t *manufRev = L"Rev0.0.0a0";
+static const wchar_t *manufName = L"Jeff's Plugin-O-Rama";
+static const wchar_t *manufRev = L"Rev0.0.0a0";
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)

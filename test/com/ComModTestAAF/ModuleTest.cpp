@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.cpp,v 1.8 2005/09/07 20:15:31 montrowe Exp $ $Name:  $
+// $Id: ModuleTest.cpp,v 1.9 2007/08/01 15:15:29 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -368,10 +368,10 @@ aafProductIdentification_t MakeProductID()
     product_version.type = kAAFVersionUnknown;
 
 
-    static aafCharacter*    company_name = L"AAF Developers Desk";
-    static aafCharacter*    product_name = L"ComModTestAAF";
-    static aafCharacter*    product_version_string = L"1.0.0.0";
-    static aafCharacter*    platform = TEST_PLATFORM_NAME;
+    static aafCharacter    company_name[] = L"AAF Developers Desk";
+    static aafCharacter    product_name[] = L"ComModTestAAF";
+    static aafCharacter    product_version_string[] = L"1.0.0.0";
+    static aafCharacter    platform[] = TEST_PLATFORM_NAME;
     aafProductIdentification_t  product_identification;
  
     product_identification.companyName = company_name;

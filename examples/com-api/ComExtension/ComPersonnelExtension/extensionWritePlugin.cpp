@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: extensionWritePlugin.cpp,v 1.16 2004/11/03 12:57:18 phil_tudor Exp $ $Name:  $
+// $Id: extensionWritePlugin.cpp,v 1.17 2007/08/01 15:15:17 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,6 +116,8 @@ static void convert(char* cName, size_t length, const wchar_t* name)
   }
 }
 
+static aafCharacter companyName[] = L"AMW Association";
+static aafCharacter productName[] = L"extensionWritePlugin";
 
 
 //
@@ -167,8 +169,8 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     v.tertiary = 0;
     v.patchLevel = 0;
     v.type = kAAFVersionUnknown;
-    ProductInfo.companyName = L"AAF Developers Desk";
-    ProductInfo.productName = L"AAF extension example";
+    ProductInfo.companyName = companyName;
+    ProductInfo.productName = productName;
     ProductInfo.productVersion = &v;
     ProductInfo.productVersionString = 0;
     ProductInfo.productID = NULL_UID;

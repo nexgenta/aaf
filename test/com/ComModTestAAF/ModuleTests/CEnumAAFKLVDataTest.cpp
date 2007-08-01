@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFKLVDataTest.cpp,v 1.17 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFKLVDataTest.cpp,v 1.18 2007/08/01 15:15:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+static const aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 static char KLVsmiley[] =        /* 16x16 smiley face */
   "      ****      "

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFModuleTest.cpp,v 1.33 2006/06/05 23:20:37 rodrigc Exp $ $Name:  $
+// $Id: CAAFModuleTest.cpp,v 1.34 2007/08/01 15:15:28 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -67,7 +67,7 @@ typedef HRESULT (*AAFModuleTestProc)(testMode_t mode,
 
 struct AAFObjectTestInfo
 {
-  wchar_t* pClassName;
+  const wchar_t* pClassName;
   AAFModuleTestProc pfnTestProc;
 
   // Encapsulate the test proc so that we can trap exceptions

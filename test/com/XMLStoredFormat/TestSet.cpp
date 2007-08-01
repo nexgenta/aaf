@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestSet.cpp,v 1.1 2007/03/26 15:57:22 philipn Exp $ $Name:  $
+// $Id: TestSet.cpp,v 1.2 2007/08/01 15:15:59 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "XMLStoredFormatTest.h"
 
 
-static bool testRestore(wchar_t* fileName)
+static bool testRestore(const wchar_t* fileName)
 {
     bool passed = true;
     

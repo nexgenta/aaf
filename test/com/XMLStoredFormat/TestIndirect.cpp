@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestIndirect.cpp,v 1.1 2007/03/26 15:57:23 philipn Exp $ $Name:  $
+// $Id: TestIndirect.cpp,v 1.2 2007/08/01 15:15:57 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "XMLStoredFormatTest.h"
 
 
-static bool testRestore(wchar_t* fileName)
+static bool testRestore(const wchar_t* fileName)
 {
     bool passed = true;
     
@@ -128,7 +128,7 @@ static bool testRestore(wchar_t* fileName)
             const aafUID_t propId = 
                 {0x10000000,0x0000,0x0000,{0x80,0x00,0x00,0x00,0x00,0x00,0x00,0x00}};
             aafUInt8 testValue = 1;
-            wchar_t* testName = L"AAA";
+            const wchar_t* testName = L"AAA";
             
             checkResult(pMob->QueryInterface(IID_IAAFObject, (void **)&pObject));
             
