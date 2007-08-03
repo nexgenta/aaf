@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MXFDump.cpp,v 1.784 2007/08/01 15:14:57 stuart_hc Exp $ $Name:  $
+// $Id: MXFDump.cpp,v 1.785 2007/08/03 16:34:15 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -3750,9 +3750,25 @@ bool isPredefinedEssenceElement(mxfKey& k)
 {
   // Prefix for MXF predefined MXF essence element labels
   mxfKey pe = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
-               0x0d, 0x01, 0x03, 0x01, 0xff, 0xff, 0xff, 0xff};
+               0x0d, 0x01, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00};
   bool result;
   if (memcmp(&k, &pe, 12) == 0) {
+    result = true;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool isLegacyPredefinedEssenceElement(mxfKey& k);
+
+bool isLegacyPredefinedEssenceElement(mxfKey& k)
+{
+  // Legacy Prefix for MXF predefined MXF essence element labels
+  mxfKey lpe = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
+               0x0d, 0x01, 0x03, 0x01, 0xff, 0xff, 0xff, 0xff};
+  bool result;
+  if (memcmp(&k, &lpe, 12) == 0) {
     result = true;
   } else {
     result = false;
@@ -3780,6 +3796,8 @@ bool isEssenceElement(mxfKey& k)
 {
   bool result;
   if (isPredefinedEssenceElement(k)) {
+    result = true;
+  } else if (isLegacyPredefinedEssenceElement(k)) {
     result = true;
   } else if (isAvidEssenceElement(k)) {
     result = true;
