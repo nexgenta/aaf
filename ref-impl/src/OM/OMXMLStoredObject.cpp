@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.45 2007/07/27 21:19:04 stuart_hc Exp $
+// $Id: OMXMLStoredObject.cpp,v 1.46 2007/08/07 17:20:54 philipn Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1699,7 +1699,7 @@ OMXMLStoredObject::saveEnum(const OMByte* internalBytes, OMUInt32 internalSize,
             value = (OMInt64)*((OMInt32*)internalBytes);
             break;
         case sizeof(OMInt64):
-            value = (OMInt64)*(internalBytes);
+            value = (OMInt64)*((OMInt64*)internalBytes);
             break;
         default:
             ASSERT("Valid integer size", false);
