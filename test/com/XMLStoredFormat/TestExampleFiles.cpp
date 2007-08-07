@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestExampleFiles.cpp,v 1.2 2007/08/01 15:15:56 stuart_hc Exp $ $Name:  $
+// $Id: TestExampleFiles.cpp,v 1.3 2007/08/07 17:19:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -26,7 +26,7 @@
 #include "XMLStoredFormatTest.h"
 
 
-bool testExampleFiles()
+int testExampleFiles()
 {
     printf("\nExample Files:\n\n");
     
@@ -88,7 +88,7 @@ bool testExampleFiles()
 
     printf("\n");
     
-    return passed;
+    return passed ? 0 : 2;
 }
 
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestOpaque.cpp,v 1.2 2007/08/01 15:15:58 stuart_hc Exp $ $Name:  $
+// $Id: TestOpaque.cpp,v 1.3 2007/08/07 17:19:31 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -198,7 +198,7 @@ static bool testRestore(const wchar_t* fileName)
 }
 
 
-bool testOpaque()
+int testOpaque()
 {
     printf("Rule 5.7: Opaque\n");
     
@@ -224,7 +224,7 @@ bool testOpaque()
 
     printf("\n");
     
-    return passed;
+    return passed ? 0 : 2;
 }
 
 

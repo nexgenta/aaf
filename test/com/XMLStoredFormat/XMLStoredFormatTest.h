@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLStoredFormatTest.h,v 1.2 2007/08/01 15:16:01 stuart_hc Exp $ $Name:  $
+// $Id: XMLStoredFormatTest.h,v 1.3 2007/08/07 17:19:32 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -65,22 +65,23 @@ bool diff(const aafCharacter* fileNameA, const aafCharacter* fileNameB);
 
 
 // the tests
-bool testCharacter();
-bool testEnum();
-bool testExtEnum();
-bool testFixedArray();
-bool testIndirect();
-bool testInteger();
-bool testOpaque();
-bool testRecord();
-bool testRename();
-bool testSet();
-bool testStream();
-bool testString();
-bool testVarArray();
-bool testWeakRef();
+// returns 0 when passed, 1 when there are expected failures only, otherwise 2 when there are failures
+int testCharacter();
+int testEnum();
+int testExtEnum();
+int testFixedArray();
+int testIndirect();
+int testInteger();
+int testOpaque();
+int testRecord();
+int testRename();
+int testSet();
+int testStream();
+int testString();
+int testVarArray();
+int testWeakRef();
 
-bool testExampleFiles();
+int testExampleFiles();
 
 #endif
 
