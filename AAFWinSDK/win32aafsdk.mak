@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.36 2005/12/20 14:32:37 ajakowpa Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.37 2007/08/08 14:29:21 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -174,7 +174,6 @@ AAFSDK_CFG=$(AAFSDK)\config.mk
 #
 AAFSDK_BIN     = $(AAFSDK)\bin
 AAFSDK_DEBUG   = $(AAFSDK_BIN)\debug
-AAFSDK_HELP    = $(AAFSDK)\help
 AAFSDK_INCLUDE = $(AAFSDK)\include
 AAFSDK_LIB     = $(AAFSDK)\lib
 AAFSDK_BIN_EXT = $(AAFSDK_BIN)\aafext
@@ -225,7 +224,6 @@ TARGET_DIRS = \
 	$(AAFSDK_DEBUG) \
 	$(AAFSDK_DEBUG_EXT) \
 !endif
-	$(AAFSDK_HELP) \
 	$(AAFSDK_INCLUDE) \
 	$(AAFSDK_LIB)
 
@@ -396,7 +394,6 @@ TARGET_DIRS_TO_REMOVE = \
 	$(AAFSDK_DEBUG) \
 	$(AAFSDK_BIN_EXT) \
 	$(AAFSDK_BIN) \
-	$(AAFSDK_HELP) \
 	$(AAFSDK_INCLUDE) \
 !if "$(AAFSDK)"=="."
 	$(AAFSDK_LIB)
@@ -465,10 +462,6 @@ $(AAFSDK_DEBUG) : $(AAFSDK_BIN)
 $(AAFSDK_DEBUG_EXT) : $(AAFSDK_DEBUG)
 	if not exist $(AAFSDK_DEBUG_EXT) \
 	    md $(AAFSDK_DEBUG_EXT)
-
-$(AAFSDK_HELP) :
-	if not exist $(AAFSDK_HELP) \
-	    md $(AAFSDK_HELP)
 
 $(AAFSDK_INCLUDE) :
 	if not exist $(AAFSDK_INCLUDE) \
