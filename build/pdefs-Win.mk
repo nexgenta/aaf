@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-Win.mk,v 1.7 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-Win.mk,v 1.8 2007/08/08 15:48:22 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,7 @@ SHELL = /bin/sh
 #------------------------------------------------------------------------------
 # Compiler-specific definitions
 #------------------------------------------------------------------------------
-COMPILER ?= g++
+COMPILER ?= cl
 include $(AAFBASE)/build/cdefs-$(COMPILER).mk
 
 
