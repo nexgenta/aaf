@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2007/08/08 23:14:35 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,3 +26,8 @@
 EXAMPLE = ExportAudioExample
 
 include ../comexamplerules.mk
+
+.PHONY : check
+check : $(AAFSDKBINDIR)/ExportAudioExample$(EXE)
+	@if [ ! -r Laser.wav ]; then cp ../../../test/com/ComModTestAAF/Laser.wav .; fi
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ExportAudioExample$(EXE)

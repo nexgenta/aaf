@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2007/05/15 17:47:18 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2007/08/08 23:14:36 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -50,6 +50,10 @@ CXXFILES2 = ComClientTestAAF.cpp
 $(AAFSDKBINDIR)/ComClientAAF$(EXE) : $(CXXOBJS2)
 	$(LD) $(CXXOBJS2) $(LINK_AAF_APP)
 
+.PHONY : check
+check : $(AAFSDKBINDIR)/ComClientAAF$(EXE) $(AAFSDKBINDIR)/ComAAFInfo$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ComClientAAF$(EXE)
+	for f in ../*/*.aaf ../../../test/com/*/*.aaf; do if echo $$f | grep UTF8FileNameTest > /dev/null; then echo "Skipping $$f until wctou8() et al are removed from the SDK"; else echo ComAAFInfo $$f; (cd `dirname $$f`; $(APP_RUN_ENV) $(AAFSDKBINDIR)/ComAAFInfo$(EXE) `basename $$f` > /dev/null) || exit $$?; fi; done
 
 .PHONY : clean
 clean :

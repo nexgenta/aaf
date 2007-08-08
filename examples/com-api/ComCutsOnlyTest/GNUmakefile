@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2004/05/05 16:04:36 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.5 2007/08/08 23:14:35 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,3 +26,7 @@
 EXAMPLE = ComCutsTestAAF
 
 include ../comexamplerules.mk
+
+.PHONY : check
+check : $(AAFSDKBINDIR)/ComCutsTestAAF$(EXE)
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ComCutsTestAAF$(EXE)

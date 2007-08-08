@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.4 2006/03/10 19:17:16 stuart_hc Exp $
+# $Id: GNUmakefile,v 1.5 2007/08/08 23:14:36 stuart_hc Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,3 +26,21 @@
 EXAMPLE = ImportDV
 
 include ../comexamplerules.mk
+
+TEST_CMD = $(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportDV$(EXE)
+.PHONY : check
+check : $(AAFSDKBINDIR)/ImportDV$(EXE)
+	@# Only run libdv compression tests if libdv available
+ifdef LIBDV_PATH
+	@rm -f raw.yuv
+	$(TEST_CMD) -compressionEnable ../ExportDV/ExportDV.aaf && test -f raw.yuv
+	@rm -f raw.yuv
+	$(TEST_CMD) -compressionEnable ../ExportDV/ExportDV.mxf && test -f raw.yuv
+	@rm -f raw.yuv
+	$(TEST_CMD) -compressionEnable ../ExportDV/ExportDV_legacyDV.aaf && test -f raw.yuv
+	@rm -f raw.yuv
+	$(TEST_CMD) -compressionEnable ../ExportDV/ExportDV_DVBased.aaf && test -f raw.yuv
+endif
+	@# Always run test using DV-compressed frame (doesn't require libdv)
+	@rm -f raw.dv
+	$(TEST_CMD) ../ExportDV/ExportDV_NoCompression.aaf && test -f raw.dv

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2004/02/27 14:26:36 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2007/08/08 23:14:35 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -26,3 +26,7 @@
 EXAMPLE = ComPropDirectDump
 
 include ../comexamplerules.mk
+
+.PHONY : check
+check : $(AAFSDKBINDIR)/ComPropDirectDump$(EXE)
+	for f in ../*/*.aaf ../../../test/com/*/*.aaf; do if echo $$f | grep UTF8FileNameTest > /dev/null; then echo "Skipping $$f until wctou8() et al are removed from the SDK"; else echo ComPropDirectDump $$f; (cd `dirname $$f`; $(APP_RUN_ENV) $(AAFSDKBINDIR)/ComPropDirectDump$(EXE) `basename $$f` > /dev/null) || exit $$?; fi; done
