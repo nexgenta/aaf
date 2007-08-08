@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.20 2007/07/26 03:11:01 jptrainor Exp $ $Name:  $
+# $Id: common.mk,v 1.21 2007/08/08 14:34:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -208,9 +208,9 @@ endif
 #	make RPATH=/usr/local/lib/aaf
 #
 #----------------------------------------------------------
-#RPATH ?= $(LIBDIR)  <-- this doesnt work
+# Set RPATH only if it was never defined
 ifeq ($(origin RPATH), undefined)
-    RPATH = $(LIBDIR)
+    RPATH = $(AAFSDKBINDIR)
 endif
 
 
