@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFInfo.cpp,v 1.47 2007/08/01 15:15:27 stuart_hc Exp $ $Name:  $
+// $Id: AAFInfo.cpp,v 1.48 2007/08/08 21:15:50 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -55,8 +55,7 @@ typedef IAAFSmartPointer<IEnumAAFTypeDefs> IEnumAAFTypeDefsSP;
 static void     FatalErrorCode(HRESULT errcode, int line, const char *file)
 {
   printf("Error '%0x' returned at line %d in %s\n", errcode, line, file);
-  // we don't need to exit on failure
-  //exit(1); 
+  exit(1); 
 }
 
 static HRESULT moduleErrorTmp = S_OK;/* note usage in macro */
@@ -493,6 +492,7 @@ static void ReadAAFFile(aafWChar * pFileName)
   else
   {
     fprintf(stderr, "Error : Failed to open file (result = %0x).\n", hr);
+    exit(1);
   }
 }
 
