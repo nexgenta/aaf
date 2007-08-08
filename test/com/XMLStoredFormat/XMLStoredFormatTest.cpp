@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: XMLStoredFormatTest.cpp,v 1.4 2007/08/07 17:19:32 philipn Exp $ $Name:  $
+// $Id: XMLStoredFormatTest.cpp,v 1.5 2007/08/08 16:27:40 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,7 +139,13 @@ void copyAndTouch(const aafCharacter* inFileName, const aafCharacter* outFileNam
         sep++;
     }
 #endif
-    system(copyCmd);
+    int result = system(copyCmd);
+    if (result != 0)
+    {
+        fprintf(stderr, "\nSystem copy command returned '%0x', at line %d in %s\n", result,
+            __LINE__, __FILE__);
+        throw "System copy command failed";
+    }
 
     
     IAAFFile* outFile = 0;
