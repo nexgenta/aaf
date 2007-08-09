@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: VideoEssenceSource.cpp,v 1.8 2007/07/28 19:57:22 terabrit Exp $ $Name:  $
+// $Id: VideoEssenceSource.cpp,v 1.9 2007/08/09 18:02:20 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -390,8 +390,8 @@ std::auto_ptr< SampleSrcBuffer > BarsSource::GetNext()
 	// The component width is enforced in the Execute method.
 	create_rgbx_bars_image( _width, _height, rgbBufStride, rgbBufSize, rgbBuf );
 	
-	int convertedBufSize;
-	aafUInt8* convertedBuf;
+	int convertedBufSize = 0;
+	aafUInt8* convertedBuf = NULL;
 		
 	// Next, perform color space conversion and resampling.
 	switch ( _format ) {
