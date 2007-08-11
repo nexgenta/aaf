@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.53 2007/08/11 15:09:33 terabrit Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.54 2007/08/11 15:15:01 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -869,6 +869,26 @@ AAFRESULT STDMETHODCALLTYPE
 
   hr = pvdOut->GetBits (&pOutBits);
   if (AAFRESULT_FAILED(hr)) return hr;
+
+	// OFM 2007-08-09 merge forward
+	/*	
+		this seems areasonable and worthwhile defensive addition
+
+		but whence comes the real problem?
+
+		pOutBits will be 0 if the PropValData has not been initialized
+		which will be the case if the ImplAAFProperty for the member believes it is Optional
+		which of course record members are not - they are mandatory
+
+		perhaps this is the real bug?
+	*/
+	if( !pOutBits )
+	{
+		aafUInt32 bitsSize; pvdOut->GetBitsSize( &bitsSize );
+
+		hr = pvdOut->AllocateBits ( bitsSize, &pOutBits);
+		if (AAFRESULT_FAILED(hr)) return hr;
+	}
 
   memcpy (pOutBits+offset, pInBits, ptd->PropValSize());
 
