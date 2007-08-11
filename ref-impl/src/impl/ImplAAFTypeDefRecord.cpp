@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefRecord.cpp,v 1.52 2007/08/10 00:09:33 terabrit Exp $ $Name:  $
+// $Id: ImplAAFTypeDefRecord.cpp,v 1.53 2007/08/11 15:09:33 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1155,8 +1155,9 @@ void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
-       //   internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize); JeffB: Try changing back
+	  // OFM 2007-08-09 merge forward
+	  // internalMemberSize = _internalSizes[member];
+      internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
 
 	  ptdm->type()->externalize (internalBytes,
 						 internalMemberSize,
@@ -1226,8 +1227,9 @@ void ImplAAFTypeDefRecord::internalize(const OMByte* externalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  internalMemberSize = _internalSizes[member];
-      //    internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
+	  // OFM 2007-08-09 merge forward
+	  // internalMemberSize = _internalSizes[member];
+      internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
 
 	  ptdm->type()->internalize (externalBytes,
 						 externalMemberSize,

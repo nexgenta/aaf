@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.h,v 1.29 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.h,v 1.30 2007/08/11 15:09:33 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,6 +71,41 @@ public:
     RawAccessType
         // @parm [out] the raw access type definition
         (ImplAAFTypeDef ** ppRawTypeDef);
+
+  //*************************************************************
+  //
+  // Overrides from OMType
+  //
+  //*************************************************************
+
+  virtual bool isFixedSize(void) const;
+
+  virtual void reorder(OMByte* externalBytes,
+                       OMUInt32 externalBytesSize) const;
+
+  virtual OMUInt32 externalSize(const OMByte* internalBytes,
+								OMUInt32 internalBytesSize) const;
+
+  virtual OMUInt32 externalSize(void) const;
+
+  virtual void externalize(const OMByte* internalBytes,
+                           OMUInt32 internalBytesSize,
+                           OMByte* externalBytes,
+                           OMUInt32 externalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual OMUInt32 internalSize(const OMByte* externalBytes,
+								OMUInt32 externalBytesSize) const;
+
+  virtual OMUInt32 internalSize(void) const;
+
+  virtual void internalize(const OMByte* externalBytes,
+                           OMUInt32 externalBytesSize,
+                           OMByte* internalBytes,
+                           OMUInt32 internalBytesSize,
+                           OMByteOrder byteOrder) const;
+
+  virtual void accept(OMTypeVisitor& visitor) const;
 
 
   //

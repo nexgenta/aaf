@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.cpp,v 1.33 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.cpp,v 1.34 2007/08/11 15:09:33 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -382,4 +382,89 @@ bool ImplAAFTypeDef::isPredefined(void) const
 {
   // to prevent ambiguity
   return ImplAAFMetaDefinition::isPredefined();
+}
+
+bool ImplAAFTypeDef::isFixedSize(void) const
+{
+  bool result = false;
+  if (IsFixedSize() == kAAFTrue) {
+    result = true;
+  }
+  return result;
+}
+
+void ImplAAFTypeDef::reorder(OMByte* externalBytes,
+								   OMUInt32 externalBytesSize) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+	return;
+}
+
+
+OMUInt32 ImplAAFTypeDef::externalSize(const OMByte* /*internalBytes*/,
+											OMUInt32 /*internalBytesSize*/) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+	return false;
+}
+
+
+OMUInt32 ImplAAFTypeDef::externalSize(void) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+	return false;
+}
+
+
+void ImplAAFTypeDef::externalize(const OMByte* internalBytes,
+									   OMUInt32 internalBytesSize,
+									   OMByte* externalBytes,
+									   OMUInt32 externalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+}
+
+
+OMUInt32 ImplAAFTypeDef::internalSize(void) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+	return false;
+}
+
+OMUInt32 ImplAAFTypeDef::internalSize(const OMByte* /*externalBytes*/,
+											OMUInt32 /*externalBytesSize*/) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+	return false;
+}
+
+void ImplAAFTypeDef::internalize(const OMByte* externalBytes,
+									   OMUInt32 externalBytesSize,
+									   OMByte* internalBytes,
+									   OMUInt32 internalBytesSize,
+									   OMByteOrder byteOrder) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
+}
+
+void ImplAAFTypeDef::accept(OMTypeVisitor& visitor) const
+{
+	// should be pure virtual, but if we allow client extension
+	// of behavior, clients may have to instantiate this
+	ASSERTU (0);
 }
