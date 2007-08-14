@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.4 2004/11/22 15:02:44 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.5 2007/08/14 16:08:19 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,21 +46,45 @@ typedef off64_t off_t;
 #define ftello ftello64
 
 #elif defined (_WIN32)		// Win32 differences
+
+#if defined (COMPILER_MSC)
 typedef __int64 off_t;
 // __OFF_T_DEFINED prevents MSVC redefining off_t in wchar.h
 // which is included by utf8.h.
 typedef long _off_t;
 #define _OFF_T_DEFINED
+#endif
 
-#define fseeko(fp, off, whence) fsetpos(fp, &off)
-static off_t ftello (FILE* fp)
+#define fseeko(fp, off, whence) win_fseeko(fp, off, whence)
+static int win_fseeko(FILE *fp, off_t off, int whence)
 {
-  off_t position;
+        if (whence == SEEK_SET) {
+                fpos_t pos = off;
+                return fsetpos(fp, &pos);
+        }
+        if (whence == SEEK_CUR) {
+                // First get current pos, then add required offset
+                fpos_t pos = 0;
+                if (0 != fgetpos(fp, &pos))
+                        return -1;
+                pos += off;
+                return fsetpos(fp, &pos);
+        }
 
-  if(0 != fgetpos(fp, &position))
+        // To reach here, whence is SEEK_END
+        return fseek(fp, off, whence);
+}
+
+#define ftello(fp) win_ftello(fp)
+static off_t win_ftello(FILE* fp)
+{
+  fpos_t pos;
+
+  if(0 != fgetpos(fp, &pos))
      return -1;
 
-  return position;
+  off_t result = pos;
+  return result;
 }
 
 #else
