@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.5 2007/08/14 16:08:19 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceRIFFWAVEStream.cpp,v 1.6 2007/08/14 22:26:43 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -62,17 +62,22 @@ static int win_fseeko(FILE *fp, off_t off, int whence)
                 fpos_t pos = off;
                 return fsetpos(fp, &pos);
         }
-        if (whence == SEEK_CUR) {
-                // First get current pos, then add required offset
-                fpos_t pos = 0;
-                if (0 != fgetpos(fp, &pos))
-                        return -1;
-                pos += off;
-                return fsetpos(fp, &pos);
+
+        if (whence == SEEK_END) {
+        // Seek to end-of-file using non-64bit fseek
+            if (0 != fseek(fp, 0, SEEK_END))
+            return -1;
+        // Handle any offset from end-of-file by falling through
+        // to 64bit capable relative seek below
         }
 
-        // To reach here, whence is SEEK_END
-        return fseek(fp, off, whence);
+        // To reach here whence is SEEK_CUR
+        // First get current pos, then add required offset
+        fpos_t pos = 0;
+        if (0 != fgetpos(fp, &pos))
+                        return -1;
+        pos += off;
+        return fsetpos(fp, &pos);
 }
 
 #define ftello(fp) win_ftello(fp)
