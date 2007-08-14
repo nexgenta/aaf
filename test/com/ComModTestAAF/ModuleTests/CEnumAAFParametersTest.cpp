@@ -2,7 +2,7 @@
 // @com This file implements the module test for CEnumAAFParameters
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFParametersTest.cpp,v 1.10 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFParametersTest.cpp,v 1.11 2007/08/14 15:26:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,7 +82,7 @@ static const aafUID_t kTestEffectID =
 
 // {3D887451-4916-11d4-921E-0050049C3B9D}
 static const aafUID_t kTestCategoryID = 
-{ 0x3d887451, 0x4916, 0x11d4, { 0x92, 0x1e, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d } };
+{ 0x0d010102, 0x0101, 0x0100, { 0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01 } };
 
 class CEnumAAFParametersTest: public 
 	CEnumeratorTest<IEnumAAFParameters,IAAFParameter>

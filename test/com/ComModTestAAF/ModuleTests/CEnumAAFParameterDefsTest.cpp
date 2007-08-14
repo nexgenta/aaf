@@ -2,7 +2,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFParameterDefsTest.cpp,v 1.31 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CEnumAAFParameterDefsTest.cpp,v 1.32 2007/08/14 15:26:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,7 +57,7 @@ inline void checkExpression(bool expression, HRESULT r)
 
 #define TEST_NUM_INPUTS		1
 static const aafUID_t TEST_CATEGORY = 
-{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
+{ 0x0d010102, 0x0101, 0x0100, { 0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01 } };
 #define TEST_BYPASS			1
 static const aafUID_t TEST_EFFECT_AUID = 
 { 0x12684769, 0xcd02, 0x11d3, { 0xa3, 0xf4, 0x0, 0x4, 0xac, 0x96, 0xa9, 0x37 } };

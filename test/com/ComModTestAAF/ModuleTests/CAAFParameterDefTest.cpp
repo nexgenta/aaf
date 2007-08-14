@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFParameterDefTest.cpp,v 1.37 2006/10/10 18:58:34 akharkev Exp $ $Name:  $
+// $Id: CAAFParameterDefTest.cpp,v 1.38 2007/08/14 15:26:33 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,7 +56,7 @@ inline void checkExpression(bool expression, HRESULT r)
 
 #define TEST_NUM_INPUTS		1
 static const aafUID_t TEST_CATEGORY = 
-{ 0x9f0e730c, 0xbf8, 0x11d4, { 0xa3, 0x58, 0x0, 0x90, 0x27, 0xdf, 0xca, 0x6a } };
+{ 0x0d010102, 0x0101, 0x0100, { 0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01 } };
 #define TEST_BYPASS			1
 #define TEST_EFFECT_NAME	L"A TestEffect"
 #define TEST_EFFECT_DESC	L"A longer description of the TestEffect"
