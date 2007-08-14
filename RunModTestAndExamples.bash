@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: RunModTestAndExamples.bash,v 1.2 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: RunModTestAndExamples.bash,v 1.3 2007/08/14 19:12:54 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -263,7 +263,7 @@ RunMainScript ()
 		cd Test
 		cp ../../Test/Com/ComModTestAAF/Laser.wav .
 		echo PWD is $PWD
-		./COMModAAF
+		./ComModAAF
 		CheckExitCode $? "ComModAAF"
 		
 		VerifyFiles "`ls *.aaf`"
