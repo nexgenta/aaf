@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDictionary.cpp_ContainerDefs,v 1.1 2007/07/23 15:15:06 phil_tudor Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp_ContainerDefs,v 1.2 2007/08/16 03:25:00 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -441,52 +441,52 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220X_1080P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220X_1080P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220X_1080p, 
+  L"ContainerDef_MXFGC_Avid_DNX_220X_1080p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_145_1080P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_145_1080P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_145_1080p, 
+  L"ContainerDef_MXFGC_Avid_DNX_145_1080p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220_1080P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220_1080P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220_1080p, 
+  L"ContainerDef_MXFGC_Avid_DNX_220_1080p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_36_1080P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_36_1080P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_36_1080p, 
+  L"ContainerDef_MXFGC_Avid_DNX_36_1080p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220X_1080I, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220X_1080I", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220X_1080i, 
+  L"ContainerDef_MXFGC_Avid_DNX_220X_1080i", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_145_1080I, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_145_1080I", 
+  kAAFContainerDef_MXFGC_Avid_DNX_145_1080i, 
+  L"ContainerDef_MXFGC_Avid_DNX_145_1080i", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220_1080I, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220_1080I", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220_1080i, 
+  L"ContainerDef_MXFGC_Avid_DNX_220_1080i", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220X_720P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220X_720P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220X_720p, 
+  L"ContainerDef_MXFGC_Avid_DNX_220X_720p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_220_720P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_220_720P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_220_720p, 
+  L"ContainerDef_MXFGC_Avid_DNX_220_720p", 
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Avid_DNxHD_145_720P, 
-  L"ContainerDef_MXFGC_Avid_DNxHD_145_720P", 
+  kAAFContainerDef_MXFGC_Avid_DNX_145_720p, 
+  L"ContainerDef_MXFGC_Avid_DNX_145_720p", 
   L"");
 
