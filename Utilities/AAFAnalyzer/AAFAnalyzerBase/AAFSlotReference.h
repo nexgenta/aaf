@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSlotReference.h,v 1.3 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFSlotReference.h,v 1.4 2007/08/21 14:08:09 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -24,6 +24,8 @@
 //Analyzer Base files
 #include <Edge.h>
 
+#include <string>
+
 namespace aafanalyzer {
 
 using namespace boost;
@@ -31,11 +33,16 @@ using namespace boost;
 class AAFSlotReference : public Edge
 {
  public:
-  AAFSlotReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild);
+  
+  static const std::wstring typeName;
+
+  AAFSlotReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild, Node::LID tag);
   ~AAFSlotReference();
 
   bool Visit(shared_ptr<Visitor> spVisitor);
   virtual shared_ptr<Edge> CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const;
+
+  virtual const std::wstring& GetTypeName() const;
 
  private:
 

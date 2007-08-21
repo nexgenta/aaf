@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FileDumper.h,v 1.7 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: FileDumper.h,v 1.8 2007/08/21 14:08:16 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,11 +34,14 @@ using namespace boost;
 
 class TestLevelTestResult;
 class TestGraph;
+class Node;
 
 class FileDumper : public Test
 {
  public:
-  FileDumper(wostream& os, shared_ptr<const TestGraph> spGraph);
+
+  FileDumper(wostream& os, shared_ptr<const TestGraph> spGraph, shared_ptr<Node> spRoot, bool followReferences );
+
   ~FileDumper();
 
   virtual shared_ptr<TestLevelTestResult> Execute();
@@ -52,6 +55,9 @@ class FileDumper : public Test
   FileDumper();
   FileDumper(const FileDumper&);
   FileDumper& operator=( const FileDumper& );
+
+  shared_ptr<Node> _spRoot;
+  bool _followReferences;
 };
 
 } // end of namespace diskstream

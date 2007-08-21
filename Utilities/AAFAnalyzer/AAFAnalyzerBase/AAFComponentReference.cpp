@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFComponentReference.cpp,v 1.4 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFComponentReference.cpp,v 1.5 2007/08/21 14:08:08 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,14 +38,12 @@ namespace aafanalyzer
     
 using namespace boost;
 
-AAFComponentReference::AAFComponentReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild)
-  : Edge(spParent, spChild)
-{
-}
+AAFComponentReference::AAFComponentReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild, Node::LID tag, bool isLast)
+  : Edge(spParent, spChild, (isLast ? Edge::EDGE_KIND_LAST_REFERENCE : Edge::EDGE_KIND_REFERENCE), tag)
+{}
 
 AAFComponentReference::~AAFComponentReference()
-{
-}
+{}
 
 bool AAFComponentReference::Visit(shared_ptr<Visitor> spVisitor)
 {
@@ -60,8 +58,16 @@ bool AAFComponentReference::Visit(shared_ptr<Visitor> spVisitor)
 
 shared_ptr<Edge> AAFComponentReference::CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const
 {
-    shared_ptr<Edge> spNewEdge( new AAFComponentReference( spParent, spChild ) );
+	bool isLast = GetKind() == EDGE_KIND_LAST_REFERENCE ? true : false;
+	shared_ptr<Edge> spNewEdge( new AAFComponentReference( spParent, spChild, GetTag(), isLast) );
     return spNewEdge;
 }
+
+const std::wstring& AAFComponentReference::GetTypeName() const
+{
+  return typeName;
+}
+
+const std::wstring AAFComponentReference::typeName = L"component reference";
 
 } // end of namespace diskstream

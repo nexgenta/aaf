@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RefResolver.h,v 1.10 2005/12/06 16:50:49 ajakowpa Exp $ $Name:  $
+// $Id: RefResolver.h,v 1.11 2007/08/21 14:08:18 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,7 @@ class RefResolver : public Test
 {
  public:
   RefResolver(wostream& os, shared_ptr<const TestGraph> spGraph);
+
   ~RefResolver();
 
   shared_ptr<TestLevelTestResult> Execute();

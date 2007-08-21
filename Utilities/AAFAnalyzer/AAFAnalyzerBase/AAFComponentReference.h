@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFComponentReference.h,v 1.3 2005/11/14 19:46:50 ajakowpa Exp $ $Name:  $
+// $Id: AAFComponentReference.h,v 1.4 2007/08/21 14:08:08 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,11 +31,16 @@ using namespace boost;
 class AAFComponentReference : public Edge
 {
  public:
-  AAFComponentReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild);
+
+  static const std::wstring typeName;
+
+  AAFComponentReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild, Node::LID tag, bool isLast );
   ~AAFComponentReference();
 
   bool Visit(shared_ptr<Visitor> spVisitor);
   virtual shared_ptr<Edge> CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const;
+
+  virtual const std::wstring& GetTypeName() const;
 
  private:
 

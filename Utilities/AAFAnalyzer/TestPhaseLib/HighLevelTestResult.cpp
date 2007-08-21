@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: HighLevelTestResult.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: HighLevelTestResult.cpp,v 1.3 2007/08/21 14:08:34 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,49 +43,11 @@ HighLevelTestResult::HighLevelTestResult()
 
 HighLevelTestResult:: HighLevelTestResult( const wstring& name, 
                                            const wstring& desc,
-                                           const wstring& explain,
-                                           const wstring& docRef,
-                                           Result defaultResult )
-  : TestResult( name, desc, explain, docRef, defaultResult )
+                                           const wstring& explain )
+  : TestResult( name, desc, explain )
 {}
 
 HighLevelTestResult::~HighLevelTestResult()
 {}
-
-void HighLevelTestResult::UpdateRequirementStatus()
-{
-  this->ClearRequirements();
-  //Only update if there are subtests.
-  if (this->ContainsSubtests()) {
-
-    TestResult::SubtestResultVector subResults = this->GetSubtestResults();
-    //Repear for each type of result (PASS, WARN, FAIL) in every subtest.
-    for (unsigned int i = 0; i < subResults.size(); i++) 
-    {
-      for (int curReqLevel = PASS; curReqLevel <= FAIL; curReqLevel++)
-      {
-        //Find all the requirements and loop through them.
-        Requirement::RequirementMap spRequirements = subResults.at(i)->GetRequirements((Result)curReqLevel);           
-        Requirement::RequirementMap::iterator iter;
-        for ( iter = spRequirements.begin(); iter != spRequirements.end(); iter++ )
-        {
-            //If the requirement was already in a map store it in the map with
-            //the worst possible status.  Otherwise, add the requirement to the
-            //map that it is in, in the child subtest.
-            Result oldReqLevel;
-            if ( this->ContainsRequirment( iter->first, oldReqLevel ) ) {
-                if (oldReqLevel < curReqLevel)
-                {
-                    this->RemoveRequirement(iter->first);
-                    this->AddRequirement((Result)curReqLevel, iter->second);
-                }
-            } else {
-                this->AddRequirement((Result)curReqLevel, iter->second);
-            }
-        }
-      }
-    }
-  }
-}
 
 } // end of namespace diskstream

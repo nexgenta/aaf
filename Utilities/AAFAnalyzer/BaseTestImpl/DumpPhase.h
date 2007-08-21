@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DumpPhase.h,v 1.6 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: DumpPhase.h,v 1.7 2007/08/21 14:08:15 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,23 +37,39 @@ using namespace std;
 using namespace boost;
 
 class TestGraph;
+class Node;
 
 class DumpPhase : public TestPhase
 {
  public:
+
+  // Use the root node contained by the TestGraph. Only follow edges
+  // that model contaiment. (i.e. for AAF file this dumps the header
+  // and all contained objects)
   DumpPhase(wostream& os, shared_ptr<const TestGraph> spGraph);
+
+  // Use alternate root node.
+  // This is used to dump the top level composition in an aaf file. It
+  // will configure the visitor to follow references such that the
+  // entire composition graph, including resolved mob references, is
+  // dumped.
+  DumpPhase(wostream& os, shared_ptr<const TestGraph> spGraph, shared_ptr<Node> spRoot);
+
   ~DumpPhase();
 
   shared_ptr<const TestGraph> GetTestGraph();
   shared_ptr<TestPhaseLevelTestResult> Execute();
 
  private:
-  shared_ptr<const TestGraph> _spGraph;
-
   // prohibited
   DumpPhase();
   DumpPhase( const DumpPhase& );
   DumpPhase& operator=( const DumpPhase& );
+
+  shared_ptr<const TestGraph> _spGraph;
+  shared_ptr<Node> _spRoot;
+
+  bool _followReferences;
 };
 
 } // end of namespace diskstream

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LoadPhase.h,v 1.7 2005/10/13 19:33:58 ajakowpa Exp $ $Name:  $
+// $Id: LoadPhase.h,v 1.8 2007/08/21 14:08:17 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,12 +23,16 @@
 
 //Base Test files (included so the application only needs to include the Test
 //Phase and not individual tests in order to register tests).
-#include "FileLoad.h"
-#include "RefResolver.h"
-#include "AcyclicAnalysis.h"
+#include <FileLoad.h>
+#include <RefResolver.h>
+#include <AcyclicAnalysis.h>
+#include <CompMobDependency.h>
 
 //Test/Result files
 #include <TestPhase.h>
+
+//Base files
+#include <Node.h>
 
 //Ax files
 #include <AxTypes.h>
@@ -49,6 +53,14 @@ class LoadPhase : public TestPhase
   shared_ptr<const AAFGraphInfo> GetTestGraphInfo();
   virtual shared_ptr<TestPhaseLevelTestResult> Execute();  
 
+  // Get the (unreferenced) root nodes identified by the dependendency
+  // analysis that is executed at the start of this test phase.
+  vector<shared_ptr<Node> > GetRoots() const;
+
+  // The same set of roots, but returned as as ComMobNodeVector (to
+  // pass on to the EPMobDepPhase).
+  CompMobDependency::CompMobNodeVectorSP GetCompMobRoots();
+
  private:
 
   // prohibited
@@ -58,6 +70,8 @@ class LoadPhase : public TestPhase
 
   shared_ptr<const AAFGraphInfo> _spGraphInfo;
   const basic_string<wchar_t> _FileName;
+
+  CompMobDependency::CompMobNodeVectorSP _spRootsVector;
 };
 
 } // end of namespace diskstream

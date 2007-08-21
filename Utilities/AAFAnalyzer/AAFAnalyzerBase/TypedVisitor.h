@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.h,v 1.8 2005/12/23 19:13:57 ajakowpa Exp $ $Name:  $
+// $Id: TypedVisitor.h,v 1.9 2007/08/21 14:08:10 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,13 +40,21 @@ class AAFSlotReference;
 class TypedVisitor : public Visitor
 {
   public:
+
+    // Default constructor uses the default Visitor construct
+    // (i.e. uses Visitor::FOLLOW_CONTAINED)
     TypedVisitor();
+
+
+    // Specialize the traversal by using this constructor.
+    TypedVisitor( Visitor::Follow_e follow );
+
     virtual ~TypedVisitor();
 
-    virtual bool EdgeVisit(AAFContainment& edge) { return true; }
-    virtual bool EdgeVisit(AAFComponentReference& edge) { return false; }
-    virtual bool EdgeVisit(AAFMobReference& edge) { return false; }
-    virtual bool EdgeVisit(AAFSlotReference& edge) { return false; }
+    virtual bool EdgeVisit(AAFContainment& edge);
+    virtual bool EdgeVisit(AAFComponentReference& edge);
+    virtual bool EdgeVisit(AAFMobReference& edge);
+    virtual bool EdgeVisit(AAFSlotReference& edge);
 
 #include "TypedVisitor.h.gen"
 

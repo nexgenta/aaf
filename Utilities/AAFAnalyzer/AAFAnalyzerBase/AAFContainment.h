@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFContainment.h,v 1.3 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFContainment.h,v 1.4 2007/08/21 14:08:08 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,11 +31,16 @@ using namespace boost;
 class AAFContainment : public Edge
 {
  public:
+
+  static const std::wstring typeName;
+
   AAFContainment(shared_ptr<Node> spParent, shared_ptr<Node> spChild);
   ~AAFContainment();
 
   bool Visit(shared_ptr<Visitor> spVisitor);
-    virtual shared_ptr<Edge> CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const;
+  virtual shared_ptr<Edge> CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const;
+
+  virtual const std::wstring& GetTypeName() const;
 
  private:
 

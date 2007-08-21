@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhaseLevelTestResult.h,v 1.4 2007/08/21 14:08:34 jptrainor Exp $ $Name:  $
+// $Id: DumpVisitor.h,v 1.1 2007/08/21 14:08:16 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -18,40 +18,43 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef __TESTPHASELEVELTESTRESULT_h__
-#define __TESTPHASELEVELTESTRESULT_h__
+#ifndef __DUMPVISITOR_h__
+#define __DUMPVISITOR_h__
 
-//Test/Result files
-#include "HighLevelTestResult.h"
+#include <Visitor.h>
+#include <Edge.h>
+
+//STL files
+#include <string>
+#include <deque>
 
 namespace aafanalyzer {
 
 using namespace std;
-using namespace boost;
 
-class TestLevelTestResult;
-
-class TestPhaseLevelTestResult : public HighLevelTestResult
+class DumpVisitor : public Visitor
 {
  public:
 
-  TestPhaseLevelTestResult();
+  // Uses Visitor::FOLLOW_ALL by default
+  DumpVisitor();
 
-  TestPhaseLevelTestResult( const wstring& name, const wstring& desc,
-                            const wstring& explain );
+  DumpVisitor( Visitor::Follow_e follow );
 
-  virtual ~TestPhaseLevelTestResult();
+  virtual ~DumpVisitor();
+  
+  virtual bool PreOrderVisit(Node& node);
+  virtual bool PostOrderVisit(Node& node);
 
-  void AppendSubtestResult( shared_ptr<TestLevelTestResult> subtestResult );
-
-  const enum ResultLevel GetResultType() const;
+ private:
+  
+  std::wstring LevelToIndent(size_t l);
 
   // prohibited
-  TestPhaseLevelTestResult( const TestPhaseLevelTestResult& );
-  TestPhaseLevelTestResult& operator=( const TestPhaseLevelTestResult& );
-  
+  DumpVisitor( const DumpVisitor& );
+  DumpVisitor& operator=( const DumpVisitor& );
 };
 
 } // end of namespace diskstream
 
-#endif/*__TESTPHASELEVELTESTRESULT_h__*/
+#endif/*__DumpVisitor_h__*/

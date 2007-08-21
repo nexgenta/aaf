@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id$
+// $Id: NodeRefCountVisitor.cpp,v 1.3 2007/08/21 14:08:18 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

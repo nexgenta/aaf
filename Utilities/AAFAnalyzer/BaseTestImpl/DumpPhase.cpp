@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DumpPhase.cpp,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: DumpPhase.cpp,v 1.6 2007/08/21 14:08:15 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -20,6 +20,7 @@
 
 //Base Test files
 #include "DumpPhase.h"
+#include "TestGraph.h"
 
 //Test/Result files
 #include <TestPhaseLevelTestResult.h>
@@ -42,9 +43,18 @@ namespace aafanalyzer
 using namespace std;
 using namespace boost;
 
-DumpPhase::DumpPhase(wostream& os, shared_ptr<const TestGraph> spGraph) 
-: TestPhase(os),
-  _spGraph(spGraph)
+DumpPhase::DumpPhase(wostream& os, shared_ptr<const TestGraph> spGraph)
+  : TestPhase(os),
+    _spGraph(spGraph),
+    _spRoot(spGraph->GetRootNode()),
+    _followReferences(false)
+{}
+
+DumpPhase::DumpPhase(wostream& os, shared_ptr<const TestGraph> spGraph, shared_ptr<Node> spRoot)
+  : TestPhase(os),
+    _spGraph(spGraph),
+    _spRoot(spRoot),
+    _followReferences(true)
 {}
 
 DumpPhase::~DumpPhase()
@@ -62,11 +72,10 @@ shared_ptr<TestPhaseLevelTestResult> DumpPhase::Execute()
   spLoadTest->SetDescription(L"Output the contents of the AAF parse tree.");
 
   //dump the aaf file graph to screen
-  shared_ptr<FileDumper> dumper(new FileDumper(GetOutStream(), GetTestGraph()));
+  shared_ptr<FileDumper> dumper(new FileDumper(GetOutStream(), GetTestGraph(), _spRoot, _followReferences));
   
-  shared_ptr<const TestLevelTestResult> spTestResult( dumper->Execute() );
+  shared_ptr<TestLevelTestResult> spTestResult( dumper->Execute() );
   spLoadTest->AppendSubtestResult(spTestResult);
-  spLoadTest->SetResult(spLoadTest->GetAggregateResult());
 
   return spLoadTest;
 }

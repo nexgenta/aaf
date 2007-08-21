@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.h,v 1.8 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: CompMobDependency.h,v 1.1 2007/08/21 14:08:14 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

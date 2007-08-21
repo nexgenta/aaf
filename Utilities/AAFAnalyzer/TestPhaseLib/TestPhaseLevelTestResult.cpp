@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestPhaseLevelTestResult.cpp,v 1.2 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: TestPhaseLevelTestResult.cpp,v 1.3 2007/08/21 14:08:34 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,52 +43,18 @@ TestPhaseLevelTestResult::TestPhaseLevelTestResult()
   : HighLevelTestResult()
 {}
 
-TestPhaseLevelTestResult:: TestPhaseLevelTestResult( const wstring& name, 
+TestPhaseLevelTestResult:: TestPhaseLevelTestResult( const wstring& name,
                                                      const wstring& desc,
-                                                     const wstring& explain,
-                                                     const wstring& docRef,
-                                                     Result defaultResult )
-  : HighLevelTestResult( name, desc, explain, docRef, defaultResult )
+                                                     const wstring& explain )
+  : HighLevelTestResult( name, desc, explain )
 {}
 
 TestPhaseLevelTestResult::~TestPhaseLevelTestResult()
 {}
 
-void TestPhaseLevelTestResult::AppendSubtestResult( const shared_ptr<const TestLevelTestResult>& subtestResult )
+void TestPhaseLevelTestResult::AppendSubtestResult( shared_ptr<TestLevelTestResult> subtestResult )
 {
-
-    this->AddSubtestResult( subtestResult );
-
-    //Properly set the status of requirements based on the status of the new
-    //child requirements.
-    for (int curReqLevel = PASS; curReqLevel <= FAIL; curReqLevel++)
-    {
-      //Find all the requirements and loop through them.
-      Requirement::RequirementMap requirements = subtestResult->GetRequirements((Result)curReqLevel);
-      Requirement::RequirementMap::iterator iter;
-      for ( iter = requirements.begin(); iter != requirements.end(); iter++ )
-      {
-          //If the requirement was already in a map store it in the map with
-          //the worst possible status.  Otherwise, add the requirement to the
-          //map that it is in, in the child subtest.
-          Result oldReqLevel;
-          if ( this->ContainsRequirment( iter->first, oldReqLevel ) ) {
-              if (oldReqLevel < curReqLevel)
-              {
-                  this->RemoveRequirement(iter->first);
-                  this->AddRequirement((Result)curReqLevel, iter->second);
-              }
-          } else {
-              this->AddRequirement((Result)curReqLevel, iter->second);
-          }
-      }
-    }
-
-    //If the result of the appended test is worse than any other subtest then
-    //update the aggregate result.
-    if ( subtestResult->GetResult() > this->GetAggregateResult() ) {
-        this->SetEnumResult(subtestResult->GetResult());
-    }
+  this->AddSubtestResult( subtestResult );
 }
 
 const enum TestResult::ResultLevel TestPhaseLevelTestResult::GetResultType() const

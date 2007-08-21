@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: HighLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: HighLevelTestResult.h,v 1.4 2007/08/21 14:08:34 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,24 +33,17 @@ class HighLevelTestResult : public TestResult
  public:
 
   virtual ~HighLevelTestResult();
-
-  //This function only needs to be called if direct child test results have
-  //their requirement status modified after they are appended to this test.
-  //Requirements are automatically updated when a subtest is appended,
-  void UpdateRequirementStatus();
   
-  virtual const enum ResultLevel GetResultType() const =0;
+  virtual const enum ResultLevel GetResultType() const = 0;
 
  protected:
   HighLevelTestResult();
   HighLevelTestResult( const wstring& name, const wstring& desc,
-                       const wstring& explain, const wstring& docRef,
-                       Result defaultResult );
+                       const wstring& explain );
 
   // prohibited
   HighLevelTestResult( const HighLevelTestResult& );
   HighLevelTestResult& operator=( const HighLevelTestResult& );
-  
 };
 
 } // end of namespace diskstream

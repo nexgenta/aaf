@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TopLevelTestResult.h,v 1.3 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: TopLevelTestResult.h,v 1.4 2007/08/21 14:08:35 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,18 +36,20 @@ class TopLevelTestResult : public HighLevelTestResult
  public:
 
   TopLevelTestResult();
-  TopLevelTestResult( const wstring& name, const wstring& desc,
-                      const wstring& explain, const wstring& docRef,
-                      Result defaultResult );
-  ~TopLevelTestResult();
 
-  void AppendSubtestResult( const shared_ptr<const TestPhaseLevelTestResult>& subtestResult );
+  TopLevelTestResult( const wstring& name, const wstring& desc,
+                      const wstring& explain );
+
+  virtual ~TopLevelTestResult();
+
+  void AppendSubtestResult( shared_ptr<TestPhaseLevelTestResult> subtestResult );
+
   const enum ResultLevel GetResultType() const;
 
+ private:
   // prohibited
   TopLevelTestResult( const TopLevelTestResult& );
   TopLevelTestResult& operator=( const TopLevelTestResult& );
-  
 };
 
 } // end of namespace diskstream

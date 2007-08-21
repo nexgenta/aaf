@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFContainment.cpp,v 1.4 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFContainment.cpp,v 1.5 2007/08/21 14:08:08 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -22,6 +22,8 @@
 #include "AAFContainment.h"
 #include "TypedVisitor.h"
 
+#include <assert.h>
+
 namespace {
 
 using namespace aafanalyzer;
@@ -39,13 +41,11 @@ namespace aafanalyzer
 using namespace boost;
 
 AAFContainment::AAFContainment(shared_ptr<Node> spParent, shared_ptr<Node> spChild)
-  : Edge(spParent, spChild)
-{
-}
+  : Edge(spParent, spChild, Edge::EDGE_KIND_CONTAINMENT, spParent->GetLID() )
+{}
 
 AAFContainment::~AAFContainment()
-{
-}
+{}
 
 bool AAFContainment::Visit(shared_ptr<Visitor> spVisitor)
 {
@@ -60,8 +60,15 @@ bool AAFContainment::Visit(shared_ptr<Visitor> spVisitor)
 
 shared_ptr<Edge> AAFContainment::CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const
 {
-    shared_ptr<Edge> spNewEdge( new AAFContainment( spParent, spChild ) );
-    return spNewEdge;
+  shared_ptr<Edge> spNewEdge( new AAFContainment( spParent, spChild ) );
+  return spNewEdge;
 }
+
+const std::wstring& AAFContainment::GetTypeName() const
+{
+  return typeName;
+}
+
+const std::wstring AAFContainment::typeName = L"containment";
 
 } // end of namespace diskstream

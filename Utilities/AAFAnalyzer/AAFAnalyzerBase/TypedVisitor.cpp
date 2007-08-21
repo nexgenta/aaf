@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TypedVisitor.cpp,v 1.5 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: TypedVisitor.cpp,v 1.6 2007/08/21 14:08:10 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,11 +39,34 @@ namespace aafanalyzer
 {
 
 TypedVisitor::TypedVisitor()
-{
-}
+  : Visitor()
+{}
+
+TypedVisitor::TypedVisitor( Visitor::Follow_e follow )
+  : Visitor( follow )
+{}
 
 TypedVisitor::~TypedVisitor()
-{ 
+{}
+
+bool TypedVisitor::EdgeVisit(AAFContainment& edge)
+{
+  return Visitor::EdgeVisit(edge);
+}
+
+bool TypedVisitor::EdgeVisit(AAFComponentReference& edge)
+{
+  return Visitor::EdgeVisit(edge);
+}
+
+bool TypedVisitor::EdgeVisit(AAFMobReference& edge)
+{
+  return Visitor::EdgeVisit(edge);
+}
+
+bool TypedVisitor::EdgeVisit(AAFSlotReference& edge)
+{
+  return Visitor::EdgeVisit(edge);
 }
 
 } // end of namespace diskstream

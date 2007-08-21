@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFMobReference.cpp,v 1.4 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFMobReference.cpp,v 1.5 2007/08/21 14:08:09 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,14 +38,12 @@ namespace aafanalyzer
     
 using namespace boost;
 
-AAFMobReference::AAFMobReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild)
-  : Edge(spParent, spChild)
-{
-}
+AAFMobReference::AAFMobReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild, Node::LID tag )
+  : Edge(spParent, spChild, Edge::EDGE_KIND_REFERENCE, tag)
+{}
 
 AAFMobReference::~AAFMobReference()
-{
-}
+{}
 
 bool AAFMobReference::Visit(shared_ptr<Visitor> spVisitor)
 {
@@ -59,9 +57,16 @@ bool AAFMobReference::Visit(shared_ptr<Visitor> spVisitor)
 }
 
 shared_ptr<Edge> AAFMobReference::CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const
-{
-    shared_ptr<Edge> spNewEdge( new AAFMobReference( spParent, spChild ) );
-    return spNewEdge;
+{  
+  shared_ptr<Edge> spNewEdge( new AAFMobReference( spParent, spChild, GetTag() ) );
+  return spNewEdge;
 }
+
+const std::wstring& AAFMobReference::GetTypeName() const
+{
+  return typeName;
+}
+
+const std::wstring AAFMobReference::typeName = L"mob reference";
 
 } // end of namespace diskstream

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.cpp,v 1.4 2007/07/18 05:42:59 jptrainor Exp $
+// $Id: TestRegistry.cpp,v 1.5 2007/08/21 14:08:35 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

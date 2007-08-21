@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: EPDerivationTest.h,v 1.4 2005/10/13 19:33:58 ajakowpa Exp $
+// $Id: EPDerivationTest.h,v 1.5 2007/08/21 14:08:28 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -21,8 +21,8 @@
 #ifndef __EPDerivatinTest_h__
 #define __EPDerivatinTest_h__
 
-//Edit Protocol Test files
-#include "CompMobDependency.h"
+//Base Test files
+#include <CompMobDependency.h>
 
 //Test/Result files
 #include <Test.h>

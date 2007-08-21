@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: Requirement.cpp,v 1.3 2007/07/18 05:42:59 jptrainor Exp $
+// $Id: Requirement.cpp,v 1.4 2007/08/21 14:08:33 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

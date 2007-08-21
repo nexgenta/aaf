@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.5 2006/01/16 19:24:29 jlow Exp $
+// $Id: AcyclicVisitor.h,v 1.6 2007/08/21 14:08:14 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,38 +35,39 @@ using namespace std;
 using namespace boost;
 
 class DetailLevelTestResult;
+class TestLevelTestResult;
 
 class AcyclicVisitor : public Visitor
 {
  public:
 
-  //typedef vector<Node::LID> Vector;
-  typedef vector<shared_ptr<Node> > Vector;
+  AcyclicVisitor(wostream& os,
+		         shared_ptr<TestLevelTestResult> spTestResult);
 
-  AcyclicVisitor(wostream& os);
   virtual ~AcyclicVisitor();
 
   virtual bool PreOrderVisit(Node& node);
   virtual bool PostOrderVisit(Node& node);
 
-  shared_ptr<const DetailLevelTestResult> GetTestResult() const;
-
  private:
  
-  typedef set<Node::LID> Set;
- 
-  bool IsPresent(Node::LID lid);
-  void Erase(Node::LID lid);
-
-  wostream& _os;
-  shared_ptr< DetailLevelTestResult > _spResult;
-  Vector _Vector;
-  Set _Set;
-
   // prohibited
   AcyclicVisitor();
   AcyclicVisitor( const AcyclicVisitor& );
   AcyclicVisitor& operator=( const AcyclicVisitor& );
+
+  bool IsPresent(Node::LID lid);
+  void Erase(Node::LID lid);
+
+  //typedef vector<Node::LID> Vector;
+  typedef vector<shared_ptr<Node> > NodeVector;
+  typedef set<Node::LID> NodeSet;
+ 
+  NodeVector _nodeVector;
+  NodeSet _nodeSet;
+
+  wostream& _os;
+  shared_ptr<TestLevelTestResult> _spTestResult;
 };
 
 } // end of namespace diskstream

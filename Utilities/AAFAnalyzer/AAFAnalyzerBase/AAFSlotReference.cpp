@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFSlotReference.cpp,v 1.4 2005/11/14 19:46:50 ajakowpa Exp $
+// $Id: AAFSlotReference.cpp,v 1.5 2007/08/21 14:08:09 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,8 +38,8 @@ namespace aafanalyzer
 
 using namespace boost;
 
-AAFSlotReference::AAFSlotReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild)
-  : Edge(spParent, spChild)
+AAFSlotReference::AAFSlotReference(shared_ptr<Node> spParent, shared_ptr<Node> spChild, Node::LID tag)
+  : Edge(spParent, spChild, Edge::EDGE_KIND_REFERENCE, tag)
 {
 }
 
@@ -60,8 +60,15 @@ bool AAFSlotReference::Visit(shared_ptr<Visitor> spVisitor)
 
 shared_ptr<Edge> AAFSlotReference::CreateNewEdge( shared_ptr<Node> spParent, shared_ptr<Node> spChild ) const
 {
-    shared_ptr<Edge> spNewEdge( new AAFSlotReference( spParent, spChild ) );
-    return spNewEdge;
+  shared_ptr<Edge> spNewEdge( new AAFSlotReference( spParent, spChild, GetTag() ) );
+  return spNewEdge;
 }
+
+const wstring& AAFSlotReference::GetTypeName() const
+{
+  return typeName;
+}
+
+const wstring AAFSlotReference::typeName = L"slot reference";
 
 } // end of namespace diskstream
