@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.h,v 1.19 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.h,v 1.20 2007/08/21 06:20:07 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -186,6 +186,28 @@ AxString AxNameToString( IAAFSmartPointer< Type >& sp, const AxString& defaul )
 			throw;
 		}
 	}
+}
+
+
+template <class Type>
+std::pair<bool,AxString> AxExistsNameToString( IAAFSmartPointer< Type >& sp )
+{
+	std::pair<bool,AxString> result(false,L"");
+
+  try
+  {
+    result.second = AxNameToString<Type>(sp);
+    result.first = true;
+  }
+  catch ( const AxExHResult& ex )
+  {
+    if ( AAFRESULT_PROP_NOT_PRESENT != ex.getHResult() )
+    {
+      throw;
+    }
+  }
+
+  return result;
 }
 
 AxString AxTaggedValueToString( IAAFTaggedValueSP& sp );

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMobSlot.h,v 1.12 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
+// $Id: AxMobSlot.h,v 1.13 2007/08/21 06:20:07 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,9 @@ public:
 	void SetSlotID( aafSlotID_t val );
 
 	AxString GetName();
-	AxString GetName( const AxString& deafault );
+	AxString GetName( const AxString& defaul );
+	std::pair<bool,AxString> ExistsName();
+
 	IAAFSegmentSP GetSegment();
 	aafUInt32 GetPhysicalNum();
 	aafSlotID_t GetSlotID();

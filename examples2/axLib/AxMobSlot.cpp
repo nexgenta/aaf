@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMobSlot.cpp,v 1.13 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
+// $Id: AxMobSlot.cpp,v 1.14 2007/08/21 06:20:07 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -59,6 +59,11 @@ AxString AxMobSlot::GetName()
 AxString AxMobSlot::GetName( const AxString& defaul )
 {
 	return AxNameToString< IAAFMobSlot >( _spIaafMobSlot, defaul );
+}
+
+std::pair<bool,AxString> AxMobSlot::ExistsName()
+{
+  return AxExistsNameToString< IAAFMobSlot >( _spIaafMobSlot );
 }
 
 aafUInt32 AxMobSlot::GetPhysicalNum()
