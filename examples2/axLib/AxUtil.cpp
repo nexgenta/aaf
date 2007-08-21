@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.21 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.22 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,8 @@ const aafMobID_t AxConstants::NULL_MOBID  =  { {0,0,0,0,0,0,0,0,0,0,0,0}, // SMP
 					       0, // instanceLow
 					       { 0, 0, 0, {0,0,0,0,0,0,0,0} } // material (uuid) 
                                              };
+
+const aafUID_t AxConstants::NULL_UID = {0,0,0,{0,0,0,0,0,0,0,0}};
 
 //=---------------------------------------------------------------------=
 

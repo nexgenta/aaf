@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxTypes.h,v 1.13 2004/10/27 14:07:17 stuart_hc Exp $ $Name:  $
+// $Id: AxTypes.h,v 1.14 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -163,7 +163,6 @@ private:
 	mutable std::auto_ptr<T> _ptr;
 	int _size;
 };
-
 
 #endif
 
