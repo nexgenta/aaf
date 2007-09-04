@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.h,v 1.6 2007/08/21 14:08:19 jptrainor Exp $
+// $Id: ResolveRefVisitor.h,v 1.7 2007/09/04 17:28:23 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -66,7 +66,7 @@ class ResolveRefVisitor : public TypedVisitor
 					 IAAFMobSP spParentIaafMob,
 					 const aafSlotID_t slotId );
 
-  shared_ptr<vector<shared_ptr<Node> > > GetChildComponents( shared_ptr<Node> spMobSlotNode );
+  shared_ptr<vector<shared_ptr<Node> > > GetContainedChildComponents( shared_ptr<Node> spMobSlotNode );
 
   wostream& _os;
   shared_ptr<EdgeMap> _spEdgeMap;
