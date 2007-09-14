@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.cpp,v 1.8 2007/08/21 14:08:35 jptrainor Exp $
+// $Id: TestResult.cpp,v 1.9 2007/09/14 15:40:14 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -262,6 +262,11 @@ void TestResult::ConsolidateResults()
     this->ClearRequirements();
   }
 
+  // This exists to provide TestLevelTestResult an opportunity to
+  // initialize its set of passing requirements to those of the
+  // associated test (i.e. they are assumed to all pass). These are
+  // updated to reflect failed requires when the DetelLevelTestResults
+  // (i.e. sub results) are consolidated.
   this->InitConsolidateResults();
 
   for( SubtestResultVector::iterator iter = _spSubtestResults->begin();

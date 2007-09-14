@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicAnalysis.h,v 1.8 2005/10/18 17:02:42 ajakowpa Exp $ $Name:  $
+// $Id: AcyclicAnalysis.h,v 1.9 2007/09/14 15:40:01 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -46,12 +46,16 @@ class AcyclicAnalysis : public Test
   AxString GetDescription() const;
   static const TestInfo GetTestInfo();
 
+  bool IsCyclic() const;
+
  private:
 
   // prohibited
   AcyclicAnalysis();
   AcyclicAnalysis(const AcyclicAnalysis&);
   AcyclicAnalysis& operator=( const AcyclicAnalysis& );
+
+  bool _isCyclic;
 };
 
 } // end of namespace diskstream

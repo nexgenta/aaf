@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicVisitor.h,v 1.6 2007/08/21 14:08:14 jptrainor Exp $
+// $Id: AcyclicVisitor.h,v 1.7 2007/09/14 15:40:01 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,12 +42,14 @@ class AcyclicVisitor : public Visitor
  public:
 
   AcyclicVisitor(wostream& os,
-		         shared_ptr<TestLevelTestResult> spTestResult);
+		 shared_ptr<TestLevelTestResult> spTestResult);
 
   virtual ~AcyclicVisitor();
 
   virtual bool PreOrderVisit(Node& node);
   virtual bool PostOrderVisit(Node& node);
+
+  bool IsCycleDetected() const;
 
  private:
  
@@ -56,8 +58,7 @@ class AcyclicVisitor : public Visitor
   AcyclicVisitor( const AcyclicVisitor& );
   AcyclicVisitor& operator=( const AcyclicVisitor& );
 
-  bool IsPresent(Node::LID lid);
-  void Erase(Node::LID lid);
+  void CreateCycleTestResult();
 
   //typedef vector<Node::LID> Vector;
   typedef vector<shared_ptr<Node> > NodeVector;
@@ -68,6 +69,9 @@ class AcyclicVisitor : public Visitor
 
   wostream& _os;
   shared_ptr<TestLevelTestResult> _spTestResult;
+
+  int _level;
+  bool _cycleDetected;
 };
 
 } // end of namespace diskstream

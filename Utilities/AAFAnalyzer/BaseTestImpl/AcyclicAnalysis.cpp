@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AcyclicAnalysis.cpp,v 1.9 2007/08/21 14:08:13 jptrainor Exp $
+// $Id: AcyclicAnalysis.cpp,v 1.10 2007/09/14 15:40:00 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,14 +53,14 @@ using namespace std;
 using namespace boost;
 
 AcyclicAnalysis::AcyclicAnalysis(wostream& os, shared_ptr<const TestGraph> spGraph)
-: Test(os, GetTestInfo())
+  : Test(os, GetTestInfo()),
+    _isCyclic(false)
 {
   SetTestGraph(spGraph);
 }
 
 AcyclicAnalysis::~AcyclicAnalysis()
-{
-}
+{}
 
 shared_ptr<TestLevelTestResult> AcyclicAnalysis::Execute()
 {
@@ -70,6 +70,8 @@ shared_ptr<TestLevelTestResult> AcyclicAnalysis::Execute()
   DepthFirstTraversal dfs(GetTestGraph()->GetEdgeMap(), GetTestGraph()->GetRootNode());
 
   dfs.TraverseDown(spVisitor, GetTestGraph()->GetRootNode()); 
+
+  _isCyclic = spVisitor->IsCycleDetected();
   
   return spTestResult;
 }
@@ -94,6 +96,11 @@ const TestInfo AcyclicAnalysis::GetTestInfo()
     spReqIds->push_back(L"REQ_EP_256");  
 
     return TestInfo(L"AcyclicAnalysis", spReqIds);
+}
+
+bool AcyclicAnalysis::IsCyclic() const
+{
+  return _isCyclic;
 }
 
 } // end of namespace aafanalyzer

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestLevelTestResult.cpp,v 1.3 2007/08/21 14:08:34 jptrainor Exp $
+// $Id: TestLevelTestResult.cpp,v 1.4 2007/09/14 15:40:14 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,7 +49,9 @@ using namespace boost;
 
 TestLevelTestResult::TestLevelTestResult( const shared_ptr<const Test> associatedTest )
   : LowLevelTestResult( associatedTest )
-{}
+{
+  ProtectedSetResult(PASS);
+}
 
 TestLevelTestResult::TestLevelTestResult( const wstring& name,
                                           const wstring& desc,
@@ -58,14 +60,16 @@ TestLevelTestResult::TestLevelTestResult( const wstring& name,
                                           const shared_ptr<const Test> associatedTest )
   : LowLevelTestResult( associatedTest, name, desc, explain )
 {
-  this->ProtectedSetResult(result);
+  ProtectedSetResult(result);
 }
 
 TestLevelTestResult::TestLevelTestResult( const wstring& name,
                                           const wstring& desc,
                                           const shared_ptr<const Test> associatedTest )
   : LowLevelTestResult( associatedTest, name, desc, L"" )
-{}
+{
+  ProtectedSetResult(PASS);
+}
 
 TestLevelTestResult::~TestLevelTestResult()
 {}
@@ -113,12 +117,18 @@ void TestLevelTestResult::InitConsolidateResults()
 {
   const Requirement::RequirementMap& coveredReqs = GetAssociatedTest()->GetCoveredRequirements();
 
+  // We start by with each test requirement assigned a PASS result.
+  // If/when the individual test add PASS detail results explicitely
+  // then this will have to be removed.
   for( Requirement::RequirementMap::const_iterator iter = coveredReqs.begin();
        iter != coveredReqs.end();
        ++iter )
   {
     this->AddRequirement( PASS, iter->second );
   }
+
+  // And set the overall result to pass.
+  ProtectedSetResult( PASS );
 }
 
 } // end of namespace diskstream
