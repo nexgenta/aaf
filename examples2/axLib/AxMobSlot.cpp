@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMobSlot.cpp,v 1.14 2007/08/21 06:20:07 jptrainor Exp $ $Name:  $
+// $Id: AxMobSlot.cpp,v 1.15 2007/09/16 13:56:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -73,6 +73,24 @@ aafUInt32 AxMobSlot::GetPhysicalNum()
 	CHECK_HRESULT( _spIaafMobSlot->GetPhysicalNum( &num ) );
 
 	return num;
+}
+
+std::pair<bool,aafUInt32> AxMobSlot::ExistsPhysicalNum()
+{
+  std::pair<bool,aafUInt32> num(true,0);
+
+  AAFRESULT hr = _spIaafMobSlot->GetPhysicalNum( &num.second );
+
+  if ( hr == AAFRESULT_PROP_NOT_PRESENT )
+  {
+    num.first = false;
+  }
+  else
+  {
+    CHECK_HRESULT( hr );
+  }
+
+  return num;
 }
 
 aafSlotID_t AxMobSlot::GetSlotID()
@@ -228,6 +246,25 @@ aafPosition_t AxTimelineMobSlot::GetUserPos()
 
     return pos;
 }
+
+std::pair<bool,aafPosition_t> AxTimelineMobSlot::ExistsUserPos()
+{
+	std::pair<bool,aafPosition_t> pos(true,0);
+
+	AAFRESULT hr = _spIaafTimelineMobSlot->GetUserPos( &pos.second );
+	
+	if ( hr == AAFRESULT_PROP_NOT_PRESENT )
+	{
+		pos.first = false;
+	}
+	else
+	{
+		CHECK_HRESULT( hr );
+	}
+
+	return pos;
+}
+
 
 //=---------------------------------------------------------------------=
 
