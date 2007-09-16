@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestRegistry.cpp,v 1.5 2007/08/21 14:08:35 jptrainor Exp $
+// $Id: TestRegistry.cpp,v 1.6 2007/09/16 15:04:43 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,14 +114,17 @@ void TestRegistry::Register( const TestInfo& info )
                     shared_ptr<const Requirement> unsafeReq(
                         new Requirement(id,
                                         Requirement::FILE,
-										L"file",
+					L"file",
                                         Requirement::ADHOC,
-										L"adhoc",
-                                        L"Unsafe Requirement",
-                                        L"This Requirement ID does not exist in the requirements file",
-                                        L"None",
-                                        L"N/A",
-                                        L"N/A" ) );
+					L"adhoc",
+					L"",                                                             // action
+                                        L"Unsafe Requirement",                                           // name
+                                        L"This Requirement ID does not exist in the requirements file",  // desc
+					L"",                                                             // annotation
+					L"",                                                             // note
+                                        L"None",                                                         // document
+                                        L"N/A",                                                          // document version
+                                        L"N/A" ) );                                                      // document section
                     if ( coveredByTest->find(id) == coveredByTest->end() )
                     {
                         (*coveredByTest)[id] = unsafeReq;

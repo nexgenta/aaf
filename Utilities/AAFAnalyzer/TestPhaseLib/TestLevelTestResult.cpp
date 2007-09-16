@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestLevelTestResult.cpp,v 1.4 2007/09/14 15:40:14 jptrainor Exp $
+// $Id: TestLevelTestResult.cpp,v 1.5 2007/09/16 15:04:36 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -124,10 +124,11 @@ void TestLevelTestResult::InitConsolidateResults()
        iter != coveredReqs.end();
        ++iter )
   {
-    this->AddRequirement( PASS, iter->second );
+    this->AddRequirement( COVERED, iter->second );
   }
 
-  // And set the overall result to pass.
+  // And set the overall result to pass. If any test add WARN, or
+  // FAIL, results this will be reset.
   ProtectedSetResult( PASS );
 }
 

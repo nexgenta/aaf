@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.h,v 1.9 2007/08/21 14:08:35 jptrainor Exp $ $Name:  $
+// $Id: TestResult.h,v 1.10 2007/09/16 15:04:47 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,11 +45,11 @@ class TestResult
   typedef vector< shared_ptr<TestResult> > SubtestResultVector;
   typedef shared_ptr<SubtestResultVector> SubtestResultsSP;
 
-  // The actual test result.  UNDEFINED is the default result when
-  // no result value is provided by the constructor.
-  // Once all processing has completed and the results are considated no
-  // TestResult instance should be left in an undefined result value.
-  enum Result      {UNDEFINED, PASS, WARN, FAIL};
+  // The actual test result.  UNDEFINED is the default result when no
+  // result value is provided by the constructor.  The left most
+  // (minimum value) should always be UNDEFINED, and the rightmost
+  // (maxium value) should alwasy be FAIL.
+  enum Result      {UNDEFINED, COVERED, NOTED, PASS, WARN, FAIL};
 
   // The specialized type of this result.
   enum ResultLevel {TOP, PHASE, TEST, DETAIL};
@@ -161,6 +161,8 @@ class TestResult
  
   SubtestResultsSP _spSubtestResults; 
   
+  const Requirement::RequirementMapSP _spCoveredRequirements;
+  const Requirement::RequirementMapSP _spNotedRequirements;
   const Requirement::RequirementMapSP _spPassedRequirements;
   const Requirement::RequirementMapSP _spWarnedRequirements;
   const Requirement::RequirementMapSP _spFailedRequirements;

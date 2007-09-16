@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: RequirementLoader.h,v 1.6 2007/08/21 14:08:34 jptrainor Exp $ $Name:  $
+// $Id: RequirementLoader.h,v 1.7 2007/09/16 15:04:35 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,8 +58,11 @@ public:
         TypeAsString(),
         Category(Requirement::CAT_UNDEFINED),
         CategoryAsString(),
+        Action(),
         Name(),
         Desc(),
+        Annotate(),
+        Note(),
         Document(),
         Version(),
         Section()
@@ -72,8 +75,11 @@ public:
       wstring TypeAsString;
       Requirement::Category Category;
       wstring CategoryAsString;
+      wstring Action;
       wstring Name;
       wstring Desc;
+      wstring Annotate;
+      wstring Note;
       wstring Document;
       wstring Version;
       wstring Section;
