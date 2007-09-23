@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMob.cpp,v 1.14 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
+// $Id: AxMob.cpp,v 1.15 2007/09/23 11:33:11 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -157,6 +157,24 @@ aafUID_t AxMob::GetUsageCode( const aafUID_t& defaul )
   }
 
   CHECK_HRESULT(hr);
+
+  return usageCode;
+}
+
+std::pair<bool,aafUID_t> AxMob::ExistsUsageCode()
+{
+  std::pair<bool,aafUID_t> usageCode(false, AxConstants::NULL_UID);
+
+  const AAFRESULT hr = _spIaafMob->GetUsageCode( &usageCode.second );
+
+  if ( AAFRESULT_PROP_NOT_PRESENT == hr )
+  {
+    return usageCode;
+  }
+
+  CHECK_HRESULT(hr);
+
+  usageCode.first = true;
 
   return usageCode;
 }

@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxMob.h,v 1.15 2007/08/21 05:11:30 jptrainor Exp $ $Name:  $
+// $Id: AxMob.h,v 1.16 2007/09/23 11:33:11 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -70,6 +70,7 @@ public:
 	void SetUsageCode( const aafUID_t& usageCode );
 	aafUID_t GetUsageCode();
 	aafUID_t GetUsageCode( const aafUID_t& defaul );
+	std::pair<bool,aafUID_t> ExistsUsageCode();
 
 	inline operator IAAFMobSP ()
 	{ return AxQueryInterface<IAAFMob2,IAAFMob>( _spIaafMob ); }
