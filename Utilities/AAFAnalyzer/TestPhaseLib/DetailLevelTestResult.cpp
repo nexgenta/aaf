@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.cpp,v 1.6 2007/08/21 14:08:34 jptrainor Exp $
+// $Id: DetailLevelTestResult.cpp,v 1.7 2007/09/23 14:13:49 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -99,11 +99,13 @@ void DetailLevelTestResult::SetResult( const wstring& reqId, Result result )
     if ( reqCount )
     {
       Result containedIn = UNDEFINED;
+
       assert( this->ContainsRequirement( reqId, containedIn ) );
 
       // .. and the map it is stored in should match the individual
       // result value for this object.
       assert( containedIn == this->GetResult() );
+      (void)containedIn;
     }
   }
 

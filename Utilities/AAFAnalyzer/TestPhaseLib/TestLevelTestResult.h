@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestLevelTestResult.h,v 1.4 2007/08/21 14:08:34 jptrainor Exp $ $Name:  $
+// $Id: TestLevelTestResult.h,v 1.5 2007/09/23 14:13:49 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,6 +60,8 @@ class TestLevelTestResult : public LowLevelTestResult
   const enum ResultLevel GetResultType() const;
 
   // Add a single result for one requirement.
+  // DEPRECATED - use the version below that doesn't take result
+  // name/desc arguments.
   shared_ptr<DetailLevelTestResult> AddSingleResult( const wstring& reqId,
 						     Result result,
 						     const wstring& resultName,
