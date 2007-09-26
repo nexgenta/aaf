@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.cpp,v 1.96 2007/07/13 18:15:47 philipn Exp $ $Name:  $
+// $Id: OMProperty.cpp,v 1.97 2007/09/26 15:34:46 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -51,7 +51,11 @@ OMProperty::OMProperty(const OMPropertyId propertyId,
   _name(name),
   _propertySet(0),
   _definition(0),
+#if 0 // HACK4MEIP2
+  _isOptional(true),
+#else
   _isOptional(false),
+#endif
   _isPresent(false)
 {
   TRACE("OMProperty::OMProperty");
