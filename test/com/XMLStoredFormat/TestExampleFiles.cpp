@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestExampleFiles.cpp,v 1.4 2007/08/08 17:25:20 philipn Exp $ $Name:  $
+// $Id: TestExampleFiles.cpp,v 1.5 2007/11/05 04:03:50 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,8 +71,9 @@ int testExampleFiles()
             saveCopy(exampleFiles[i], L"tmp.xml");
             if (diff(exampleFiles[i], L"tmp.xml"))
             {
-                printf("FAILED\n");
+                printf("%ls <-> %ls FAILED\n", exampleFiles[i], L"tmp.xml");
                 thisFilePassed = false;
+				exit(1);
             }
             else
             {
