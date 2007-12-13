@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: dumper.cpp,v 1.53 2007/11/05 06:06:11 stuart_hc Exp $ $Name:  $
+// $Id: dumper.cpp,v 1.54 2007/12/13 05:27:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -448,18 +448,20 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 				checkResult(pTDI->GetInteger(pPVal, (aafMemPtr_t) &val, sizeof (val)));
 				
 				os << "value: ";
-				aafInt32 hi = (aafUInt32) ((val & AAFCONSTINT64(0xffffffff00000000)) >> 32);
+				// Display small (<= 0x7fffffff) positive aafInt64 numbers without filling
+				// while all other numbers are displayed filled to 16 hex digits.
+				aafInt32 hi = (aafUInt32) (val >> 32);
 				aafInt32 lo = (aafInt32) val & 0xffffffff;
-				if (hi && ((hi != ~0) || (lo >= 0)))
+				if (hi || lo < 0)
 				{
-					int width = os.width();
-					char fill = os.fill();
+					char fill = os.fill();		// save stream fill setting
 					os << hex << "0x";
 					os.width(8);
 					os.fill('0');
-					os << hi << lo;
-					os.width(width);
-					os.fill(fill);
+					os << hi;
+					os.width(8);
+					os << lo;
+					os.fill(fill);				// restore fill setting
 				}
 				else
 				{
