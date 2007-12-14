@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.236 2007/12/14 17:16:56 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.237 2007/12/14 19:58:54 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -88,6 +88,10 @@
 OMKLVKey metaDictionaryKey =
   {0x8A, 0xE5, 0x95, 0x9D, 0x57, 0xB3, 0xDA, 0x33,
    0x8A, 0x5F, 0xB4, 0x11, 0x4D, 0x66, 0x4B, 0x40};
+
+// {0D010101-0300-0000-060E-2B3402060101}
+const OMClassId SMPTERootClassId =
+{0x0d010101, 0x0300, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
 
   // @mfunc Open the root <c OMKLVStoredObject> in the raw storage
   //        <p rawStorage> for reading only.
@@ -825,7 +829,8 @@ OMRootStorable* OMKLVStoredObject::restore(OMFile& file)
   root->setStore(file.rootStore());
   root->setClassFactory(metaDictionary);
   // HACK4MEIP2
-  if (cid == OMRootStorable::_rootClassId) {
+  if (cid == OMRootStorable::_rootClassId ||
+      cid == SMPTERootClassId) {
     flatRestore(*root->propertySet());
     _storage->removeObject(*root);
     // restore the meta object directory
