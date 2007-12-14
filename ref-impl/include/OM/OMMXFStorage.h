@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.h,v 1.161 2007/03/20 18:54:21 akharkev Exp $ $Name:  $
+// $Id: OMMXFStorage.h,v 1.162 2007/12/14 16:24:16 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -421,6 +421,8 @@ public:
   virtual void restoreObjectDirectory(OMUInt64 headerOffset);
 
   virtual void setObjectDirectoryOffset(OMUInt64 objectDirectoryOffset);
+
+  virtual OMUInt64 objectDirectoryOffset(void) const;
 
   virtual OMUInt32 addStream(OMDataStream* stream);
 

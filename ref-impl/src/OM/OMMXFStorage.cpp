@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMXFStorage.cpp,v 1.235 2007/08/03 16:34:15 phil_tudor Exp $ $Name:  $
+// $Id: OMMXFStorage.cpp,v 1.236 2007/12/14 16:24:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1558,6 +1558,12 @@ void OMMXFStorage::setObjectDirectoryOffset(OMUInt64 objectDirectoryOffset)
 {
   TRACE("OMMXFStorage::setObjectDirectoryOffset");
   _objectDirectoryOffset = objectDirectoryOffset;
+}
+
+OMUInt64 OMMXFStorage::objectDirectoryOffset(void) const
+{
+  TRACE("OMMXFStorage::objectDirectoryOffset");
+  return _objectDirectoryOffset;
 }
 
 OMMXFStorage::ObjectDirectory* OMMXFStorage::instanceIdToObject(void)
