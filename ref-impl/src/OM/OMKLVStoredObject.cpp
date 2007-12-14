@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObject.cpp,v 1.237 2007/12/14 19:58:54 akharkev Exp $ $Name:  $
+// $Id: OMKLVStoredObject.cpp,v 1.238 2007/12/14 20:07:00 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,6 +82,9 @@
 // If defined, OM_SAVEOBJECTDIRECTORY causes Object Directory
 // to be written to a file.
 #define OM_SAVEOBJECTDIRECTORY 1
+// If defined, OM_WRITELEGACYROOTCLASSID causes the SMPTE Root class ID
+// to be written to a file, otherwise the internal legacy GUID is used.
+#define OM_WRITELEGACYROOTCLASSID 1
 
 #include "OMTypeVisitor.h"
 
@@ -460,7 +463,13 @@ void OMKLVStoredObject::save(OMStorable& object)
   OMUInt64 position = _storage->position();
   _storage->enterObject(object, position);
 
-  save(object.classId());
+  OMClassId classId = object.classId();
+#if !defined (OM_WRITELEGACYROOTCLASSID)
+  if (classId == OMRootStorable::_rootClassId) {
+    classId = SMPTERootClassId;
+  }
+#endif
+  save(classId);
   save(*object.propertySet());
 }
 
