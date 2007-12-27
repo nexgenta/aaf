@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MXFDump.cpp,v 1.785 2007/08/03 16:34:15 phil_tudor Exp $ $Name:  $
+// $Id: MXFDump.cpp,v 1.786 2007/12/27 23:39:21 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -2369,6 +2369,9 @@ struct AAFKey {
   {"Root", NULLMXFKEY,
 // {B3B398A5-1C90-11d4-8053-080036210804}
 {0xb3b398a5, 0x1c90, 0x11d4,{0x80, 0x53, 0x08, 0x00, 0x36, 0x21, 0x08, 0x04}}},
+  {"Root", NULLMXFKEY,
+// {0D010101-0300-0000-060E-2B3402060101}
+{0x0d010101, 0x0300, 0x0000,{0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}}},
   //
   {"AAFMPEG2VideoDescriptor", NULLMXFKEY,
 // {0D010101-0101-5100-060E-2B3402060101}
