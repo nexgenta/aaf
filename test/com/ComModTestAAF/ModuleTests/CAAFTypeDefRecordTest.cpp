@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefRecordTest.cpp,v 1.22 2008/01/16 20:26:30 heydowns Exp $ $Name:  $
+// $Id: CAAFTypeDefRecordTest.cpp,v 1.23 2008/01/21 19:12:18 heydowns Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -766,8 +766,10 @@ static HRESULT ReadRecord (const aafWChar * pFileName, int loadingMode)
            * register own offsets/layout. This is slated for fixing in
            * future rev of the SDK.
            */
-	  if (temphr == AAFRESULT_DEFAULT_ALREADY_USED)
-	      throw AAFRESULT_SUCCESS;
+	  if (temphr == AAFRESULT_DEFAULT_ALREADY_USED) {
+	      temphr = AAFRESULT_SUCCESS;
+	      throw temphr;
+	  }
 
 	  checkResult (temphr);
 
