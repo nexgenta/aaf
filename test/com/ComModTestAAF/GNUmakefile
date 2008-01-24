@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.15 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.16 2008/01/24 08:37:07 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -75,7 +75,7 @@ realclean : clean
 
 
 .PHONY : check
-check : $(AAFSDKBINDIR)/ComModAAF$(EXE)
+check : all
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
 
