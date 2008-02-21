@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObject.cpp,v 1.46 2007/08/07 17:20:54 philipn Exp $
+// $Id: OMXMLStoredObject.cpp,v 1.47 2008/02/21 03:53:33 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1689,17 +1689,27 @@ OMXMLStoredObject::saveEnum(const OMByte* internalBytes, OMUInt32 internalSize,
     OMInt64 value = 0;
     switch (internalSize)
     {
+        // Since internalBytes may not be aligned to a suitable boundary
+        // the memcpy's below are used to force correct alignment.
+        // This is necessary to avoid SIGBUS BUS_ADRALN errors under SparcSolaris.
+
         case sizeof(OMInt8):
             value = (OMInt64)*((OMInt8*)internalBytes);
             break;
         case sizeof(OMInt16):
-            value = (OMInt64)*((OMInt16*)internalBytes);
+            OMInt16 tmp16;
+            memcpy(&tmp16, internalBytes, internalSize);    // force correct alignment
+            value = (OMInt64)tmp16;
             break;
         case sizeof(OMInt32):
-            value = (OMInt64)*((OMInt32*)internalBytes);
+            OMInt32 tmp32;
+            memcpy(&tmp32, internalBytes, internalSize);    // force correct alignment
+            value = (OMInt64)tmp32;
             break;
         case sizeof(OMInt64):
-            value = (OMInt64)*((OMInt64*)internalBytes);
+            OMInt64 tmp64;
+            memcpy(&tmp64, internalBytes, internalSize);    // force correct alignment
+            value = (OMInt64)tmp64;
             break;
         default:
             ASSERT("Valid integer size", false);
