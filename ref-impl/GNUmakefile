@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.9 2007/04/12 17:11:41 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.10 2008/02/21 03:55:03 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,7 @@ clean :
 	cd aaflib && $(MAKE) GENDEPS=0 $@
 	cd aafiid && $(MAKE) GENDEPS=0 $@
 	cd src && $(MAKE) GENDEPS=0 $@
+	cd expat && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
@@ -50,3 +51,4 @@ realclean :
 	cd aaflib && $(MAKE) GENDEPS=0 $@
 	cd aafiid && $(MAKE) GENDEPS=0 $@
 	cd src && $(MAKE) GENDEPS=0 $@
+	cd expat && $(MAKE) GENDEPS=0 $@
