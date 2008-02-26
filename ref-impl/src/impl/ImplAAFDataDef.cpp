@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFDataDef.cpp,v 1.25 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFDataDef.cpp,v 1.26 2008/02/26 05:43:22 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -216,9 +216,9 @@ AAFRESULT ImplAAFDataDef::IsDataDefEquivalentOf (
 			aafBool	argIsTimecode = kAAFFalse;
 			CHECK(pDataDef->IsTimecodeKind (&argIsTimecode));
 
-			if((thisIsPicture == kAAFTrue) && (argIsPicture == kAAFTrue)
-					|| (thisIsSound == kAAFTrue) && (argIsSound == kAAFTrue)
-					|| (thisIsTimecode == kAAFTrue) && (argIsTimecode == kAAFTrue))
+			if(((thisIsPicture == kAAFTrue) && (argIsPicture == kAAFTrue))
+					|| ((thisIsSound == kAAFTrue) && (argIsSound == kAAFTrue))
+					|| ((thisIsTimecode == kAAFTrue) && (argIsTimecode == kAAFTrue)))
 				result = kAAFTrue;
 		}
 

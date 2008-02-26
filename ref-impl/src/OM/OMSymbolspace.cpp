@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.cpp,v 1.2 2007/03/26 16:00:55 philipn Exp $ $Name:  $
+// $Id: OMSymbolspace.cpp,v 1.3 2008/02/26 05:43:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -942,8 +942,8 @@ OMSymbolspace::registerDeferredDefs(OMDictionary* dictionary)
             count = dependencies->count();
             for (j = 0; j < count; j++)
             {
-                if (typeForReg->dependsOnAType() && !dictionary->registerTypeDef(dependencies->getAt(j)) ||
-                    !typeForReg->dependsOnAType() && !dictionary->registerClassDef(dependencies->getAt(j)))
+                if ((typeForReg->dependsOnAType() && !dictionary->registerTypeDef(dependencies->getAt(j))) ||
+                    (!typeForReg->dependsOnAType() && !dictionary->registerClassDef(dependencies->getAt(j))))
                 {
                     dependenciesSatified = false;
                     break;
@@ -953,8 +953,8 @@ OMSymbolspace::registerDeferredDefs(OMDictionary* dictionary)
         else
         {
             dependenciesSatified = true;
-            if (typeForReg->dependsOnAType() && !dictionary->registerTypeDef(*typeForReg->dependsOn()) ||
-                !typeForReg->dependsOnAType() && !dictionary->registerClassDef(*typeForReg->dependsOn()))
+            if ((typeForReg->dependsOnAType() && !dictionary->registerTypeDef(*typeForReg->dependsOn())) ||
+                (!typeForReg->dependsOnAType() && !dictionary->registerClassDef(*typeForReg->dependsOn())))
             {
                 dependenciesSatified = false;
             }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObject.cpp,v 1.16 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
+// $Id: OMSSStoredObject.cpp,v 1.17 2008/02/26 05:43:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -146,8 +146,8 @@ OMSSStoredObject* OMSSStoredObject::open(IStorage *in_storage, OMFile::OMAccessM
   HRESULT status = in_storage->Stat(&statstg, STATFLAG_NONAME);
   checkStatus(status);
   PRECONDITION ("Valid root storage access mode: ", 
-  		((mode == OMFile::modifyMode && (statstg.grfMode & (STGM_READWRITE)) ||
-		(mode == OMFile::readOnlyMode && (statstg.grfMode & STGM_READ) == 0))));
+  		((mode == OMFile::modifyMode && (statstg.grfMode & (STGM_READWRITE))) ||
+		(mode == OMFile::readOnlyMode && (statstg.grfMode & STGM_READ) == 0)));
 
   OMSSStoredObject* newStore = new OMSSStoredObject(in_storage);
   ASSERT("Valid heap pointer", newStore != 0);
