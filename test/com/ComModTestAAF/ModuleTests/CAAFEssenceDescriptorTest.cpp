@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDescriptorTest.cpp,v 1.47 2006/10/10 17:52:32 akharkev Exp $ $Name:  $
+// $Id: CAAFEssenceDescriptorTest.cpp,v 1.48 2008/02/26 05:41:09 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -350,10 +350,12 @@ static HRESULT CreateAAFFile(
 		{
 			pLocator = NULL;
 			if (edesc->GetLocatorAt(i, &pLocator) != AAFRESULT_SUCCESS)
+			{
 				if (pLocator == NULL)
 					localhr = AAFRESULT_TEST_FAILED;
 				else
 					pLocator->Release();
+			}
 		}
 			
 		if (localhr == AAFRESULT_SUCCESS)
@@ -680,10 +682,12 @@ static HRESULT CreateAAFFile(
 		{
 			pSubDescriptor = NULL;
 			if (edesc2->GetSubDescriptorAt(i, &pSubDescriptor) != AAFRESULT_SUCCESS)
+			{
 				if (pSubDescriptor == NULL)
 					localhr = AAFRESULT_TEST_FAILED;
 				else
 					pSubDescriptor->Release();
+			}
 		}
 			
 		if (localhr == AAFRESULT_SUCCESS)
