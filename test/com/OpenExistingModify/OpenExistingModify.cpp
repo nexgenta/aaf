@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: OpenExistingModify.cpp,v 1.6 2007/08/01 15:15:52 stuart_hc Exp $ $Name:  $
+// $Id: OpenExistingModify.cpp,v 1.7 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <wchar.h>
 #include <string.h>
+#include <limits.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"

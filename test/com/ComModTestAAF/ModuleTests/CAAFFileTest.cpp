@@ -1,6 +1,6 @@
 //=------------------------------------------------ -*- tab-width:4 -*- =
 //
-// $Id: CAAFFileTest.cpp,v 1.53 2007/08/01 15:15:34 stuart_hc Exp $ $Name:  $
+// $Id: CAAFFileTest.cpp,v 1.54 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,6 +29,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 
 #include "AAFWideString.h"

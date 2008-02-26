@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFKLVDataDefinitionTest.cpp,v 1.2 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
+// $Id: CAAFKLVDataDefinitionTest.cpp,v 1.3 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,6 +35,7 @@
 #include "AAFTypeDefUIDs.h"
 
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 

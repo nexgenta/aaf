@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: MultiGenCommon.cpp,v 1.4 2005/02/07 18:52:07 stuart_hc Exp $ $Name:  $
+// $Id: MultiGenCommon.cpp,v 1.5 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -23,6 +23,8 @@
 #include <MultiGenTest.h>
 
 #include <stdlib.h>
+#include <string.h>
+#include <limits.h>
 #include <errno.h>
 
 #include <memory>

@@ -1,5 +1,5 @@
 /*
- * $Id: DotRecordNode.cpp,v 1.7 2007/08/01 15:15:06 stuart_hc Exp $ $Name:  $
+ * $Id: DotRecordNode.cpp,v 1.8 2008/02/26 05:44:57 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -28,6 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <assert.h>
+#include <stdlib.h>
 #include <fstream>
 using namespace std;
 

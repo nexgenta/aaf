@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: FindMasterMob.cpp,v 1.5 2004/02/27 14:26:52 stuart_hc Exp $ $Name:  $
+// $Id: FindMasterMob.cpp,v 1.6 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -25,6 +25,7 @@
 #include <AAFStoredObjectIDs.h>
 
 #include <memory>
+#include <string.h>
 
 namespace {
 

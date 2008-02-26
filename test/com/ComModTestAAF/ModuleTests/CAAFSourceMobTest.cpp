@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceMobTest.cpp,v 1.41 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFSourceMobTest.cpp,v 1.42 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,7 @@
 #include <iostream>
 using namespace std;
 #include <stdlib.h>
+#include <string.h>
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"

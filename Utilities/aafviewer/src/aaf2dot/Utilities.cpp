@@ -1,5 +1,5 @@
 /*
- * $Id: Utilities.cpp,v 1.9 2005/06/03 12:40:09 philipn Exp $ $Name:  $
+ * $Id: Utilities.cpp,v 1.10 2008/02/26 05:44:57 stuart_hc Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -27,6 +27,7 @@
 
 #include <iostream>
 #include <assert.h>
+#include <string.h>
 using namespace std;
 
 #include <ctype.h>

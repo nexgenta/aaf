@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComModTestAAF.cpp,v 1.32 2007/04/13 15:39:06 philipn Exp $ $Name:  $
+// $Id: ComModTestAAF.cpp,v 1.33 2008/02/26 05:44:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -32,6 +32,7 @@
 #include <iomanip>
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #ifndef __AAF_h__
 #include "AAF.h"
