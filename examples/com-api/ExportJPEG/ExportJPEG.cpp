@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportJPEG.cpp,v 1.2 2007/08/01 15:15:23 stuart_hc Exp $ $Name:  $
+// $Id: ExportJPEG.cpp,v 1.3 2008/03/12 07:03:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -339,7 +339,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 			sampled_rect.xSize = 720;
 			sampled_rect.ySize = 248;
 			display_rect.xSize = 720;
-			display_rect.ySize = 240;
+			display_rect.ySize = 243;
 			line_map[0] = 16;		// TODO: fix line_map guesses
 			line_map[1] = 328;
 		}
