@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.8 2004/07/02 17:14:15 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.9 2008/03/14 04:36:53 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -49,8 +49,18 @@ ifeq ($(AAFPLATFORM),PPCDarwin)
 RELEASE_FILES_SRC = ./release-files.darwin
 SDK_FILES_SRC = ./sdk-files.darwin
 else
+ifeq ($(AAFPLATFORM),i386Darwin)
+RELEASE_FILES_SRC = ./release-files.darwin
+SDK_FILES_SRC = ./sdk-files.darwin
+else
+ifeq ($(AAFPLATFORM),UniversalDarwin)
+RELEASE_FILES_SRC = ./release-files.darwin
+SDK_FILES_SRC = ./sdk-files.darwin
+else
 RELEASE_FILES_SRC = ./release-files.unix
 SDK_FILES_SRC = ./sdk-files.unix
+endif
+endif
 endif
 endif
 
