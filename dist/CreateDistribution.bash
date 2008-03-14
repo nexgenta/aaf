@@ -1,7 +1,7 @@
 #! /bin/bash
 ###############################################################################
 #
-# $Id: CreateDistribution.bash,v 1.9 2004/07/02 17:11:53 stuart_hc Exp $ $Name:  $
+# $Id: CreateDistribution.bash,v 1.10 2008/03/14 04:36:07 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -42,10 +42,17 @@ create_unix_distribution ()
 {
 	echo create_unix_distribution $1 $2 $3;
 
-	cd $1;
-	filename=$2.tar.gz;
-	FileList=`grep -v \# $3`;
-	tar cvf - ${FileList} | gzip -c > ${filename}
+	cd $1
+	tarname=$2.tar
+	filename=$tarname.gz
+	FileList=`grep -v \# $3`
+	tar cvf $tarname ${FileList} || exit 1
+	gzip -f $tarname || exit 1
+	if [ ! -r $filename ] ; then
+		exit 1
+	fi
+	echo "output file is: "
+	echo "  $1/${filename}"
 }
 
 create_darwin_distribution ()
@@ -66,10 +73,12 @@ create_win_distribution ()
 {
 	echo create_zip_distribution $1 $2 $3;
 
-	cd $1;
-	filename=$2.zip;
-	FileList=`grep -v \# $3`;
-	zip -r ${filename} ${FileList} ;
+	cd $1
+	filename=$2.zip
+	FileList=`grep -v \# $3`
+	zip -r ${filename} ${FileList} || exit 1
+	echo "output file is: "
+	echo "  $1/${filename}"
 }
 
 
@@ -114,6 +123,8 @@ case ${AAFPLATFORM} in
 	MipsIrix)		create_unix_distribution $AAFSDK $DIST_FILE_NAME $DIST_LIST ;;
 
 	SparcSolaris)	create_unix_distribution $AAFSDK $DIST_FILE_NAME $DIST_LIST ;;
+
+	i386Darwin|UniversalDarwin)	create_unix_distribution $AAFSDK $DIST_FILE_NAME $DIST_LIST ;;
 
 	PPCDarwin)		create_darwin_distribution "$AAFSDK" "$DIST_FILE_NAME" "$DIST_LIST" "$AAFSDKBUILD_H" $1 ;;
 
