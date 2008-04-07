@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.3 2007/04/12 12:59:48 stuart_hc Exp $
+// $Id: OMXMLUtilities.h,v 1.4 2008/04/07 21:51:22 terabrit Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -53,7 +53,7 @@
 
 // MS Run-Time dosen't have POSIX strncasecmp, but provides stricmp
 #if defined (_WIN32)
-#define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
+#define strncasecmp(s1, s2, n) _strnicmp(s1, s2, n)
 #else
 #include <strings.h>	// strncasecmp()
 #endif
