@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNestedScope.cpp,v 1.35 2006/06/15 19:52:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFNestedScope.cpp,v 1.36 2008/04/16 15:30:14 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -245,8 +245,6 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 			ImplAAFSegment	*pSegment;
 			_slots.getValueAt(pSegment, n);
 			CHECK(pSegment->ChangeContainedReferences(from, to));
-			pSegment->ReleaseReference();
-			pSegment = NULL;
 		}
 	}
 	XEXCEPT
