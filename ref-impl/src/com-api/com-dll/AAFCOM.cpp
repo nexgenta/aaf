@@ -13,7 +13,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFCOM.cpp,v 1.29 2008/04/19 10:57:17 stuart_hc Exp $ $Name:  $
+// $Id: AAFCOM.cpp,v 1.30 2008/04/23 19:23:55 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -179,10 +179,6 @@ const char * AAFGetLibrarySharedDirectoryName()
 {
     static char g_SharedDirectoryName[260];
 
-#ifdef _MSC_VER
-#pragma warning (disable:4996)
-#endif
-
     strcpy(g_SharedDirectoryName, "aafext");
     
     return g_SharedDirectoryName;
@@ -193,10 +189,6 @@ const char * AAFGetLibraryPluginPrefix()
 {
 #ifdef OS_WINDOWS
     static char g_PluginPrefix[4];
-
-#ifdef _MSC_VER
-#pragma warning (disable:4996)
-#endif
 
     strcpy(g_PluginPrefix, "aaf");
 #else

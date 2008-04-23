@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFInProcServer.cpp,v 1.28 2008/04/19 10:57:17 stuart_hc Exp $ $Name:  $
+// $Id: CAAFInProcServer.cpp,v 1.29 2008/04/23 19:23:55 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -385,10 +385,6 @@ const char* CAAFInProcServer::GetServerDirectory() const
 // Implemented for each platform to get platform specific path information.
 //
 #if defined( OS_WINDOWS )
-
-#ifdef _MSC_VER
-#pragma warning (disable:4996)
-#endif
 
 HRESULT AAFGetLibraryInfo(HINSTANCE hInstance, char **pServerPath, char **pServerDirectory)
 {

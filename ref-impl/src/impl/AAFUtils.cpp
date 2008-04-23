@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFUtils.cpp,v 1.62 2008/04/07 21:50:35 terabrit Exp $ $Name:  $
+// $Id: AAFUtils.cpp,v 1.63 2008/04/23 19:23:56 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -799,7 +799,7 @@ void AAFByteSwap64(
 // NB. ':' is acceptable unescaped in the fpath component
 
 #ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strncasecmp
-#define strncasecmp(s1, s2, n) _strnicmp(s1, s2, n)
+#define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
 #else
 #include <strings.h>	// strncasecmp()
 #endif
