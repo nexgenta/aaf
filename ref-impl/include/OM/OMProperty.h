@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMProperty.h,v 1.78 2008/04/23 19:23:54 vladimirg2 Exp $ $Name:  $
+// $Id: OMProperty.h,v 1.79 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2008, Licensor of the
+// The Original Code of this file is Copyright 1998-2006, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -280,11 +280,10 @@ protected:
     // @cmember Set the value of this <c OMSimpleProperty>.
   void set(const void* value, OMPropertySize valueSize);
 
+  OMPropertySize _size;
+  unsigned char* _bits;
 
 private:
-
-	OMPropertySize _size;
-    unsigned char* _bits;
 
     // OMSimpleProperty can't be assigned - declare but don't define
   OMSimpleProperty& operator = (const OMSimpleProperty& rhs);

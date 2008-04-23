@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFNestedScope.cpp,v 1.38 2008/04/23 19:23:56 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFNestedScope.cpp,v 1.39 2008/04/23 21:19:33 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -235,8 +235,6 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 														aafMobID_constref to)
 {
-	ImplAAFComponent	*comp = NULL;
-	
 	XPROTECT()
 	{
 		aafUInt32 count = _slots.count();
@@ -245,15 +243,10 @@ AAFRESULT ImplAAFNestedScope::ChangeContainedReferences(aafMobID_constref from,
 			ImplAAFSegment	*pSegment;
 			_slots.getValueAt(pSegment, n);
 			CHECK(pSegment->ChangeContainedReferences(from, to));
-			pSegment->ReleaseReference();
-			pSegment = NULL;
 		}
 	}
 	XEXCEPT
 	{
-		if(comp != NULL)
-		  comp->ReleaseReference();
-		comp = 0;
 	}
 	XEND;
 

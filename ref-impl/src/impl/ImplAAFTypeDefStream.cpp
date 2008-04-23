@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.31 2008/04/23 19:23:56 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.32 2008/04/23 21:19:33 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2008, Licensor of the
+// The Original Code of this file is Copyright 1998-2007, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -84,7 +84,6 @@ ImplAAFOMDataStreamAccess::ImplAAFOMDataStreamAccess(IAAFPropertyValue *pVal, IA
   if (_callback != 0) {
     _callback->AddRef();
   }
-  _pVal->AddRef(); 
 }
 
 ImplAAFOMDataStreamAccess::~ImplAAFOMDataStreamAccess()
@@ -92,7 +91,6 @@ ImplAAFOMDataStreamAccess::~ImplAAFOMDataStreamAccess()
   if (_callback != 0) {
     _callback->Release();
   }
-  _pVal->Release();
 }
 
 void ImplAAFOMDataStreamAccess::save(OMDataStream& /* stream */, void* context)
@@ -472,7 +470,6 @@ AAFRESULT STDMETHODCALLTYPE
   IUnknown *iUnk = static_cast<IUnknown *> (pPropertyValue->GetContainer());
   iUnk->QueryInterface(IID_IAAFPropertyValue, (void **)&pvalInterface);
   access = new ImplAAFOMDataStreamAccess(pvalInterface, pCallbackIF, pUserData);
-  pvalInterface->Release(); 
  
   pStreamPropertyValue->setStreamAccess(access);
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.72 2008/04/23 19:23:55 vladimirg2 Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.73 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -720,7 +720,8 @@ OMStorable* OMWeakReferenceProperty<Key, ReferencedObject>::getReferencedValue(v
     ASSERT("Referenced object ID can be a label",
                         keySize() == sizeof(OMUniqueObjectIdentification));
     OMUniqueObjectIdentification bid;
-    *reinterpret_cast<Key*>(&bid) = identification();
+	const Key& key = identification();
+	memcpy( reinterpret_cast<void*>(&bid), reinterpret_cast<const void*>(&key), sizeof(bid) );
     if (hostByteOrder() != bigEndian) {
 	  OMUniqueObjectIdentificationType::instance()->reorder(
                                                reinterpret_cast<OMByte*>(&bid),
