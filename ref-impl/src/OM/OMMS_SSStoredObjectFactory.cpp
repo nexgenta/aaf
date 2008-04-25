@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.6 2005/10/13 16:45:14 rodrigc Exp $ $Name:  $
+// $Id: OMMS_SSStoredObjectFactory.cpp,v 1.7 2008/04/25 20:34:25 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -200,7 +200,7 @@ OMMS_SSStoredObjectFactory::createFile (OMRawStorage* rawStorage,
 				(void**)&storage);
 
 	checkStatus(status);
-
+	iLockBytes->Release();
 	ASSERT("StgOpenStorageOnILockBytes() succeeded", SUCCEEDED(status));
 #endif //OM_USE_STORAGE_EX
 
