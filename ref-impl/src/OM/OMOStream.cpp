@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.cpp,v 1.25 2006/07/26 19:53:36 tbingham Exp $ $Name:  $
+// $Id: OMOStream.cpp,v 1.26 2008/04/25 19:56:05 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,6 +41,11 @@ static void format(ostringstream& s,
 OMOStream::OMOStream(void)
 : _base(10),
   _width(0)
+{
+}
+
+  // @mfunc Destructor.
+OMOStream::~OMOStream(void)
 {
 }
 

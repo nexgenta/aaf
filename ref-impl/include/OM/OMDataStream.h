@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStream.h,v 1.8 2004/02/27 14:26:40 stuart_hc Exp $ $Name:  $
+// $Id: OMDataStream.h,v 1.9 2008/04/25 19:55:15 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,7 +41,7 @@ public:
                const wchar_t* name);
 
     // @cmember Destructor.
-  ~OMDataStream(void);
+  virtual ~OMDataStream(void);
 
     // @cmember The size, in bytes, of the data in this
     //          <c OMDataStreamProperty>.
