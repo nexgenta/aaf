@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMOStream.h,v 1.14 2006/07/26 19:14:08 tbingham Exp $ $Name:  $
+// $Id: OMOStream.h,v 1.15 2008/04/25 19:49:11 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,6 +39,9 @@ public:
 
     // @cmember Constructor.
   OMOStream(void);
+
+    // @cmember Destructor.
+  virtual ~OMOStream(void);
 
     // @cmember Insert a character string.
   OMOStream& operator << (const char* string);
