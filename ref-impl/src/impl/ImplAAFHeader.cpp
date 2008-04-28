@@ -1,7 +1,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFHeader.cpp,v 1.100 2007/07/27 21:19:05 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFHeader.cpp,v 1.101 2008/04/28 17:12:58 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -573,7 +573,7 @@ AAFRESULT
     ImplAAFHeader::AddIdentificationObject
 (aafProductIdentification_constptr pIdent)
 {
-	ImplAAFIdentification *		identObj;
+	ImplAAFIdentification *		identObj = NULL;
 	aafProductIdentification_t ident;
 
 	XPROTECT()
@@ -622,6 +622,11 @@ AAFRESULT
 	}
 	XEXCEPT
 	{
+		if (identObj)
+		{
+			identObj->ReleaseReference();
+			identObj = NULL;
+		}
 	}
 	XEND
 	
