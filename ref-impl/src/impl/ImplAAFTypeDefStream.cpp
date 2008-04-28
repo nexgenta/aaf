@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefStream.cpp,v 1.32 2008/04/23 21:19:33 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFTypeDefStream.cpp,v 1.33 2008/04/28 19:26:09 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -84,6 +84,7 @@ ImplAAFOMDataStreamAccess::ImplAAFOMDataStreamAccess(IAAFPropertyValue *pVal, IA
   if (_callback != 0) {
     _callback->AddRef();
   }
+  _pVal->AddRef(); 
 }
 
 ImplAAFOMDataStreamAccess::~ImplAAFOMDataStreamAccess()
@@ -91,6 +92,7 @@ ImplAAFOMDataStreamAccess::~ImplAAFOMDataStreamAccess()
   if (_callback != 0) {
     _callback->Release();
   }
+  _pVal->Release();
 }
 
 void ImplAAFOMDataStreamAccess::save(OMDataStream& /* stream */, void* context)
@@ -468,8 +470,9 @@ AAFRESULT STDMETHODCALLTYPE
 
   PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
   IUnknown *iUnk = static_cast<IUnknown *> (pPropertyValue->GetContainer());
-  iUnk->QueryInterface(IID_IAAFPropertyValue, (void **)&pvalInterface);
+  iUnk->QueryInterface(IID_IAAFPropertyValue, (void **)&pvalInterface); //This call increments the reference counter
   access = new ImplAAFOMDataStreamAccess(pvalInterface, pCallbackIF, pUserData);
+  pvalInterface->Release(); //Decrement reference counter 
  
   pStreamPropertyValue->setStreamAccess(access);
 
