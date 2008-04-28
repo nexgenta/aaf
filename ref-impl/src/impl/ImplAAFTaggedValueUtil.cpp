@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTaggedValueUtil.cpp,v 1.4 2006/06/15 19:52:52 tbingham Exp $ $Name:  $
+// $Id: ImplAAFTaggedValueUtil.cpp,v 1.5 2008/04/28 18:47:26 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,6 +49,8 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
   }
 
 
+  ImplAAFTaggedValue* pTaggedVal = NULL;
+
   XPROTECT()
   {
     ImplAAFSmartPointer<ImplAAFDictionary> spDict;
@@ -64,7 +66,6 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
     // counted - don't release it.
     // pTaggedDef is the object we will return, so it is not put in a smart pointer
     // either.
-    ImplAAFTaggedValue* pTaggedVal;
     ImplAAFClassDef* pTaggedValDef = spDict->GetBuiltinDefs()->cdTaggedValue();
     if ( !pTaggedValDef ) {
       RAISE( E_FAIL );
@@ -89,7 +90,13 @@ AAFRESULT ImplAAFTaggedValueUtil::AppendNameValuePair(
 
   }
   XEXCEPT
-  {}
+  {
+    if (pTaggedVal)
+    {
+      pTaggedVal->ReleaseReference();
+      pTaggedVal = NULL;
+    }
+  }
   XEND;
 
 
