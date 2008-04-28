@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDef.cpp,v 1.34 2007/08/11 15:09:33 terabrit Exp $ $Name:  $
+// $Id: ImplAAFTypeDef.cpp,v 1.35 2008/04/28 19:10:39 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -130,6 +130,8 @@ AAFRESULT ImplAAFTypeDef::MergeTo( ImplAAFDictionary* pDstDictionary )
   {
     OMClassFactory* pDstFactory =
         dynamic_cast<OMClassFactory*>( pDstDictionary->metaDictionary() );
+    // New storable object returned by shallowCopy() is
+    // reference counted ImplAAFTypeDef.
     OMStorable* pDstStorable = shallowCopy( pDstFactory );
     ImplAAFTypeDef* pDstTypeDef =
         dynamic_cast<ImplAAFTypeDef*>( pDstStorable );
@@ -141,6 +143,10 @@ AAFRESULT ImplAAFTypeDef::MergeTo( ImplAAFDictionary* pDstDictionary )
       pDstTypeDef->onCopy( 0 );
       deepCopyTo( pDstTypeDef, 0 );
     }
+
+    // pDstTypeDef created by shallowCopy() is reference counted.
+    pDstTypeDef->ReleaseReference();
+    pDstTypeDef = 0;
   }
   else
   {
