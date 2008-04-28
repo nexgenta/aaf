@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFModule.cpp,v 1.45 2007/07/26 03:11:03 jptrainor Exp $ $Name:  $
+// $Id: ImplAAFModule.cpp,v 1.46 2008/04/28 18:24:54 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1310,11 +1310,16 @@ ImplAAFCreateRawStorageCached
   if (!AAFRESULT_SUCCEEDED(hr))
     return hr;
 
-  return ImplAAFCreateRawStorageCached2(pRawStorage,
+  hr = ImplAAFCreateRawStorageCached2(pRawStorage,
                                         pageCount,
                                         pageSize,
                                         pCachePageAllocator,
                                         ppNewRawStorage);
+
+  pCachePageAllocator->Release();
+  pCachePageAllocator = 0;
+
+  return hr;
 }
 
 STDAPI
