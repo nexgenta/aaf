@@ -7,7 +7,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFComponent.cpp,v 1.57 2006/06/15 19:52:49 tbingham Exp $ $Name:  $
+// $Id: ImplAAFComponent.cpp,v 1.58 2008/04/28 16:01:44 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -81,6 +81,30 @@ ImplAAFComponent::~ImplAAFComponent ()
 			if (pKLVData)
 			  pKLVData->ReleaseReference();
 			pKLVData = 0;
+		}
+	}
+
+	if(_userComments.isPresent())
+	{
+		aafUInt32 count = _userComments.count();
+		for (aafUInt32 j = 0; j < count; j++)
+		{
+			ImplAAFTaggedValue* pTaggedValue = _userComments.clearValueAt(j);
+			if (pTaggedValue)
+			  pTaggedValue->ReleaseReference();
+			pTaggedValue = 0;
+		}
+	}
+
+	if(_attributes.isPresent())
+	{
+		aafUInt32 count = _attributes.count();
+		for (aafUInt32 j = 0; j < count; j++)
+		{
+			ImplAAFTaggedValue* pTaggedValue = _attributes.clearValueAt(j);
+			if (pTaggedValue)
+			  pTaggedValue->ReleaseReference();
+			pTaggedValue = 0;
 		}
 	}
 }
