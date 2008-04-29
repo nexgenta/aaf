@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMMSStructuredStorage.cpp,v 1.21 2007/07/27 21:19:04 stuart_hc Exp $ $Name:  $
+// $Id: OMMSStructuredStorage.cpp,v 1.22 2008/04/29 17:16:36 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -517,7 +517,6 @@ OMInt32 StgCreateDocfileOnILockBytesEx (
 		NULL,
 		0,
 		(IStorage **) ppstorage);
-	piLockBytes->Release();
 
 	return status;
 }
