@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ModuleTest.cpp,v 1.9 2007/08/01 15:15:29 stuart_hc Exp $ $Name:  $
+// $Id: ModuleTest.cpp,v 1.10 2008/05/01 18:21:41 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -772,6 +772,9 @@ AAFRESULT GetPropertyValue(
                 pPropDef->Release();
                 pPropDef = 0;
             }
+
+            pClassDef->Release();
+            pClassDef = 0;
         }
 
         pObject->Release();
@@ -809,6 +812,9 @@ AAFRESULT GetPropertyType(
                 pPropDef->Release();
                 pPropDef = 0;
             }
+
+            pClassDef->Release();
+            pClassDef = 0;
         }
 
         pObject->Release();
