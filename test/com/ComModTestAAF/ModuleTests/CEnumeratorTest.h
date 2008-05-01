@@ -4,7 +4,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumeratorTest.h,v 1.12 2006/10/10 17:52:37 akharkev Exp $ $Name:  $
+// $Id: CEnumeratorTest.h,v 1.13 2008/05/01 20:28:29 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -286,6 +286,8 @@ void CEnumeratorTest<TEnum,TItem>::Run(
 
 	pFile->Save();
 	pFile->Close();
+	pFile->Release();
+	pFile = 0;
 }
 
 // Function to get AUID of AAF object
