@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceReferenceTest.cpp,v 1.28 2006/10/10 17:52:36 akharkev Exp $ $Name:  $
+// $Id: CAAFSourceReferenceTest.cpp,v 1.29 2008/05/01 19:58:42 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -160,6 +160,9 @@ static HRESULT CreateAAFFile(
   // Cleanup and return
   if (pSourceReference)
     pSourceReference->Release();
+
+  if (pSrcRef2)
+    pSrcRef2->Release();
 
   if (pDictionary)
     pDictionary->Release();
