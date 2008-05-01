@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ComModTestAAF.cpp,v 1.35 2008/04/23 21:19:33 vladimirg2 Exp $ $Name:  $
+// $Id: ComModTestAAF.cpp,v 1.36 2008/05/01 18:10:04 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -408,6 +408,11 @@ main(int argc, char* argv[])
 	{
 		result = AAFRESULT_TEST_FAILED;
 	}
+
+	for (int k=0; k<argc; ++k) {
+	  delete [] wargv[k];
+	}
+	delete [] wargv;
 
 	// Translate AAFRESULTs into an exit status.
 	// Only the 8 least significant bits are available to a waiting parent
