@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFMultipleDescriptorTest.cpp,v 1.4 2006/11/08 16:25:15 bmdurksen Exp $ $Name:  $
+// $Id: CAAFMultipleDescriptorTest.cpp,v 1.5 2008/05/01 19:47:06 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -106,6 +106,9 @@ static HRESULT CreateAAFFile(
 		
 		
 		checkResult(pSourceMob->SetEssenceDescriptor (eDesc));
+
+		eDesc->Release();
+		eDesc = 0;
 
 
 /* CountFileDescriptors()	******************************************/
@@ -519,6 +522,9 @@ static HRESULT CreateAAFFile(
 	}
 
 
+	if (pMDesc)
+		pMDesc->Release();
+
 	if (pMob)
 		pMob->Release();
 
@@ -616,6 +622,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	}
 
 	// Cleanup object references
+	if (pMDesc)
+		pMDesc->Release();
+
 	if (pFileDescriptor)
 		pFileDescriptor->Release();
 
