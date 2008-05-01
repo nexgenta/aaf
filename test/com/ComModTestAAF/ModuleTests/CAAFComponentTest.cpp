@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFComponentTest.cpp,v 1.38 2007/08/01 15:15:31 stuart_hc Exp $ $Name:  $
+// $Id: CAAFComponentTest.cpp,v 1.39 2008/05/01 18:46:13 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -97,6 +97,11 @@ void testCommentAttributeMethods(IAAFComponent2 *pComp2)
 
 	if(pComp2->RemoveComment(pTagVal) != AAFRESULT_SUCCESS)
 		checkResult(AAFRESULT_TEST_FAILED);
+
+	pTagVal->Release();
+	pTagVal = NULL;
+	pEnum->Release();
+	pEnum = NULL;
 
 	//test RemoveAttribute - remove the very first attribute
 	pComp2->GetAttributes(&pEnum);
