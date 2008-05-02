@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2008/05/02 13:12:58 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,11 @@ $(AAFSDKBINDIR)/EssenceAccess$(EXE) : $(CXXOBJS)
 check : $(AAFSDKBINDIR)/EssenceAccess$(EXE)
 	@if [ ! -r Laser.wav ]; then cp ../ComModTestAAF/Laser.wav .; fi
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/EssenceAccess$(EXE) 100
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/EssenceAccess$(EXE)
+	@if [ ! -r Laser.wav ]; then cp ../ComModTestAAF/Laser.wav .; fi
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/EssenceAccess$(EXE) 100
 
 
 .PHONY : clean

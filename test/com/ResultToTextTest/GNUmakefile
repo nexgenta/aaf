@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2007/05/15 17:47:21 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2008/05/02 13:13:00 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -44,6 +44,10 @@ $(AAFSDKBINDIR)/ResultToTextTest$(EXE) : $(CXXOBJS)
 .PHONY : check
 check : $(AAFSDKBINDIR)/ResultToTextTest$(EXE)
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ResultToTextTest$(EXE)
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/ResultToTextTest$(EXE)
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/ResultToTextTest$(EXE)
 
 
 .PHONY : clean

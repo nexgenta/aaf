@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.15 2006/03/11 14:34:56 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.16 2008/05/02 13:12:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -78,6 +78,10 @@ test : install
 check : test
 	cd test && $(MAKE) $@
 	cd examples && $(MAKE) $@
+
+.PHONY : valgrind-check
+valgrind-check : test
+	cd test && $(MAKE) $@
 
 #
 # Binary distributions

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2008/05/02 13:12:58 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,11 @@ $(AAFSDKBINDIR)/CreateSequence$(EXE) : $(CXXOBJS)
 .PHONY : check
 check : $(AAFSDKBINDIR)/CreateSequence$(EXE)
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/CreateSequence$(EXE) 2000
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/CreateSequence$(EXE)
+	# Use 200 instead of 2000 which causes >1GB memory usage
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/CreateSequence$(EXE) 200
 
 
 .PHONY : clean

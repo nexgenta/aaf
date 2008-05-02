@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.16 2008/01/24 08:37:07 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.17 2008/05/02 13:12:58 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -78,5 +78,8 @@ realclean : clean
 check : all
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
+.PHONY : valgrind-check
+valgrind-check : all
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/ComModAAF$(EXE)
 
 include $(AAFBASE)/build/rules.mk

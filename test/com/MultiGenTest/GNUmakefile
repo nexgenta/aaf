@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2007/07/19 11:39:43 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.13 2008/05/02 13:12:59 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -89,6 +89,12 @@ check : $(AAFSDKBINDIR)/MultiGenTest$(EXE)
 	rm -f basic.aaf
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/MultiGenTest$(EXE) -r LoadLib $(TEST_LIB_NAME) -r FileOp write S4KBinary basic.aaf -r AddMasterMobs A B -r FileOp save_and_close -r UnloadLib || exit 1
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/MultiGenTest$(EXE) -r LoadLib $(TEST_LIB_NAME) -r FileOp read S4KBinary basic.aaf -r FindMasterMobsExclusive A B -r FileOp close -r UnloadLib || exit 1
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/MultiGenTest$(EXE)
+	rm -f basic.aaf
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/MultiGenTest$(EXE) -r LoadLib $(TEST_LIB_NAME) -r FileOp write S4KBinary basic.aaf -r AddMasterMobs A B -r FileOp save_and_close -r UnloadLib || exit 1
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/MultiGenTest$(EXE) -r LoadLib $(TEST_LIB_NAME) -r FileOp read S4KBinary basic.aaf -r FindMasterMobsExclusive A B -r FileOp close -r UnloadLib || exit 1
 
 
 include $(AAFBASE)/build/rules.mk

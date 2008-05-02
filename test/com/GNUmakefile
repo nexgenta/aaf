@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.15 2007/03/26 15:57:25 philipn Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.16 2008/05/02 13:12:57 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -71,6 +71,19 @@ XMLStoredFormat :
 
 .PHONY : check
 check :
+	cd ComModTestAAF && $(MAKE) $@
+	cd CreateSequence && $(MAKE) $@
+	cd EssenceAccess && $(MAKE) $@
+	cd MultiGenTest && $(MAKE) $@
+	cd ComFileKindTest && $(MAKE) $@
+	cd UTF8FileNameTest && $(MAKE) $@
+	cd OpenExistingModify && $(MAKE) $@
+	cd ScaleTest && $(MAKE) $@
+	cd ResultToTextTest && $(MAKE) $@
+	cd XMLStoredFormat && $(MAKE) $@
+
+.PHONY : valgrind-check
+valgrind-check :
 	cd ComModTestAAF && $(MAKE) $@
 	cd CreateSequence && $(MAKE) $@
 	cd EssenceAccess && $(MAKE) $@

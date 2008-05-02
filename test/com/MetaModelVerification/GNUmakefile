@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2008/05/02 13:12:59 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -45,6 +45,10 @@ $(AAFSDKBINDIR)/MetaModelVerification$(EXE) : $(CXXOBJS)
 .PHONY : check
 check : $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/MetaModelVerification$(EXE)
 
 
 .PHONY : clean

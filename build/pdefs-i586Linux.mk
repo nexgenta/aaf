@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.14 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.15 2008/05/02 13:12:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -140,3 +140,7 @@ LIBEXT ?= .a
 DLL ?= .so
 
 
+#------------------------------------------------------------------------------
+# Testing tools
+#------------------------------------------------------------------------------
+VALGRIND_CMD = valgrind --num-callers=100 --leak-check=full

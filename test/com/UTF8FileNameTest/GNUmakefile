@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2007/05/15 17:47:21 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2008/05/02 13:13:00 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -48,6 +48,10 @@ $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE) : $(CXXOBJS)
 .PHONY : check
 check : $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
+
+.PHONY : valgrind-check
+valgrind-check : $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
+	$(APP_RUN_ENV) $(VALGRIND_CMD) $(AAFSDKBINDIR)/UTF8FileNameTest$(EXE)
 
 
 .PHONY : clean
