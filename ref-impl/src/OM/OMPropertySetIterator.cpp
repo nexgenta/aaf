@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySetIterator.cpp,v 1.8 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMPropertySetIterator.cpp,v 1.9 2008/05/02 18:38:10 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,6 +27,7 @@
 
 #include "OMPropertySetIterator.h"
 #include "OMPropertySet.h"
+#include "OMProperty.h"
 
 #include "OMAssertions.h"
 
@@ -195,6 +196,7 @@ OMPropertyId OMPropertySetIterator::propertyId(void) const
 
   PRECONDITION("Valid iterator", _iterator.valid());
 
-  return _iterator.key();
+  const OMProperty* p = _iterator.value();
+  return p->propertyId();
 }
 

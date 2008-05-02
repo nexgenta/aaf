@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySetIterator.h,v 1.8 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMPropertySetIterator.h,v 1.9 2008/05/02 18:42:18 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@
 #define OMPROPERTYSETITERATOR_H
 
 #include "OMContainerIterator.h"
-#include "OMRedBlackTreeIterator.h"
+#include "OMVectorIterator.h"
 #include "OMDataTypes.h"
 
 class OMProperty;
@@ -124,7 +124,7 @@ public:
 
 private:
 
-  OMRedBlackTreeIterator<OMPropertyId, OMProperty*> _iterator;
+  OMVectorIterator<OMProperty*> _iterator;
 
 };
 

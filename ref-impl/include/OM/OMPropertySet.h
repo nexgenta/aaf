@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySet.h,v 1.27 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMPropertySet.h,v 1.28 2008/05/02 18:39:22 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,6 +28,9 @@
 
 #include "OMDataTypes.h"
 #include "OMRedBlackTree.h"
+#include "OMVector.h"
+#include "OMVectorIterator.h"
+
 
 class OMProperty;
 class OMStorable;
@@ -105,10 +108,12 @@ public:
 
 private:
 
+  bool find(const OMPropertyId propertyId, OMProperty *&result) const;
+
   friend class OMPropertySetIterator;
 
-  typedef OMRedBlackTreeIterator<OMPropertyId, OMProperty*> SetIterator;
-  typedef OMRedBlackTree<OMPropertyId, OMProperty*> Set;
+  typedef OMVectorIterator<OMProperty*> SetIterator;
+  typedef OMVector<OMProperty*> Set;
 
   typedef OMRedBlackTreeIterator<OMUniqueObjectIdentification, OMProperty*> DynamicSetIterator;
   typedef OMRedBlackTree<OMUniqueObjectIdentification, OMProperty*> DynamicSet;
