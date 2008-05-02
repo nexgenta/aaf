@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMCharacterStringPropertyT.h,v 1.13 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMCharacterStringPropertyT.h,v 1.14 2008/05/02 18:33:18 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -58,7 +58,7 @@ OMCharacterStringProperty<CharacterType>::~OMCharacterStringProperty(void)
 template <typename CharacterType>
 OMCharacterStringProperty<CharacterType>::operator const CharacterType*() const
 {
-  return reinterpret_cast<const CharacterType*>(this->_bits);
+  return reinterpret_cast<const CharacterType*>(this->bits());
 }
 
   // @mfunc Assign the string <p characterString> to this

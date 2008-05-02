@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMVariableSizePropertyT.h,v 1.20 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMVariableSizePropertyT.h,v 1.21 2008/05/02 18:34:16 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -122,7 +122,7 @@ void OMVariableSizeProperty<PropertyType>::getValueAt(
   PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid value", value != 0);
 
-  *value = ((PropertyType*)_bits)[index];
+  *value = ((PropertyType*)bits())[index];
 }
 
   // @mfunc Set the value of the item at position <p index> in this
@@ -143,7 +143,7 @@ void OMVariableSizeProperty<PropertyType>::setValueAt(
   PRECONDITION("Valid index", index < count());
   PRECONDITION("Valid value", value != 0);
 
-  ((PropertyType*)_bits)[index] = *value;
+  ((PropertyType*)bits())[index] = *value;
 }
 
   // @mfunc Set the value of the item at the last position in this

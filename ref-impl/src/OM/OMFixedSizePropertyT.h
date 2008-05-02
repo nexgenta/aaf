@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFixedSizePropertyT.h,v 1.16 2008/04/23 21:19:32 vladimirg2 Exp $ $Name:  $
+// $Id: OMFixedSizePropertyT.h,v 1.17 2008/05/02 18:31:59 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -116,7 +116,7 @@ OMFixedSizeProperty<PropertyType>::operator PropertyType() const
 template <typename PropertyType>
 PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void)
 {
-  return reinterpret_cast<PropertyType*>(_bits);
+  return reinterpret_cast<PropertyType*>(bits());
 }
 
   // @mfunc Const "Address of" operator.
@@ -127,7 +127,7 @@ PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void)
 template <typename PropertyType>
 const PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void) const
 {
-  return reinterpret_cast<const PropertyType*>(_bits);
+  return reinterpret_cast<const PropertyType*>(bits());
 }
 
   // @mfunc Convert this <c OMFixedSizeProperty> into a const
@@ -140,7 +140,7 @@ const PropertyType* OMFixedSizeProperty<PropertyType>::operator &(void) const
 template <typename PropertyType>
 const PropertyType& OMFixedSizeProperty<PropertyType>::reference(void) const
 {
-  return *reinterpret_cast<const PropertyType*>(_bits);
+  return *reinterpret_cast<const PropertyType*>(bits());
 }
 
   // @mfunc Restore this <c OMFixedSizeProperty>, the external (persisted)
