@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySet.cpp,v 1.38 2008/05/02 18:36:42 vladimirg2 Exp $ $Name:  $
+// $Id: OMPropertySet.cpp,v 1.39 2008/05/05 06:22:58 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -118,8 +118,6 @@ void OMPropertySet::put(OMProperty* property)
   PRECONDITION("Valid property id", property->propertyId() != 0);
   PRECONDITION("Property is not present", !isPresent(property->propertyId()));
   PRECONDITION("Room in set", count() < OMUINT16_MAX);
-
-  OMPropertyId propertyId = property->propertyId();
 
   property->setPropertySet(this);
   _set.prepend(property);
