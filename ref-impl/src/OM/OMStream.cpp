@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMStream.cpp,v 1.16 2006/06/14 20:10:37 tbingham Exp $ $Name:  $
+// $Id: OMStream.cpp,v 1.17 2008/05/05 06:25:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -174,7 +174,7 @@ OMUInt64 OMStream::size(void) const
   OMInt64 status =
 #endif
 #if defined(_MSC_VER)
-  _fstati64( fileno( _file ), &fileStat );
+  _fstati64( _fileno( _file ), &fileStat );
 #else
   fstat( fileno( _file ), &fileStat );
 #endif

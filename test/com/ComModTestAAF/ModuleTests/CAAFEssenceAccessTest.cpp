@@ -2,7 +2,7 @@
 // @com This file implements the module test for CAAFEssenceAccess
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceAccessTest.cpp,v 1.56 2007/08/01 15:15:33 stuart_hc Exp $ $Name:  $
+// $Id: CAAFEssenceAccessTest.cpp,v 1.57 2008/05/05 06:25:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -242,7 +242,7 @@ static aafUInt8 *readDVframe(aafUInt32 *bufferSize)
 // perhaps all examples have access to instead of duplicating code.
 
 #ifdef _MSC_VER			// MS VC++ dosen't provide POSIX strncasecmp, getcwd
-#define strncasecmp(s1, s2, n) strnicmp(s1, s2, n)
+#define strncasecmp(s1, s2, n) _strnicmp(s1, s2, n)
 #include <direct.h>
 #define getcwd(buf, size) _getcwd(buf, size)
 #else
