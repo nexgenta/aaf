@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.58 2007/07/27 21:19:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.59 2008/05/06 09:39:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,8 +36,9 @@
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
 #include "AAFCompressionDefs.h"
+#include "AAFTypeDefUIDs.h"
+#include "AAFStoredObjectIDs.h"
 
-#include "CAAFBuiltinDefs.h"
 
 // {0DB382D1-3BAC-11d3-BFD6-00104BC9156D}
 const CLSID CLSID_AAFJPEGCodec = 
@@ -417,6 +418,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	HRESULT hr = S_OK;
 	IAAFCodecDef	*codecDef = NULL;
+	IAAFDataDef		*pDefPicture = NULL, *pDefLegacyPicture = NULL;
 	IAAFClassDef	*fileClass = NULL;
 	IAAFDefObject	*obj = NULL;
 	IAAFClassDef    *pcd = 0;
@@ -442,10 +444,10 @@ HRESULT STDMETHODCALLTYPE
 		pcd = 0;
 		
 		// Support "Picture" type of data definition.
-		CAAFBuiltinDefs defs (dict);
-		checkResult(codecDef->AddEssenceKind (defs.ddkAAFPicture()));
-		checkResult(codecDef->AddEssenceKind (defs.ddPicture()));
-
+		checkResult(dict->LookupDataDef(kAAFDataDef_Picture, &pDefPicture));
+		checkResult(codecDef->AddEssenceKind(pDefPicture));
+		checkResult(dict->LookupDataDef(kAAFDataDef_LegacyPicture, &pDefLegacyPicture));
+		checkResult(codecDef->AddEssenceKind(pDefLegacyPicture));
 		
 		// Initialize the standard Definition properties.
 		checkResult(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
@@ -484,6 +486,16 @@ HRESULT STDMETHODCALLTYPE
 	}
 
 	// Cleanup on error.
+	if (NULL != pDefLegacyPicture)
+	  {
+		pDefLegacyPicture->Release();
+		pDefLegacyPicture = 0;
+	  }
+	if (NULL != pDefPicture)
+	  {
+		pDefPicture->Release();
+		pDefPicture = 0;
+	  }
 	if (NULL != codecDef)
 	  {
 		codecDef->Release();

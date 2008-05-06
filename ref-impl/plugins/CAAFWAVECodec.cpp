@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.cpp,v 1.70 2007/07/27 21:19:03 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.cpp,v 1.71 2008/05/06 09:39:12 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,8 +36,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-
-#include "CAAFBuiltinDefs.h"
 
 
 #define HEADER_BUFSIZE			2000			// Big enough to hold ANY single-entry coding history
@@ -108,6 +106,7 @@ HRESULT STDMETHODCALLTYPE
 {
 	IAAFClassDef	*fileClass = NULL;
 	IAAFCodecDef	*codecDef = NULL;
+	IAAFDataDef		*pDefSound = NULL, *pDefLegacySound = NULL;
 	IAAFDefObject	*obj = NULL;
 	IAAFClassDef    *pcd = 0;
 	aafUID_t		uid;
@@ -127,9 +126,10 @@ HRESULT STDMETHODCALLTYPE
 		uid = kAAFCodecWAVE;
 		CHECK(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
 		CHECK(codecDef->Initialize(uid, L"WAVE Codec", L"Handles RIFF WAVE data."));
-		CAAFBuiltinDefs defs (dict);
-		CHECK(codecDef->AddEssenceKind (defs.ddkAAFSound()));
-		CHECK(codecDef->AddEssenceKind (defs.ddSound()));
+		CHECK(dict->LookupDataDef(kAAFDataDef_Sound, &pDefSound));
+		CHECK(codecDef->AddEssenceKind(pDefSound));
+		CHECK(dict->LookupDataDef(kAAFDataDef_LegacySound, &pDefLegacySound));
+		CHECK(codecDef->AddEssenceKind(pDefLegacySound));
 	  	CHECK(dict->LookupClassDef(AUID_AAFWAVEDescriptor, &fileClass));
 		CHECK(codecDef->SetFileDescriptorClass (fileClass));
 		fileClass->Release ();
@@ -140,6 +140,16 @@ HRESULT STDMETHODCALLTYPE
 	}
 	XEXCEPT
 	{
+		if(pDefLegacySound != NULL)
+		{
+			pDefLegacySound->Release();
+			pDefLegacySound = 0;
+		}
+		if(pDefSound != NULL)
+		{
+			pDefSound->Release();
+			pDefSound = 0;
+		}
 		if(codecDef != NULL)
 		  {
 			codecDef->Release();

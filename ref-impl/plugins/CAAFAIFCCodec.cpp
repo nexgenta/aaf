@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.19 2007/07/27 21:19:02 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.20 2008/05/06 09:39:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,8 +36,6 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-
-#include "CAAFBuiltinDefs.h"
 
 #define STD_HDRSIZE_NODATA		256			// Make sure that the buffer is big enough
 
@@ -112,6 +110,7 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 {
 	IAAFClassDef	*fileClass = NULL;
 	IAAFCodecDef	*codecDef = NULL;
+	IAAFDataDef		*pDefSound = NULL, *pDefLegacySound = NULL;
 	IAAFDefObject	*obj = NULL;
 	IAAFClassDef    *pcd = 0;
 	aafUID_t		uid;
@@ -131,9 +130,10 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 		uid = kAAFCODEC_AIFC;
 		CHECK(codecDef->QueryInterface(IID_IAAFDefObject, (void **)&obj));
 		CHECK(codecDef->Initialize(uid, L"AIFC Codec", L"Handles RIFF AIFC data."));
-		CAAFBuiltinDefs defs (dict);
-		CHECK(codecDef->AddEssenceKind (defs.ddkAAFSound()));
-		CHECK(codecDef->AddEssenceKind (defs.ddSound()));
+		CHECK(dict->LookupDataDef(kAAFDataDef_Sound, &pDefSound));
+		CHECK(codecDef->AddEssenceKind(pDefSound));
+		CHECK(dict->LookupDataDef(kAAFDataDef_LegacySound, &pDefLegacySound));
+		CHECK(codecDef->AddEssenceKind(pDefLegacySound));
 		CHECK(dict->LookupClassDef(AUID_AAFAIFCDescriptor, &fileClass));
 		CHECK(codecDef->SetFileDescriptorClass (fileClass));
 		fileClass->Release ();
@@ -144,6 +144,16 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 	}
 	XEXCEPT
 	{
+		if(pDefLegacySound != NULL)
+		{
+			pDefLegacySound->Release();
+			pDefLegacySound = 0;
+		}
+		if(pDefSound != NULL)
+		{
+			pDefSound->Release();
+			pDefSound = 0;
+		}
 		if(codecDef != NULL)
 		{
 			codecDef->Release();
