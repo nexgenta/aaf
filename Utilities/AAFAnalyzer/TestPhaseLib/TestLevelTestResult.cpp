@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestLevelTestResult.cpp,v 1.5 2007/09/16 15:04:36 jptrainor Exp $
+// $Id: TestLevelTestResult.cpp,v 1.6 2008/05/18 18:37:01 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -79,34 +79,34 @@ const enum TestResult::ResultLevel TestLevelTestResult::GetResultType() const
   return TestResult::TEST;
 }
 
+
 shared_ptr<DetailLevelTestResult> TestLevelTestResult::AddSingleResult( const wstring& reqId,
+                                                                        const wstring& explain,
                                                                         Result result,
-                                                                        const wstring& resultName,
-                                                                        const wstring& resultDesc,
-                                                                        const wstring& resultExplain )
+									Node& node )
 {
   shared_ptr<DetailLevelTestResult>
     spResult( new DetailLevelTestResult( this->GetAssociatedTest(),
-                                         resultName,
-                                         resultDesc,
-                                         resultExplain,
+                                         explain,
                                          reqId,
-                                         result ) );
+                                         result,
+					 node.GetSharedPointerToNode() ) );
 
   this->AddSubtestResult( spResult );
 
   return spResult;
 }
 
-shared_ptr<DetailLevelTestResult> TestLevelTestResult::AddSingleResult( const wstring& reqId,
-                                                                        const wstring& explain,
-                                                                        Result result )
+shared_ptr<DetailLevelTestResult> TestLevelTestResult::AddUnassociatedSingleResult( const wstring& reqId,
+										    const wstring& explain,
+										    Result result )
 {
   shared_ptr<DetailLevelTestResult>
     spResult( new DetailLevelTestResult( this->GetAssociatedTest(),
                                          explain,
                                          reqId,
-                                         result ) );
+                                         result,
+					 shared_ptr<Node>() ) );
 
   this->AddSubtestResult( spResult );
 

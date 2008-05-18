@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxUtil.cpp,v 1.23 2008/02/26 05:44:57 stuart_hc Exp $ $Name:  $
+// $Id: AxUtil.cpp,v 1.24 2008/05/18 18:37:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <limits.h>
 #include <errno.h>
 
 //=---------------------------------------------------------------------=

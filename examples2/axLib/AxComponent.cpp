@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.cpp,v 1.26 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
+// $Id: AxComponent.cpp,v 1.27 2008/05/18 18:37:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -42,6 +42,23 @@ aafLength_t AxComponent::GetLength()
 	CHECK_HRESULT( _spIaafComponent->GetLength( &len ) );
 
 	return len;
+}
+
+std::pair<bool,aafLength_t> AxComponent::ExistsLength()
+{
+  std::pair<bool,aafLength_t> len(true,0);
+
+  AAFRESULT hresult = _spIaafComponent->GetLength( &len.second );
+  if ( hresult == AAFRESULT_PROP_NOT_PRESENT )
+  {
+    len.first = false;
+  }
+  else
+  {
+    CHECK_HRESULT( hresult );
+  }
+
+  return len;
 }
 
 void AxComponent::SetLength( const aafLength_t& len )

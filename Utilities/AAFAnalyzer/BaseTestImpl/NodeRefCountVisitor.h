@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: NodeRefCountVisitor.h,v 1.3 2007/08/21 14:08:18 jptrainor Exp $
+// $Id: NodeRefCountVisitor.h,v 1.4 2008/05/18 18:36:52 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -123,9 +123,17 @@ class NodeRefCountVisitor : public TypedVisitor
     return spRefCountMap;
   }
 
-  // Return a vector of all nodes with a particular reference count.
+  static bool CompareEqual( int rhs, int lhs )
+  {
+    return rhs == lhs;
+  }
 
-  ReferencedNodeVectorSP GetNodesWithCount( int refCount )
+  static bool CompareGreater( int rhs, int lhs )
+  {
+    return rhs > lhs;
+  }
+
+  ReferencedNodeVectorSP GetNodesComparedToCount( int refCount, bool (*CompareFunc)(int,int) )
   {
     ReferencedNodeVectorSP spNodes( new ReferencedNodeVector );
 
@@ -135,7 +143,7 @@ class NodeRefCountVisitor : public TypedVisitor
     NodeMap::const_iterator iter;
     for( iter = _nodeMap.begin(); iter != _nodeMap.end(); ++iter )
     {
-      if ( iter->second == refCount )
+      if ( CompareFunc(iter->second, refCount) )
       {
 	shared_ptr<Node> spNode = iter->first;
     
@@ -146,6 +154,20 @@ class NodeRefCountVisitor : public TypedVisitor
     }
     
     return spNodes;
+  }
+
+  // Return a vector of all nodes with a particular reference count.
+
+  ReferencedNodeVectorSP GetNodesWithCount( int refCount )
+  {
+    return GetNodesComparedToCount( refCount, CompareEqual );
+  }
+
+  // Return a vector of all nodes with a count greater than or equal to minRefCount.
+
+  ReferencedNodeVectorSP GetNodesWithCountGreater( int refCount )
+  {
+    return GetNodesComparedToCount( refCount, CompareGreater );
   }
 
  private:

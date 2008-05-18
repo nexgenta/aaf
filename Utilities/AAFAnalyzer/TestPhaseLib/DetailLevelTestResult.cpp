@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.cpp,v 1.7 2007/09/23 14:13:49 jptrainor Exp $
+// $Id: DetailLevelTestResult.cpp,v 1.8 2008/05/18 18:37:01 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -48,25 +48,15 @@ using namespace boost;
 DetailLevelTestResult::DetailLevelTestResult( const shared_ptr<const Test> associatedTest,
                                               const wstring& explain,
                                               const wstring& reqId,
-                                              Result result )
+                                              Result result,
+					      shared_ptr<Node> spNode )
   : LowLevelTestResult( associatedTest, L"", L"", explain ),
-    _reqId( reqId )
+    _reqId( reqId ),
+    _spNode( spNode )
 {
   shared_ptr<const Requirement> spReq = GetRequirement();
   SetName( spReq->GetName() );
   SetDescription( spReq->GetDescription() );
-  SetResult( _reqId, result );
-}
-
-DetailLevelTestResult::DetailLevelTestResult( const shared_ptr<const Test> associatedTest,
-                                              const wstring& name,
-                                              const wstring& desc,
-                                              const wstring& explain,
-                                              const wstring& reqId,
-                                              Result result )
-  : LowLevelTestResult( associatedTest, name, desc, explain ),
-    _reqId( reqId )
-{
   SetResult( _reqId, result );
 }
 
@@ -147,6 +137,11 @@ shared_ptr<const Requirement> DetailLevelTestResult::GetRequirement() const
 
   // Look up and return the requirement.
   return this->GetAssociatedTest()->GetRequirement( _reqId );
+}
+
+shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode()
+{
+  return _spNode;
 }
 
 } // end of namespace diskstream

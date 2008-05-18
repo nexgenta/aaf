@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.cpp,v 1.1 2007/08/21 14:08:14 jptrainor Exp $
+// $Id: CompMobDependency.cpp,v 1.2 2008/05/18 18:36:52 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -52,7 +52,9 @@ using namespace std;
 using namespace boost;
 
 CompMobDependency::CompMobDependency(wostream& os, shared_ptr<const TestGraph> spGraph)
-: Test(os, GetTestInfo() )
+  : Test(os, GetTestInfo() ),
+    _spRootCompMobs(),
+    _spNonRootCompMobs()
 {
   SetTestGraph(spGraph);
 }
@@ -94,6 +96,9 @@ shared_ptr<TestLevelTestResult> CompMobDependency::Execute()
 
   spTestLevelResult->AddDetail( ss.str() );
 
+  // And the non root comp mobs.
+  _spNonRootCompMobs = spVisitor->GetNodesWithCountGreater(0);
+
   return spTestLevelResult;
 }
 
@@ -113,6 +118,11 @@ AxString CompMobDependency::GetDescription() const
 CompMobDependency::CompMobNodeVectorSP CompMobDependency::GetRootCompMobNodes()
 {
   return _spRootCompMobs;
+}
+
+CompMobDependency::CompMobNodeVectorSP CompMobDependency::GetNonRootCompMobNodes()
+{
+  return _spNonRootCompMobs;
 }
 
 const TestInfo CompMobDependency::GetTestInfo()

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CompMobDependency.h,v 1.1 2007/08/21 14:08:14 jptrainor Exp $ $Name:  $
+// $Id: CompMobDependency.h,v 1.2 2008/05/18 18:36:52 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -56,6 +56,8 @@ class CompMobDependency : public Test
 
   CompMobNodeVectorSP GetRootCompMobNodes();
 
+  CompMobNodeVectorSP GetNonRootCompMobNodes();
+
  private:
 
   // prohibited
@@ -64,6 +66,7 @@ class CompMobDependency : public Test
   CompMobDependency& operator=( const CompMobDependency& );
 
   CompMobNodeVectorSP _spRootCompMobs;
+  CompMobNodeVectorSP _spNonRootCompMobs;
 };
 
 } // end of namespace diskstream

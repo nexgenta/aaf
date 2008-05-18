@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ResolveRefVisitor.cpp,v 1.10 2007/09/23 14:13:44 jptrainor Exp $
+// $Id: ResolveRefVisitor.cpp,v 1.11 2008/05/18 18:36:52 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -222,7 +222,8 @@ bool ResolveRefVisitor::PostOrderVisit(AAFTypedObjNode<IAAFSourceClip>& node)
 
     _spTestLevelResult->AddSingleResult( L"REQ_EP_016",
                                          explain,
-					 TestResult::WARN );
+					 TestResult::WARN,
+					 node );
 
   }
 
@@ -294,10 +295,9 @@ shared_ptr<Node> ResolveRefVisitor::ResolveChildSlotNode( shared_ptr<EdgeMap> sp
      << L" with id " << AxStringUtil::mobid2Str( axParentMob.GetMobID() );
 
   _spTestLevelResult->AddSingleResult( L"REQ_EP_257",
+                                       ss.str(),
                                        TestResult::FAIL,
-                                       L"Slot Resolve",
-                                       L"Lookup slot in resolved mob.",
-                                       ss.str() );
+				       *spParentMobNode );
 
   return shared_ptr<Node>();
 }

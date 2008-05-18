@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: AxComponent.h,v 1.25 2007/07/18 04:58:37 jptrainor Exp $ $Name:  $
+// $Id: AxComponent.h,v 1.26 2008/05/18 18:37:09 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -37,6 +37,7 @@ public:
 	virtual ~AxComponent();
 
 	aafLength_t GetLength();
+	std::pair<bool,aafLength_t> ExistsLength();
 	void SetLength( const aafLength_t& len );
 
 	void SetDataDef( IAAFDataDefSP );

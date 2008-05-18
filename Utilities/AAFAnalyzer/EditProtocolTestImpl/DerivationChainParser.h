@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DerivationChainParser.h,v 1.1 2007/09/23 14:13:44 jptrainor Exp $
+// $Id: DerivationChainParser.h,v 1.2 2008/05/18 18:36:54 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -41,6 +41,7 @@ using namespace std;
 using namespace boost;
 
 class TestLevelTestResult;
+class Node;
 
 class DerivationChainParser
 {
@@ -69,14 +70,15 @@ class DerivationChainParser
   // false if not.
   // Test results are added to spTestResult.
   bool Transition( const EventID& event,
-                   const AxString& nextName );
+                   const AxString& nextName,
+		   Node& node );
 
   // Retrns true if the parser has reached a valid end state (no
   // further events can be parsed).
   bool IsInEndState() const;
 
   // Call to verify the end state is value after processing all available tokens.
-  void CheckEndState();
+  void CheckEndState( Node& node );
   
   // Add a detail message the is formated (i.e. indented) the same way
   // the the messages generated internally by this class are formated.
@@ -125,14 +127,16 @@ private:
   static void InitStateNames();
 
   void AddNotationalResult( const wstring& nextName,
-			    State currentState );
+			    State currentState,
+			    Node& node );
 
-  void AddFinalNotationalResult();
+  void AddFinalNotationalResult( Node& node );
 
   void AddParseErrorResults( const wstring& curName,
 			     const wstring& nextName,
 			     const EventID& event,
-			     State currentState );
+			     State currentState,
+			     Node& node );
 
   // state variables
   stack<State> _currentState;
