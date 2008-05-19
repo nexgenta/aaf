@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.h,v 1.6 2008/05/18 18:37:01 jptrainor Exp $ $Name:  $
+// $Id: DetailLevelTestResult.h,v 1.7 2008/05/19 03:39:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,10 @@ class DetailLevelTestResult : public LowLevelTestResult
 
   // Returns ~0 if this result is not associated with any particular
   // node.
-  shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode();
+  shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode() const;
+
+  // Get the require id against which this result is being reported.
+  const wstring& GetId() const;
 
  private:
 
@@ -91,7 +94,7 @@ class DetailLevelTestResult : public LowLevelTestResult
   // This is here primarily to aid debugging. We add test results
   // on at a time against requirements, but they are accumulated
   // in sets in the TestResult base class. This is less obtuse.
-  const wstring& _reqId;
+  const wstring _reqId;
 
   // The node associated with the AAF object that caused the error.
   shared_ptr<Node> _spNode;

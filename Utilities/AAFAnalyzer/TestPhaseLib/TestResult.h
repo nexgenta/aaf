@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.h,v 1.11 2008/05/18 18:37:09 jptrainor Exp $ $Name:  $
+// $Id: TestResult.h,v 1.12 2008/05/19 03:39:42 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -72,6 +72,7 @@ class TestResult
   // this is the agreggate result. (i.e. the worst result 
   // amount all the children.
   Result GetResult() const;
+  const wstring& GetResultAsString() const;
 
   // This test's child results.
   const SubtestResultVector& GetSubtestResults() const;
@@ -171,6 +172,9 @@ class TestResult
 
   // Arbitrary comments that can be added to any result.
   vector<wstring> _details;
+
+  // map Result enum to string name.
+  static map<Result,wstring> _resultToString;
 };
 
 } // end of namespace diskstream

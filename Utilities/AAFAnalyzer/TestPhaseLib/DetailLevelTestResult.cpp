@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.cpp,v 1.8 2008/05/18 18:37:01 jptrainor Exp $
+// $Id: DetailLevelTestResult.cpp,v 1.9 2008/05/19 03:39:42 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -139,9 +139,14 @@ shared_ptr<const Requirement> DetailLevelTestResult::GetRequirement() const
   return this->GetAssociatedTest()->GetRequirement( _reqId );
 }
 
-shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode()
+shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode() const
 {
   return _spNode;
+}
+
+const wstring& DetailLevelTestResult::GetId() const
+{
+  return _reqId;
 }
 
 } // end of namespace diskstream
