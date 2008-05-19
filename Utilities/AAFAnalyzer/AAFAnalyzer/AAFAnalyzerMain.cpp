@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.36 2008/05/19 03:39:41 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.37 2008/05/19 20:17:15 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -445,9 +445,9 @@ void RecursiveOutputXMLResults( shared_ptr<const TestResult> res, wostream& os )
 
 void OutputXMLResults(shared_ptr<const TestResult> res, wostream& os)
 {
-  os << "<aafanalyzer_results version=\"" << AAFANALYZER_VERSION << "\"" << endl;
+  os << "<aafanalyzer_results version=\"" << AAFANALYZER_VERSION << "\">" << endl;
   RecursiveOutputXMLResults(res,os);
-  os << "<\aafanalyzer_results>" << endl;
+  os << "</aafanalyzer_results>" << endl;
 }
 
 //======================================================================
