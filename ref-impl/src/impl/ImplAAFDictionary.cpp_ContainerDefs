@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: ImplAAFDictionary.cpp_ContainerDefs,v 1.2 2007/08/16 03:25:00 terabrit Exp $ $Name:  $
+// $Id: ImplAAFDictionary.cpp_ContainerDefs,v 1.3 2008/05/22 21:22:52 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -473,6 +473,11 @@ InitContainerDefinition (
 InitContainerDefinition (
   kAAFContainerDef_MXFGC_Avid_DNX_220_1080i, 
   L"ContainerDef_MXFGC_Avid_DNX_220_1080i", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Avid_DNX_145_1440_1080i, 
+  L"ContainerDef_MXFGC_Avid_DNX_145_1440_1080i", 
   L"");
 
 InitContainerDefinition (

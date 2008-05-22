@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFContainerDefs.h,v 1.16 2007/08/16 03:24:38 terabrit Exp $ $Name:  $
+// $Id: AAFContainerDefs.h,v 1.17 2008/05/22 21:21:25 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -476,6 +476,11 @@ const aafUID_t kAAFContainerDef_MXFGC_Avid_DNX_145_1080i =
 //{0e040301-0206-0203-060e-2b3404010101}
 const aafUID_t kAAFContainerDef_MXFGC_Avid_DNX_220_1080i =
 {0x0e040301, 0x0206, 0x0203, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{0e040301-0206-0204-060e-2b3404010101}
+const aafUID_t kAAFContainerDef_MXFGC_Avid_DNX_145_1440_1080i =
+{0x0e040301, 0x0206, 0x0204, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0e040301-0206-0301-060e-2b3404010101}
