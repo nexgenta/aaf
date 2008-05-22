@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCIDescriptorHelper.h,v 1.11 2007/09/19 20:01:12 terabrit Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptorHelper.h,v 1.12 2008/05/22 21:26:42 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -82,6 +82,9 @@ public:
 	STDMETHOD (GetSampleRate) (aafRational_t*  pRate);
 	STDMETHOD (SetContainerFormat) (IAAFContainerDef *pFormat);
 	STDMETHOD (GetContainerFormat) (IAAFContainerDef **ppFormat);
+	// Added methods to go direct to AUID
+	STDMETHOD (SetContainerFormat) (const aafUID_t &FormatID);
+	STDMETHOD (GetContainerFormat) (aafUID_t *pFormatID);
 	//
 	// DigitalImageDescriptor methods:
 	//
