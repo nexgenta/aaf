@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: DetailLevelTestResult.h,v 1.7 2008/05/19 03:39:42 jptrainor Exp $ $Name:  $
+// $Id: DetailLevelTestResult.h,v 1.8 2008/05/22 08:28:36 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,7 +77,7 @@ class DetailLevelTestResult : public LowLevelTestResult
 
   // Returns ~0 if this result is not associated with any particular
   // node.
-  shared_ptr<Node> DetailLevelTestResult::GetAssociatedNode() const;
+  shared_ptr<Node> GetAssociatedNode() const;
 
   // Get the require id against which this result is being reported.
   const wstring& GetId() const;

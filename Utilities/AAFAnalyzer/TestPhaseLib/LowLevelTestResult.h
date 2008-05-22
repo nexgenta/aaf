@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: LowLevelTestResult.h,v 1.4 2007/08/21 14:08:34 jptrainor Exp $ $Name:  $
+// $Id: LowLevelTestResult.h,v 1.5 2008/05/22 08:28:37 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -60,7 +60,7 @@ class LowLevelTestResult : public TestResult
   LowLevelTestResult( const LowLevelTestResult& );
   LowLevelTestResult& operator=( const LowLevelTestResult& );
 
-  void LowLevelTestResult::SetRequirementStatus( TestResult::Result level, const shared_ptr<const Requirement>& req);
+  void SetRequirementStatus( TestResult::Result level, const shared_ptr<const Requirement>& req);
 
   const shared_ptr<const Test> _spAssociatedTest;
 };
