@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.37 2008/05/19 20:17:15 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.38 2008/05/22 07:15:25 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -420,10 +420,11 @@ void OutputSimpleResultMsgs( shared_ptr<const TestResult> res )
 
 void WriteXMLResult(shared_ptr<const DetailLevelTestResult> res, wostream& os)
 {
-  os << "\t<req id=\"" << res->GetId() << "\">" << endl;
-  os << "\t\t<result>" << res->GetResultAsString() << "</result>" << endl;
+  os << "\t<result>" << endl;
+  os << "\t\t<id>" <<  res->GetId() << "</id>" << endl;
+  os << "\t\t<status>" << res->GetResultAsString() << "</status>" << endl;
   os << "\t\t<explain><![CDATA[" << res->GetExplanation() << "]]></explain>" << endl;
-  os << "\t</req>" << endl;
+  os << "\t</result>" << endl;
 }
 
 void RecursiveOutputXMLResults( shared_ptr<const TestResult> res, wostream& os )
