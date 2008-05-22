@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.38 2008/05/22 07:15:25 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.39 2008/05/22 08:30:22 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -671,7 +671,7 @@ public:
     }
 
     req_stmnt_os << report << L", ";
-    req_stmnt_os << Q( L"current", false );
+    req_stmnt_os << Q( L"active", false );
     req_stmnt_os << L");";
     req_stmnt_os << endl;
     _insert_requirement_stmnts.insert( req_stmnt_os.str() );
