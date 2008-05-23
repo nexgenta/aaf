@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.10 2007/09/14 15:39:59 jptrainor Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.11 2008/05/23 08:08:40 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -109,7 +109,6 @@ realclean:
 	cd AAFAnalyzerBase && $(MAKE) GENDEPS=0 $@
 	cd EPAnalyzerBase && $(MAKE) GENDEPS=0 $@
 	cd TestPhaseLib && $(MAKE) GENDEPS=0 $@
-	cd RegressionTest && $(MAKE) GENDEPS=0 $@
 	cd BaseTestImpl && $(MAKE) GENDEPS=0 $@
 	cd EditProtocolTestImpl && $(MAKE) GENDEPS=0 $@
 	cd AAFAnalyzer && $(MAKE) GENDEPS=0 $@
