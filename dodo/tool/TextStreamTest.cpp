@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TextStreamTest.cpp,v 1.3 2004/02/27 14:26:35 stuart_hc Exp $ $Name:  $
+// $Id: TextStreamTest.cpp,v 1.4 2008/05/23 21:08:22 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -45,7 +45,7 @@ void TextStream::Test ()
   assert (0 == ts1._cachedLen);
   assert (0 == ts1.GetLength());
 
-  char * str = "What's up with this?\nI just want to know.\n";
+  const char * str = "What's up with this?\nI just want to know.\n";
   TextStream ts2 (str);
   assert (strlen (str) == ts2._cachedLen);
   assert (strlen (str) == ts2.GetLength());
