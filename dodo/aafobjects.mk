@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.172 2007/02/02 19:24:31 akharkev Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.173 2008/05/23 12:46:36 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -265,6 +265,7 @@ PLUGIN_OBJECTS="\
 	AAFEssenceCodec2 \
 	AAFEssenceContainer \
 	AAFEssenceDataStream \
+	AAFEssenceDataStream2 \
 	AAFEssenceStream \
 	AAFInterpolator \
 	AAFMultiEssenceCodec \
