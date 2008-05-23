@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveClip.cpp,v 1.5 2007/04/17 17:32:51 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.cpp,v 1.6 2008/05/23 21:53:56 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -251,7 +251,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::IsDescribedSlotIDPresent (aafUInt32  describedSlotID,
+    CAAFDescriptiveClip::IsDescribedSlotIDPresent (aafUInt32  DescribedSlotID,
         aafBoolean_t*  pIsPresent)
 {
   HRESULT hr;
@@ -267,7 +267,7 @@ HRESULT STDMETHODCALLTYPE
   try
     {
       hr = ptr->IsDescribedSlotIDPresent
-       (describedSlotID,
+       (DescribedSlotID,
         pIsPresent);
     }
   catch (OMException& e)
@@ -305,7 +305,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::AddDescribedSlotID (aafUInt32  describedSlotID)
+    CAAFDescriptiveClip::AddDescribedSlotID (aafUInt32  DescribedSlotID)
 {
   HRESULT hr;
 
@@ -320,7 +320,7 @@ HRESULT STDMETHODCALLTYPE
   try
     {
       hr = ptr->AddDescribedSlotID
-       (describedSlotID);
+       (DescribedSlotID);
     }
   catch (OMException& e)
     {
@@ -357,7 +357,7 @@ HRESULT STDMETHODCALLTYPE
 
 
 HRESULT STDMETHODCALLTYPE
-    CAAFDescriptiveClip::RemoveDescribedSlotID (aafUInt32  describedSlotID)
+    CAAFDescriptiveClip::RemoveDescribedSlotID (aafUInt32  DescribedSlotID)
 {
   HRESULT hr;
 
@@ -372,7 +372,7 @@ HRESULT STDMETHODCALLTYPE
   try
     {
       hr = ptr->RemoveDescribedSlotID
-       (describedSlotID);
+       (DescribedSlotID);
     }
   catch (OMException& e)
     {

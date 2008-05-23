@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveClip.h,v 1.4 2007/04/17 17:32:51 phil_tudor Exp $ $Name:  $
+// $Id: CAAFDescriptiveClip.h,v 1.5 2008/05/23 21:53:56 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,7 +71,7 @@ public:
   /// the given properties.  Only required properties are set.
   /// Optional properties are added with separate functions.
   ///
-  /// Succeeds if:
+  /// Succeds if:
   /// - This object has not already been Initialize()d.
   ///
   /// This method will return the following codes.  If more than one of
@@ -199,10 +199,10 @@ public:
   ///   - the DescribedSlotIDs property is not present.
   //
   STDMETHOD (IsDescribedSlotIDPresent) (
-    // Described slot ID whose presence is to be queried
-    /*[in]*/ aafUInt32  describedSlotID,
+    // described slot ID whose presence is to be queried
+    /*[in]*/ aafUInt32  DescribedSlotID,
 
-    // True if describedSlotID is present
+    // True if DescribedSlotID is present
     /*[out,retval]*/ aafBoolean_t*  pIsPresent);
 
 
@@ -229,8 +229,8 @@ public:
   ///     of described slot IDs referenced by this DescriptiveClip.
   //
   STDMETHOD (AddDescribedSlotID) (
-    // Described slot ID to add. 
-    /*[in]*/ aafUInt32  describedSlotID);
+    // described slot ID to add. 
+    /*[in]*/ aafUInt32  DescribedSlotID);
 
 
   //***********************************************************
@@ -263,8 +263,8 @@ public:
   ///     of described slot IDs referenced by this DescriptiveClip.
   //
   STDMETHOD (RemoveDescribedSlotID) (
-    // Described slot ID to remove. 
-    /*[in]*/ aafUInt32  describedSlotID);
+    // described slot ID to remove. 
+    /*[in]*/ aafUInt32  DescribedSlotID);
 
 
 
