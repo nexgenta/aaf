@@ -2,7 +2,7 @@
 // @com This file implements tests for variour file kinds
 //=---------------------------------------------------------------------=
 //
-// $Id: ComFileKindTest.cpp,v 1.30 2008/05/05 09:18:24 stuart_hc Exp $ $Name:  $
+// $Id: ComFileKindTest.cpp,v 1.31 2008/05/23 08:16:32 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,8 +43,6 @@ using namespace std;
 #include "AAFDefUIDs.h"
 #include "AAFFileMode.h"
 #include "AAFFileKinds.h"
-
-#include "CAAFBuiltinDefs.h"
 
 static void RemoveTestFile(const aafWChar* pFileName)
 {
@@ -158,11 +156,12 @@ static HRESULT WriteAAFFile(IAAFFile* pFile)
 
     // Get the AAF Dictionary
     checkResult(pHeader->GetDictionary(&pDictionary));
-    CAAFBuiltinDefs defs (pDictionary);
 
     // Create a Mob
-    checkResult(defs.cdMasterMob()->CreateInstance(IID_IAAFMob, 
-                                                   (IUnknown **)&pMob));
+	IAAFClassDef *classDef = NULL;
+    checkResult(pDictionary->LookupClassDef(AUID_AAFMasterMob, &classDef));
+    checkResult(classDef->CreateInstance(IID_IAAFMob, (IUnknown **)&pMob));
+	classDef->Release();
 
     // Initialize the Mob
     checkResult(pMob->SetMobID(TEST_MobID));

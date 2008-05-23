@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPersonnelResource.cpp,v 1.13 2007/08/01 15:15:17 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPersonnelResource.cpp,v 1.14 2008/05/23 08:16:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,8 +34,6 @@
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
-
-#include "CAAFBuiltinDefs.h"
 
 
 
@@ -672,6 +670,7 @@ HRESULT STDMETHODCALLTYPE
 	IAAFPluginDef	*desc = NULL;
 	IAAFLocator				*pLoc = NULL;
  	IAAFNetworkLocator		*pNetLoc = NULL;
+ 	IAAFClassDef			*classDef = NULL;
 	
 	if ((NULL == dict) || (NULL == descPtr))
 		return AAFRESULT_NULL_PARAM;
@@ -681,11 +680,10 @@ HRESULT STDMETHODCALLTYPE
 
 	try
 	{
-	    CAAFBuiltinDefs defs (dict);
-
-		checkResult(defs.cdPluginDef()->
-					CreateInstance(IID_IAAFPluginDef, 
-								   (IUnknown **)&desc));
+	    checkResult(dict->LookupClassDef(AUID_AAFPluginDefinition, &classDef));
+		checkResult(classDef-> CreateInstance(IID_IAAFPluginDef, (IUnknown **)&desc));
+		classDef->Release();
+		classDef = NULL;
 
 		checkResult(desc->Initialize(AVID_PERSONNELRESOURCE_PLUGIN,
 		                       const_cast<wchar_t *>(kPersonnelResourceDisplayName),
@@ -699,9 +697,8 @@ HRESULT STDMETHODCALLTYPE
 		checkResult(desc->SetSupportsAuthentication(kAAFFalse));
 
 		// Create the network locator for the Manufacturer's web site: 
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFLocator, 
-								   (IUnknown **)&pLoc));
+		checkResult(dict->LookupClassDef(AUID_AAFNetworkLocator, &classDef));
+		checkResult(classDef->CreateInstance(IID_IAAFLocator, (IUnknown **)&pLoc));
 		checkResult(pLoc->SetPath (kManufURL));
 		checkResult(pLoc->QueryInterface(IID_IAAFNetworkLocator, (void **)&pNetLoc));
 		checkResult(desc->SetManufacturerInfo(pNetLoc));
@@ -712,12 +709,12 @@ HRESULT STDMETHODCALLTYPE
 
 		
 		// Create a Network locator to point to our default download site.
-		checkResult(defs.cdNetworkLocator()->
-					CreateInstance(IID_IAAFLocator, 
-								   (IUnknown **)&pLoc));
+		checkResult(classDef->CreateInstance(IID_IAAFLocator, (IUnknown **)&pLoc));
 		checkResult(pLoc->SetPath (kDownloadURL));
 		checkResult(desc->AppendLocator(pLoc));
 	
+		classDef->Release();
+		classDef = NULL;
 		pLoc->Release();
 		pLoc = NULL;
 
@@ -742,6 +739,8 @@ HRESULT STDMETHODCALLTYPE
 		pLoc->Release();
 	if (NULL != pNetLoc)
 		pNetLoc->Release();
+	if (NULL != classDef)
+		classDef->Release();
 
 
 	return hr;

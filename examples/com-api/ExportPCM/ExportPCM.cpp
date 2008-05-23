@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportPCM.cpp,v 1.9 2007/08/09 18:17:43 stuart_hc Exp $ $Name:  $
+// $Id: ExportPCM.cpp,v 1.10 2008/05/23 08:16:31 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -43,7 +43,6 @@ using namespace std;
 #include "AAFContainerDefs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
-#include "CAAFBuiltinDefs.h"		// for cdMasterMob()
 
 // Include the AAF interface declarations.
 #include "AAF.h"
@@ -191,8 +190,12 @@ static HRESULT CreateAAFFile(const aafWChar * pFileName)
 	check(pHeader->AddMob(pMob));
 
 	// Locator needed for non-embedded essence
-	CAAFBuiltinDefs defs(pDictionary);
-	check(defs.cdNetworkLocator()->CreateInstance(IID_IAAFLocator, (IUnknown **)&pLocator));
+	IAAFClassDef *classDef = NULL;
+	check(pDictionary->LookupClassDef(AUID_AAFNetworkLocator, &classDef));
+	check(classDef->CreateInstance(IID_IAAFLocator, (IUnknown **)&pLocator));
+	classDef->Release();
+	classDef = NULL;
+
 	if (container == NIL_UID)
 	{
 		pLocator = NULL;
