@@ -2,7 +2,7 @@
 #define __CAAFBuiltinDefs_h__
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBuiltinDefs.h,v 1.8 2006/04/05 13:42:42 jlow Exp $ $Name:  $
+// $Id: CAAFBuiltinDefs.h,v 1.16 2008/05/23 08:25:18 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

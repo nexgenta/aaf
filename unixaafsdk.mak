@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: unixaafsdk.mak,v 1.19 2007/08/08 14:29:21 stuart_hc Exp $ $Name:  $
+# $Id: unixaafsdk.mak,v 1.20 2008/05/23 08:25:18 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -228,8 +228,7 @@ TARGET_H_FILES = \
 	$(AAFSDK_INCLUDE)/AAFSmartPointer2.h \
 	$(AAFSDK_INCLUDE)/AAFSmartPointerBase.h \
 	$(AAFSDK_INCLUDE)/AAFStoredObjectIDs.h \
-	$(AAFSDK_INCLUDE)/AAFTypeDefUIDs.h \
-	$(AAFSDK_INCLUDE)/CAAFBuiltinDefs.h
+	$(AAFSDK_INCLUDE)/AAFTypeDefUIDs.h
 
 
 #
@@ -510,9 +509,6 @@ $(AAFSDK_INCLUDE)/AAFStoredObjectIDs.h : $(TOOLKIT_INCLUDE)/AAFStoredObjectIDs.h
 
 $(AAFSDK_INCLUDE)/AAFTypeDefUIDs.h : $(TOOLKIT_INCLUDE)/AAFTypeDefUIDs.h
 	$(UPDATE) $(TOOLKIT_INCLUDE)/AAFTypeDefUIDs.h $@
-
-$(AAFSDK_INCLUDE)/CAAFBuiltinDefs.h : $(TOOLKIT_INCLUDE)/CAAFBuiltinDefs.h
-	$(UPDATE) $(TOOLKIT_INCLUDE)/CAAFBuiltinDefs.h $@
 
 
 #
