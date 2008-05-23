@@ -1,5 +1,5 @@
 /*
- *  $Id: avilib.h,v 1.2 2005/09/01 16:05:07 stuart_hc Exp $ $Name:  $
+ *  $Id: avilib.h,v 1.3 2008/05/23 08:10:26 stuart_hc Exp $ $Name:  $
  *
  *  avilib.h
  *
@@ -390,7 +390,7 @@ int  AVI_read_data(avi_t *AVI, char *vidbuf, long max_vidbuf,
                                long *len);
 
 void AVI_print_error(char *str);
-char *AVI_strerror(void);
+const char *AVI_strerror(void);
 char *AVI_syserror(void);
 
 int AVI_scan(char *name);
