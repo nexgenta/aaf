@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.cpp,v 1.12 2008/05/19 03:39:42 jptrainor Exp $
+// $Id: TestResult.cpp,v 1.13 2008/05/24 05:47:04 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -129,6 +129,12 @@ enum TestResult::Result TestResult::GetResult() const
 const wstring& TestResult::GetResultAsString() const
 {
   return _resultToString[_result];
+}
+
+/*static*/
+const wstring& TestResult::ResultToString(Result result)
+{
+  return TestResult::_resultToString[result];
 }
 
 void TestResult::SetExplanation(const wstring& exp)

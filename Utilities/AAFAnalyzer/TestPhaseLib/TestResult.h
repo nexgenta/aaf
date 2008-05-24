@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestResult.h,v 1.12 2008/05/19 03:39:42 jptrainor Exp $ $Name:  $
+// $Id: TestResult.h,v 1.13 2008/05/24 05:47:04 jptrainor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -73,6 +73,7 @@ class TestResult
   // amount all the children.
   Result GetResult() const;
   const wstring& GetResultAsString() const;
+  static const wstring& ResultToString(Result result);
 
   // This test's child results.
   const SubtestResultVector& GetSubtestResults() const;
