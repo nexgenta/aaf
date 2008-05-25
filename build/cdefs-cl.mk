@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-cl.mk,v 1.2 2007/07/22 14:34:51 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-cl.mk,v 1.3 2008/05/25 17:40:23 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -62,12 +62,12 @@ GENDEPS=0
 #------------------------------------------------------------------------------
 # Debug info generation
 #------------------------------------------------------------------------------
-DBG_FLAGS = /nologo /EHsc /RTC1 /MDd /W3 /WX /Z7 /Gs /GR /D "_DEBUG" /D "OM_DEBUG" /D "OM_STACK_TRACE_ON_ASSERT" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H"
+DBG_FLAGS = /nologo /EHsc /RTC1 /MDd /W3 /WX /Z7 /Gs /GR /D "_DEBUG" /D "OM_DEBUG" /D "OM_STACK_TRACE_ON_ASSERT" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H" /D "_CRT_SECURE_NO_DEPRECATE" /D "_CRT_SECURE_NO_WARNINGS" /D "_CRT_NONSTDC_NO_DEPRECATE" /D "_SECURE_SCL=0"
 
 #------------------------------------------------------------------------------
 # Optimisation flags when building a Release
 #------------------------------------------------------------------------------
-REL_FLAGS = /nologo /EHsc /MD /O2 /W3 /WX /Z7 /Gs /GR /D "NDEBUG" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H"
+REL_FLAGS = /nologo /EHsc /MD /O2 /W3 /WX /Z7 /Gs /GR /D "NDEBUG" /D "OM_USE_SCHEMASOFT_SS" /D "OM_USE_WINDOWS_SS" /D "_WIN32" /D "WIN32" /D "_CONSOLE" -DUNICODE /D "OM_USE_STORAGE_EX" /D "COM_NO_WINDOWS_H" /D "_CRT_SECURE_NO_DEPRECATE" /D "_CRT_SECURE_NO_WARNINGS" /D "_CRT_NONSTDC_NO_DEPRECATE" /D "_SECURE_SCL=0"
 
 #------------------------------------------------------------------------------
 # Compiler flags
