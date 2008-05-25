@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.41 2008/05/24 05:47:04 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.42 2008/05/25 02:54:19 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -702,6 +702,8 @@ public:
 
   void Dump( wostream& os )
   {
+    os << L"START TRANSACTION;" << endl << endl;
+
     for( set<wstring>::const_iterator iter = _insert_standard_stmnts.begin();
 	 iter != _insert_standard_stmnts.end();
 	 ++iter )
@@ -715,6 +717,8 @@ public:
     {
       wcout << *iter << endl;
     }
+
+    os << L"COMMIT;" << endl;
   }
 
 private:
