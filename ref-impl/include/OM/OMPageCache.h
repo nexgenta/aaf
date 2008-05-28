@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPageCache.h,v 1.8 2005/09/07 17:51:48 montrowe Exp $ $Name:  $
+// $Id: OMPageCache.h,v 1.9 2008/05/28 21:03:59 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -35,7 +35,9 @@
 
 class OMCachePageAllocator;
 
-  // @class Page caches.
+  // @class Page caches. Client inherit from this class and provide
+  //        implementations for the pure virtual functions
+  //        <mf OMPageCache::readPage()> and <mf OMPageCache::writePage()>.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMPageCache {
 public:
