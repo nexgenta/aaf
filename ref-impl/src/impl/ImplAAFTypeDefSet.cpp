@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefSet.cpp,v 1.31 2007/03/26 16:00:46 philipn Exp $ $Name:  $
+// $Id: ImplAAFTypeDefSet.cpp,v 1.32 2008/05/30 16:53:28 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2007, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -628,15 +628,15 @@ ImplAAFTypeDefSet::GetElements (
     }
 
     AAFRESULT hr = pEnumPropVals->Initialize( this, pSetPropertyValue );
-    if ( AAFRESULT_SUCCESS != hr ) {
-      pEnumPropVals->ReleaseReference();
-      return hr;
+    if ( AAFRESULT_SUCCESS == hr ) {
+      pEnumPropVals->AcquireReference();
+      *ppEnum = pEnumPropVals;
     }
 
-    pEnumPropVals->AcquireReference();
-    *ppEnum = pEnumPropVals;
+    pEnumPropVals->ReleaseReference();
+    pEnumPropVals = NULL;
 
-    return AAFRESULT_SUCCESS;
+    return hr;
   }
 }
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.52 2007/02/06 15:46:17 wschilp Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.53 2008/05/30 16:53:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -178,11 +178,15 @@ ImplAAFTypeDefFixedArray::GetElements ( ImplAAFPropertyValue * pInPropVal,
   if ( AAFRESULT_FAILED( hr ) ) {
     return hr;
   }
+  if ( AAFRESULT_SUCCEEDED( hr ) ) {
+    pEnum->AcquireReference();
+    *ppEnum = pEnum;
+  }
+
+  pEnum->ReleaseReference();
+  pEnum = NULL;
   
-  pEnum->AcquireReference();
-  *ppEnum = pEnum;
-  
-  return AAFRESULT_SUCCESS;
+  return hr;
 }
 
 // Override from AAFTypeDef

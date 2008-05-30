@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.70 2007/05/17 16:25:12 akharkev Exp $ $Name:  $
+// $Id: ImplAAFTypeDefVariableArry.cpp,v 1.71 2008/05/30 16:53:33 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2007, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -347,14 +347,15 @@ ImplAAFTypeDefVariableArray::GetElements (
     }
 
     AAFRESULT hr = pEnum->Initialize( this, pInPropVal );
-    if ( AAFRESULT_FAILED( hr ) ) {
-      return hr;
+    if ( AAFRESULT_SUCCEEDED( hr ) ) {
+      pEnum->AcquireReference();
+      *ppEnum = pEnum;
     }
-    
-    pEnum->AcquireReference();
-    *ppEnum = pEnum;
-  
-    return AAFRESULT_SUCCESS;
+
+    pEnum->ReleaseReference();
+    pEnum = NULL;
+
+    return hr;
   }
 }
 
