@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCDescriptorTest.cpp,v 1.36 2008/01/24 17:56:03 akharkev Exp $ $Name:  $
+// $Id: CAAFAIFCDescriptorTest.cpp,v 1.37 2008/05/30 16:53:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -152,6 +152,8 @@ static HRESULT CreateAAFFile(
 		checkResult(pHeader->QueryInterface(IID_IAAFEndian, (void **)&pEndian));
 		eAAFByteOrder_t byteorder;
 		checkResult(pEndian->GetNativeByteOrder(&byteorder));
+		pEndian->Release();
+		pEndian = NULL;
 
 //		AIFCSummary summary;
 		unsigned char	writeBuf[SUMMARY_SIZE], *writePtr;
@@ -317,6 +319,8 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 		checkResult(pHeader->QueryInterface(IID_IAAFEndian, (void **)&pEndian));
 		eAAFByteOrder_t byteorder;
 		checkResult(pEndian->GetNativeByteOrder(&byteorder));
+		pEndian->Release();
+		pEndian = NULL;
 
 		checkExpression((strncmp((char*)summary+FORM_HDR_SIZE, "COMM", 4) == 0) &&
 						(strncmp((char*)summary, "FORM", 4) == 0) &&

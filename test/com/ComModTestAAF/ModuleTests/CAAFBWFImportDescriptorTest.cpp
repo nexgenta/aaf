@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.5 2006/11/08 16:25:14 bmdurksen Exp $ $Name:  $
+// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.6 2008/05/30 16:53:55 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -333,12 +333,12 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pBWFImportDesc->CountUnknownBWFChunks(&numData));
 			checkExpression(1 == numData, AAFRESULT_TEST_FAILED);
 		
-			//pRIFFChunk->Release();
+			pRIFFChunk->Release();
 			pRIFFChunk = NULL;
-			pRIFFChunkTest->Release();
-			pRIFFChunkTest = NULL;
 			pEnum->Release();
 			pEnum = NULL;
+			pBWFImportDesc->Release();
+			pBWFImportDesc = NULL;
 			pEssDesc->Release();
 			pEssDesc = NULL;
 								
@@ -351,14 +351,20 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	
 			
 		}
+		pRIFFChunkTest->Release();
+		pRIFFChunkTest = NULL;
+
 		pMob->Release();
 		pMob = NULL;
 		
 		pHeader->Release();
 		pHeader = NULL;
-		
+
+		pDictionary->Release();
+		pDictionary = NULL;
+
 		pFile->Close();
-    	pFile->Release();
+		pFile->Release();
 		pFile = NULL;
 
 	return hr;

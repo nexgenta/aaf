@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFAIFCCodec.cpp,v 1.20 2008/05/06 09:39:11 stuart_hc Exp $ $Name:  $
+// $Id: CAAFAIFCCodec.cpp,v 1.21 2008/05/30 16:49:17 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -132,8 +132,12 @@ CAAFAIFCCodec::GetIndexedDefinitionObject (aafUInt32 index, IAAFDictionary *dict
 		CHECK(codecDef->Initialize(uid, L"AIFC Codec", L"Handles RIFF AIFC data."));
 		CHECK(dict->LookupDataDef(kAAFDataDef_Sound, &pDefSound));
 		CHECK(codecDef->AddEssenceKind(pDefSound));
+		pDefSound->Release ();
+		pDefSound = 0;
 		CHECK(dict->LookupDataDef(kAAFDataDef_LegacySound, &pDefLegacySound));
 		CHECK(codecDef->AddEssenceKind(pDefLegacySound));
+		pDefLegacySound->Release ();
+		pDefLegacySound = 0;
 		CHECK(dict->LookupClassDef(AUID_AAFAIFCDescriptor, &fileClass));
 		CHECK(codecDef->SetFileDescriptorClass (fileClass));
 		fileClass->Release ();

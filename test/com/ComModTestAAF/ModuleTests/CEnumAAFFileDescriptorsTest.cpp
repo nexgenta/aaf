@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CEnumAAFFileDescriptorsTest.cpp,v 1.2 2006/08/29 16:12:13 bmdurksen Exp $ $Name:  $
+// $Id: CEnumAAFFileDescriptorsTest.cpp,v 1.3 2008/05/30 16:53:57 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2005, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -107,6 +107,8 @@ static HRESULT CreateAAFFile(
 		
 		checkResult(pSourceMob->SetEssenceDescriptor (eDesc));
 
+		eDesc->Release();
+		eDesc = NULL;
 
 /* CountFileDescriptors()	******************************************/
 	{
@@ -203,6 +205,9 @@ static HRESULT CreateAAFFile(
 	if (pSourceMob)
 		pSourceMob->Release();
 	
+	if (pMDesc)
+		pMDesc->Release();
+
 	if (pDictionary)
 		pDictionary->Release();
 
@@ -638,8 +643,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	if (FDArray)
 		delete [] FDArray;
 
+	if (cloneFDIter)
+		cloneFDIter->Release();
+
+	if (aFD)
+		aFD->Release();
+
 	if (FDIter)
 		FDIter->Release();
+
+	if (pMDesc)
+		pMDesc->Release();
 
 	if (pFileDescriptor)
 		pFileDescriptor->Release();
