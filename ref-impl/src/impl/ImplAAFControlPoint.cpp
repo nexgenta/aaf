@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFControlPoint.cpp,v 1.27 2006/05/24 18:01:51 tbingham Exp $ $Name:  $
+// $Id: ImplAAFControlPoint.cpp,v 1.28 2008/05/30 16:48:54 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -107,7 +107,10 @@ AAFRESULT STDMETHODCALLTYPE
   else
   {
     if (_cachedTypeDef)
+    {
       _cachedTypeDef->ReleaseReference ();
+      _cachedTypeDef = NULL;
+    }
   }
 
   // Cleanup
