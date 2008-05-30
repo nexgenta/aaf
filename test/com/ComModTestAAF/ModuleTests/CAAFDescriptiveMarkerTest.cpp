@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFDescriptiveMarkerTest.cpp,v 1.5 2005/09/07 19:52:58 montrowe Exp $ $Name:  $
+// $Id: CAAFDescriptiveMarkerTest.cpp,v 1.6 2008/05/30 16:53:44 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -136,12 +136,13 @@ static HRESULT CreateAAFFile(
     testRawStorageType_t rawStorageType,
     aafProductIdentification_constref productID)
 {
+  mtc::SimpleFilePointers filePointers;
+
   try {
     using namespace mtc;
 
     IAAFSmartPointer<IAAFHeader> pHeader;
     IAAFSmartPointer<IAAFDictionary> pDict;
-    SimpleFilePointers filePointers;
     CreateSimpleAAFFile( pFileName, 
 			 fileKind,
 			 rawStorageType,
@@ -201,6 +202,9 @@ static HRESULT CreateAAFFile(
     CheckResult( filePointers.pFile->Close() );
   }
   catch( const AAFRESULT& hr ) {
+    if(filePointers.pFile) {
+      filePointers.pFile->Close();
+    }
     return hr;
   }
 
@@ -209,10 +213,11 @@ static HRESULT CreateAAFFile(
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
+  mtc::SimpleFilePointers filePointers;
+
   try {
     using namespace mtc;
 
-    SimpleFilePointers filePointers;
     ReadSimpleAAFFile( pFileName, &filePointers );
 
     // Get slot 2 from the composition and verify that that attached
@@ -290,6 +295,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     CheckResult( filePointers.pFile->Close() );
   }
   catch( const AAFRESULT& hr ) {
+    if(filePointers.pFile) {
+      filePointers.pFile->Close();
+    }
     cout << "failed hr = " << hr << endl;
     return hr;
   }
