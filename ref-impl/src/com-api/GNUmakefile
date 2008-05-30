@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.25 2007/05/15 17:47:20 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.26 2008/05/30 12:06:43 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -96,6 +96,16 @@ com-api : $(OBJDIR) $(LIBDIR) com-dll $(LIBTARGET)
 com-dll :
 	cd com-dll && $(MAKE)
 
+
+# Under MSVC compilers, a different version of STORAGE_LIBS must be used for each
+# compiler version to avoid undefined behaviour at runtime.
+ifeq ($(COMPILER),cl)
+  MSVC_VER = $(shell cl 2>&1 | head -1 | sed -e 's/.*Version //' -e 's/\..*//')
+  ifeq ($(MSVC_VER),14)
+    # 13 means vs7, 14 means vs8
+    STORAGE_LIBS = $(AAFBASE)/AAF$(AAFPLATFORM)SDK/vs8/sss-impl/ssrw_c$(LIBEXT)
+  endif
+endif
 
 # For a static build, simply archive the object files into a static library.
 # The static library is intended for debugging only.
