@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.16 2008/05/30 16:49:17 akharkev Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.17 2008/06/02 12:16:51 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1597,6 +1597,15 @@ HRESULT STDMETHODCALLTYPE
 		{
 			CHECK(find_data_chunk_offset());
 		}
+
+		// fill in member data from descriptor
+		aafUInt32 bitspersample, numch;
+		CHECK(_filedes->GetLength(&_sampleFrames));
+		CHECK(_snddes->GetAudioSamplingRate(&_sampleRate));
+		CHECK(_snddes->GetQuantizationBits(&bitspersample));
+		CHECK(_snddes->GetChannelCount(&numch));
+		_bitsPerSample = bitspersample;
+		_numCh = numch;
 
 		containerDef->Release();
 		defObj->Release();

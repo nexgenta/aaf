@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.h,v 1.1 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.h,v 1.2 2008/06/02 12:16:51 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -304,7 +304,7 @@ private:
 	aafUInt16			_bitsPerSample;
 	aafUInt16			_numCh;
 	aafUInt16			_bytesPerFrame;		// also known as nBlockAlign
-	aafUInt32			_sampleFrames;
+	aafLength_t			_sampleFrames;
 	aafUInt64			_lengthSamplesWritten;
 	aafUInt32			_dataChunkOffset;
 	pcm_interleaveBuf_t	*_interleaveBuf;
