@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.17 2008/06/02 12:16:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.18 2008/06/03 03:06:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1604,8 +1604,8 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(_snddes->GetAudioSamplingRate(&_sampleRate));
 		CHECK(_snddes->GetQuantizationBits(&bitspersample));
 		CHECK(_snddes->GetChannelCount(&numch));
-		_bitsPerSample = bitspersample;
-		_numCh = numch;
+		_bitsPerSample = (aafUInt16)bitspersample;
+		_numCh = (aafUInt16)numch;
 
 		containerDef->Release();
 		defObj->Release();
