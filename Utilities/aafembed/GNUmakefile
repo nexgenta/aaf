@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.2 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.3 2008/06/03 03:41:12 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -35,10 +35,6 @@ INCLUDES = -I. -I$(AAFSDKINCLUDEDIR)
 .PHONY : all
 all : $(OBJDIR) $(AAFSDKBINDIR)/aafembed$(EXE)
 
-# Compile avilib.c using only gcc
-#$(OBJDIR)/avilib.o: avilib.c
-#	gcc -c $(CFLAGS) -Wno-error $(INCLUDES) $< -o $@
-
 $(AAFSDKBINDIR)/aafembed$(EXE) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(LINK_AAF_APP)
 
@@ -46,8 +42,7 @@ $(AAFSDKBINDIR)/aafembed$(EXE) : $(CXXOBJS)
 clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
-	@$(RM) $(AAFSDKBINDIR)/aafdump$(EXE)
-	@$(RMDIR) $(OBJDIR)/ii_files
+	@$(RM) $(AAFSDKBINDIR)/aafembed$(EXE)
 
 
 .PHONY : realclean
