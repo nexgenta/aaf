@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2008/06/03 03:36:50 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -65,15 +65,14 @@ $(BINTARGET) : $(CXXOBJS)
 	$(LD) $(CXXOBJS) $(LINK_AXLIB_APP) $(LINK_AAF_APP)
 
 .PHONY : clean
-clean ::
+clean :
 	@$(RM) $(CXXOBJS)
 	@$(RM) $(DEPS)
 	@$(RM) $(BINTARGET)
-	@$(RMDIR) $(OBJDIR)/ii_files
 
 
 .PHONY : realclean
-realclean :: clean
+realclean : clean
 
 
 include $(AAFBASE)/build/rules.mk
