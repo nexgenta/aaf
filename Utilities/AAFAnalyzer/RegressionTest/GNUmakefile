@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.12 2007/08/21 14:08:33 jptrainor Exp $
+# $Id: GNUmakefile,v 1.13 2008/06/03 03:35:13 stuart_hc Exp $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -50,3 +50,6 @@ check :
 clean :
 	cd TestFiles && $(MAKE) GENDEPS=0 $@
 	cd TestStructure && $(MAKE) GENDEPS=0 $@
+
+.PHONY : realclean
+realclean : clean
