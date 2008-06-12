@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFile.cpp,v 1.153 2008/06/12 22:05:20 akharkev Exp $ $Name:  $
+// $Id: OMFile.cpp,v 1.154 2008/06/12 22:23:25 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -57,6 +57,10 @@ OMFile::~OMFile(void)
 
   delete _rawStorage;
   _rawStorage = 0;
+
+  // We don't own the following
+  _dictionary = 0;
+  _classFactory = 0;
 }
 
   // @mfunc Open an existing <c OMFile> for read-only access, the
@@ -842,8 +846,7 @@ void OMFile::close(void)
     factory->close(this);
   }
 
-  // TBS - tjb delete _rootStore; _rootStore = 0;
-
+  _rootStore = 0; //  We don't own _rootStore
   _root->detach();
   delete _root;
   _root = 0;
