@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObjectFactory.h,v 1.11 2007/03/26 16:00:57 philipn Exp $
+// $Id: OMXMLStoredObjectFactory.h,v 1.12 2008/06/12 21:33:44 akharkev Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -118,6 +118,9 @@ public:
     // @cmember Perform any necessary actions when the file
     //          contained in <p rawStorage> is closed.
   virtual void close(OMRawStorage* rawStorage, bool isWritable);
+
+    // @cmember Perform any necessary actions when <p file> is closed.
+  virtual void close(OMFile* /* file */);
 
 private:
   // @access Private members.
