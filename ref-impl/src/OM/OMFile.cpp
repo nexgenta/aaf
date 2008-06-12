@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMFile.cpp,v 1.152 2007/07/26 03:11:02 jptrainor Exp $ $Name:  $
+// $Id: OMFile.cpp,v 1.153 2008/06/12 22:05:20 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -839,14 +839,7 @@ void OMFile::close(void)
   if (isValid()) {
     OMStoredObjectFactory* factory = findFactory(_encoding);
     ASSERT("Recognized file encoding", factory != 0);
-    OMRawStorage* store = rawStorage();
-    if (store != 0) {
-      factory->close(store, isWritable());
-      store->synchronize();
-    } else {
-      const wchar_t* name = fileName();
-      factory->close(name, isWritable());
-    }
+    factory->close(this);
   }
 
   // TBS - tjb delete _rootStore; _rootStore = 0;
