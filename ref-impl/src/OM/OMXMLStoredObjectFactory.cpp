@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObjectFactory.cpp,v 1.22 2008/06/12 21:33:44 akharkev Exp $
+// $Id: OMXMLStoredObjectFactory.cpp,v 1.23 2008/06/12 22:16:29 akharkev Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -262,26 +262,6 @@ bool OMXMLStoredObjectFactory::compatibleNamedFile(
   TRACE("OMXMLStoredObjectFactory::compatibleNamedFile");
 
   return true;
-}
-
-  // @mfunc Perform any necessary actions when the file
-  //        contained in <p fileName> is closed.
-  //   @parm The file name.
-void OMXMLStoredObjectFactory::close(const wchar_t* /* fileName */,
-                                     bool /* isWritable */)
-{
-  TRACE("OMXMLStoredObjectFactory::close");
-  // Nothing to do.
-}
-
-  // @mfunc Perform any necessary actions when the file
-  //        contained in <p rawStorage> is closed.
-  //   @parm The <c OMRawStorage>
-void OMXMLStoredObjectFactory::close(OMRawStorage* /* rawStorage */,
-                                     bool /* isWritable */)
-{
-  TRACE("OMXMLStoredObjectFactory::close");
-  // Nothing to do.
 }
 
   // @mfunc Perform any necessary actions when <p file> is closed.

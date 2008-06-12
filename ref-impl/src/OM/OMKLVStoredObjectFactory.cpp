@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObjectFactory.cpp,v 1.33 2005/08/26 20:28:03 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObjectFactory.cpp,v 1.34 2008/06/12 22:16:29 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -275,14 +275,4 @@ void OMKLVStoredObjectFactory::close(OMFile* file)
     store->checkStreams();
     delete store;
   }
-}
-
-void OMKLVStoredObjectFactory::close(const wchar_t* /* fileName */,
-                                     bool /* isWritable */)
-{
-}
-
-void OMKLVStoredObjectFactory::close(OMRawStorage* /* rawStorage */,
-                                     bool /* isWritable */)
-{
 }

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSSStoredObjectFactory.cpp,v 1.6 2008/06/12 21:54:09 akharkev Exp $ $Name:  $
+// $Id: OMSSStoredObjectFactory.cpp,v 1.7 2008/06/12 22:16:29 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -315,32 +315,6 @@ bool OMSSStoredObjectFactory::compatibleNamedFile(
     result = false;
   }
   return result;
-}
-
-  // @mfunc Perform any necessary actions when the file
-  //        contained in <p fileName> is closed.
-  //   @parm The file name.
-void OMSSStoredObjectFactory::close(const wchar_t* fileName,
-                                     bool isWritable)
-{
-  TRACE("OMSSStoredObjectFactory::close");
-
-  if (isWritable) {
-    writeSignature(fileName, signature());
-  }
-}
-
-  // @mfunc Perform any necessary actions when the file
-  //        contained in <p rawStorage> is closed.
-  //   @parm The <c OMRawStorage>
-void OMSSStoredObjectFactory::close(OMRawStorage* rawStorage,
-                                     bool isWritable )
-{
-  TRACE("OMSSStoredObjectFactory::close");
-
-  if (isWritable) {
-    writeSignature(rawStorage, signature());
-  }
 }
 
   // @mfunc Perform any necessary actions when <p file> is closed.

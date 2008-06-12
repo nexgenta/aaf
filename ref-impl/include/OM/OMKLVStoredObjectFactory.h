@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMKLVStoredObjectFactory.h,v 1.19 2005/08/26 20:28:03 tbingham Exp $ $Name:  $
+// $Id: OMKLVStoredObjectFactory.h,v 1.20 2008/06/12 22:16:29 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,10 +113,6 @@ public:
 
     // @cmember Perform any necessary actions when <p file> is closed.
   virtual void close(OMFile* file);
-
-  virtual void close(const wchar_t* fileName, bool isWritable);
-
-  virtual void close(OMRawStorage* rawStorage, bool isWritable);
 
 };
 

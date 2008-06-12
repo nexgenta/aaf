@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLStoredObjectFactory.h,v 1.12 2008/06/12 21:33:44 akharkev Exp $
+// $Id: OMXMLStoredObjectFactory.h,v 1.13 2008/06/12 22:16:29 akharkev Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -110,14 +110,6 @@ public:
     // @cmember Can a file be created successfully as a named file and
     //          accessed successfully in the mode specified by <p accessMode> ?
   virtual bool compatibleNamedFile(const OMFile::OMAccessMode accessMode);
-
-    // @cmember Perform any necessary actions when the file
-    //          contained in <p fileName> is closed.
-  virtual void close(const wchar_t* fileName, bool isWritable);
-
-    // @cmember Perform any necessary actions when the file
-    //          contained in <p rawStorage> is closed.
-  virtual void close(OMRawStorage* rawStorage, bool isWritable);
 
     // @cmember Perform any necessary actions when <p file> is closed.
   virtual void close(OMFile* /* file */);
