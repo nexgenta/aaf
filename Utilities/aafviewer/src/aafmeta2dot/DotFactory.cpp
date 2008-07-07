@@ -1,6 +1,6 @@
 
 /*
- * $Id: DotFactory.cpp,v 1.4 2004/09/10 17:13:14 stuart_hc Exp $ $Name:  $
+ * $Id: DotFactory.cpp,v 1.5 2008/07/07 11:22:23 philipn Exp $ $Name:  $
  *
  *      Copyright (c) 2003, Philip de Nier (philipn@users.sourceforge.net)
  *
@@ -265,14 +265,13 @@ DotFactory::RemoveDotElement( DotElement *element)
 
 
    // remove the element
-   bool found = false;
-   for ( iter=_dotElements.begin(); iter!=_dotElements.end() && !found; iter++ )
+   for ( iter=_dotElements.begin(); iter!=_dotElements.end(); iter++ )
    {
       if ( (*iter)->GetUID().compare( element->GetUID() ) == 0 )
       {
-	 found = true;
-	 _dotElements.erase( iter );
 	 delete *iter;
+	 _dotElements.erase( iter );
+	 break;
       }
    }
 
