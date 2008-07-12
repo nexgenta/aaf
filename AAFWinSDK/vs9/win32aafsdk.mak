@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.1 2008/06/13 23:15:54 terabrit Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.2 2008/07/12 12:27:24 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -188,11 +188,11 @@ TOOLKIT_INCLUDE_COMAPI = $(TOOLKIT_INCLUDE)\com-api
 TOOLKIT_INCLUDE_REFAPI = $(TOOLKIT_INCLUDE)\ref-api
 TOOLKIT_PLUGINS = $(AAFTOOLKIT)\ref-impl\plugins
 
-TOOLKIT_COMIDL = $(AAFTOOLKIT)\AAFWinSDK\vs8\ref-impl\include\comidl
-TOOLKIT_DEBUG_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\vs8\Debug\RefImpl
-TOOLKIT_RELEASE_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\vs8\Release\RefImpl
-TOOLKIT_DEBUG_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\vs8\Debug\RefImpl\aafext
-TOOLKIT_RELEASE_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\vs8\Release\RefImpl\aafext
+TOOLKIT_COMIDL = $(AAFTOOLKIT)\AAFWinSDK\vs9\ref-impl\include\comidl
+TOOLKIT_DEBUG_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\vs9\Debug\RefImpl
+TOOLKIT_RELEASE_REFIMPL = $(AAFTOOLKIT)\AAFWinSDK\vs9\Release\RefImpl
+TOOLKIT_DEBUG_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\vs9\Debug\RefImpl\aafext
+TOOLKIT_RELEASE_REFIMPL_EXT = $(AAFTOOLKIT)\AAFWinSDK\vs9\Release\RefImpl\aafext
 
 
 #
