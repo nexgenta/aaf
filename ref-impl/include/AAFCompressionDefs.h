@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFCompressionDefs.h,v 1.9 2007/02/06 15:46:02 wschilp Exp $ $Name:  $
+// $Id: AAFCompressionDefs.h,v 1.10 2008/07/14 17:01:05 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,6 +77,15 @@ const aafUID_t kAAFCompressionDef_DV_Based_50Mbps_525_60 =
 const aafUID_t kAAFCompressionDef_DV_Based_50Mbps_625_50 =
 {0x04010202, 0x0202, 0x0400, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
+
+//{04010202-7100-0000-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_VC3_1 =
+{0x04010202, 0x7100, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{04010202-7100-0000-060e-2b3404010101}
+const aafUID_t kAAFCompressionDef_Avid_DNxHD_Legacy =
+{0x0e040201, 0x0204, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 // AAF CompressionDefinition legacy aliases
 //
