@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFPluginObjectTable_i.cpp,v 1.17 2004/11/04 15:49:26 stuart_hc Exp $ $Name:  $
+// $Id: AAFPluginObjectTable_i.cpp,v 1.18 2008/07/14 17:06:12 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,6 +33,8 @@
 #include "CAAFPCMCodec.h"
 #include "CAAFJPEGCodec.h"
 #include "CAAFCDCICodec.h"
+#include "CAAFVC3Codec.h"
+#include "CAAFDNxHDCodec.h"
 
 //
 // Include all objects in the following table:
@@ -46,4 +48,6 @@ AAF_BEGIN_OBJECT_MAP(AAFPluginObjectMap)
 	AAF_OBJECT_ENTRY(AAFPCMCodec)
 	AAF_OBJECT_ENTRY(AAFJPEGCodec)
 	AAF_OBJECT_ENTRY(AAFCDCICodec)
+	AAF_OBJECT_ENTRY(AAFVC3Codec)
+	AAF_OBJECT_ENTRY(AAFDNxHDCodec)
 AAF_END_OBJECT_MAP()
