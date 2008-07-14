@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.1 2008/07/14 17:06:12 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.2 2008/07/14 22:10:16 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -803,7 +803,7 @@ HRESULT STDMETHODCALLTYPE
 	case 1252: byte14n15 = 0x7112; break;
 	case 1253: byte14n15 = 0x7113; break;
 	default:
-		throw HRESULT(AAFRESULT_NOT_IMPLEMENTED);
+		return HRESULT(AAFRESULT_NOT_IMPLEMENTED);
 		break;
 	}
 	_compression.Data2=byte14n15;
