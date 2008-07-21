@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDNxHDCodec.h,v 1.1 2008/07/14 17:06:12 terabrit Exp $ $Name:  $
+// $Id: CAAFDNxHDCodec.h,v 1.2 2008/07/21 22:00:04 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -362,6 +362,7 @@ private:
 			return 0;
 			break;
 		}
+		return 0; // avoid unnecessary warning
 	}
 
 	aafUInt32 GetUncomprFrameSize()
@@ -416,7 +417,7 @@ private:
 			return 0;
 			break;
 		}
-
+		return 0; // avoid unnecessary warning
 	}
 
 	int GetPixelsPerLine()
@@ -446,6 +447,7 @@ private:
 			return 0;
 			break;
 		}
+		return 0; // avoid unnecessary warning
 	}
 
 
