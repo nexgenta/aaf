@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.2 2008/07/14 22:10:16 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.3 2008/07/22 02:56:01 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -160,31 +160,6 @@ const aafCharacter kAAFPropName_DIDFrameIndexByteOrder[]	= { 'F','r','a','m','e'
 const aafCharacter kAAFPropName_DIDFirstFrameOffset[]	= { 'F','i','r','s','t','F','r','a','m','e','O','f','f','s','e','t','\0' };
 const aafCharacter kAAFPropName_DIDImageSize[]	= { 'I','m','a','g','e','S','i','z','e','\0' };
 const aafCharacter kAAFPropName_CDCIOffsetToFrameIndexes[]	= { 'O','f','f','s','e','t','T','o','F','r','a','m','e','I','n','d','e','x','e','s','\0'};
-
-static aafBool EqualDegenerateAUID(const aafUID_t *uid1, const aafUID_t *uid2)
-{
-	// does not test any bytes that are zero in uid2
-	// allows comparing a specific UL against a family of ULs
-
-	int i = sizeof(aafUID_t);
-
-	const char* u1= (const char*)uid1;
-	const char* u2= (const char*)uid2;
-
-	char b;
-	do
-		if( *u1++ != (b = *u2++) && b ) return kAAFFalse;
-	while( --i ); 
-
-	return kAAFTrue;
-}
-
-inline bool IsVC3(const aafUID_t &compId)
-{
-	if( EqualAUID(&compId,&kAAFCompressionDef_Avid_DNxHD_Legacy) ) return true; 
-	else if( EqualDegenerateAUID(&compId,&kAAFCompressionDef_VC3_1) ) return true; 
-	else return false;
-}
 
 
 // Constructor
@@ -1119,10 +1094,12 @@ HRESULT STDMETHODCALLTYPE
 		hr = ReadDescriptor( _descriptorHelper );
 		checkExpression (hr == S_OK, hr);
 
+		_ComprID = GetComprID( _compression, _containerFormat );
+		_fileBytesPerSample = GetBytesPerSample();
+
 		if (_compressEnable == kAAFCompressionEnable && IsVC3(_compression))
 		{
 #ifdef USE_VC3_CODEC
-
 #else
 			// Can't decompress without VC3 Codec
 			throw HRESULT( AAFRESULT_INVALID_OP_CODEC );
