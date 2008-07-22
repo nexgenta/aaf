@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFRGBADescriptor.cpp,v 1.12 2007/04/12 12:57:13 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFRGBADescriptor.cpp,v 1.13 2008/07/22 17:53:55 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -113,7 +113,7 @@ AAFRESULT STDMETHODCALLTYPE
 	local = _pixelLayout;
 	for( n = 0, result = 0; n < MAX_NUM_RGBA_COMPS; n++)
 	{
-		if(local.comps[n].Code != kAAFCompNone)
+		if(local.comps[n].Code != kAAFCompNone && local.comps[n].Code != kAAFCompNull)
 		{
 			result++;
 		}
@@ -226,7 +226,7 @@ AAFRESULT STDMETHODCALLTYPE
 	local = _paletteLayout;
 	for( n = 0, result = 0; n < MAX_NUM_RGBA_COMPS; n++)
 	{
-		if(local.comps[n].Code != kAAFCompNone)
+		if(local.comps[n].Code != kAAFCompNone && local.comps[n].Code != kAAFCompNull)
 		{
 			result++;
 		}
