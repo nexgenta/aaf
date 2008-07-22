@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.h,v 1.41 2007/02/01 23:30:33 akharkev Exp $ $Name:  $
+// $Id: OMDataStreamProperty.h,v 1.42 2008/07/22 15:24:48 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -47,6 +47,7 @@ public:
 
     // @cmember Destructor.
   virtual ~OMDataStreamProperty(void);
+  virtual void detach(void);
 
     // @cmember Save this <c OMDataStreamProperty>.
   virtual void save(void) const;

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMDataStreamProperty.cpp,v 1.69 2008/05/30 16:52:48 akharkev Exp $ $Name:  $
+// $Id: OMDataStreamProperty.cpp,v 1.70 2008/07/22 15:22:11 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -61,6 +61,18 @@ OMDataStreamProperty::~OMDataStreamProperty(void)
   }
   POSTCONDITION("Stream closed", _stream == 0);
   delete _streamAccess;
+}
+
+void OMDataStreamProperty::detach(void)
+{
+	  if (_stream != 0) {
+    try {
+      close();
+    } catch (...) {
+      _stream = 0;
+    }
+  }
+
 }
 
   // @mfunc Save this <c OMDataStreamProperty>.
