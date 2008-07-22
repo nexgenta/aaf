@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.7 2008/06/01 21:28:54 akharkev Exp $ $Name:  $
+// $Id: CAAFBWFImportDescriptorTest.cpp,v 1.8 2008/07/22 16:00:13 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -333,9 +333,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 			checkResult(pBWFImportDesc->CountUnknownBWFChunks(&numData));
 			checkExpression(1 == numData, AAFRESULT_TEST_FAILED);
 		
-			// Temporarily comment out the Release() to avoid
-			// segmentation fault in SchemaSoft's closeStream().
-			//pRIFFChunk->Release();
+			pRIFFChunk->Release();
 			pRIFFChunk = NULL;
 			pEnum->Release();
 			pEnum = NULL;
@@ -347,7 +345,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 							
 			pSourceMob->Release();
 			pSourceMob = NULL;
-				
+				 
 			pMobIter->Release();
 			pMobIter = NULL;
 	
