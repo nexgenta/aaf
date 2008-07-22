@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDNxHDCodec.h,v 1.3 2008/07/22 02:56:01 terabrit Exp $ $Name:  $
+// $Id: CAAFDNxHDCodec.h,v 1.4 2008/07/22 03:14:07 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -485,6 +485,7 @@ private:
 	{
 		aafUInt32 c = 0;
 
+#ifdef USE_DNxHD_CODEC
 		if( EqualAUID(&compId,&kAAFCompressionDef_Avid_DNxHD_Legacy) )
 		{
 			// derive Compression ID from Container Def
@@ -522,6 +523,7 @@ private:
 			default:	 c = 0;
 			}
 		}
+#endif
 		return c;
 	}
 
