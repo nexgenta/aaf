@@ -1,7 +1,7 @@
 /*! \file	framebuffer.h
  *	\brief	functions to fill a buffer
  *
- *	\version $Id: framebuffer.h,v 1.1 2008/07/14 17:07:34 terabrit Exp $
+ *	\version $Id: framebuffer.h,v 1.2 2008/07/23 16:38:27 terabrit Exp $
  *
  */
 /*
@@ -51,7 +51,7 @@ static void malign_free ( void * pmem ) {  _aligned_free( pmem); }
 
 // Mac OSX: malloc() always aligned 16. no posix_memalign() or memalign()
 #include <stdlib.h>
-static byte* malign( size_t size, size_t alignment ) { return malloc( size ); }
+static byte* malign( size_t size, size_t alignment ) { return (byte*)malloc( size ); }
 static void malign_free ( void * pmem ) {  free( pmem); }
 
 #else // _WIN32
