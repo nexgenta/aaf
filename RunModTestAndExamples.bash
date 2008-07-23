@@ -2,7 +2,7 @@
 
 ###############################################################################
 #
-# $Id: RunModTestAndExamples.bash,v 1.4 2008/05/26 21:52:33 terabrit Exp $ $Name:  $
+# $Id: RunModTestAndExamples.bash,v 1.5 2008/07/23 16:53:00 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -62,10 +62,12 @@ AAFBASEDIR=`pwd`
 # set AAFPLATFORM using same script as for make
 AAFPLATFORM="AAF`build/aafplatform.sh`SDK"
 
-# set default COMPILER g++
-# for Win: . which will become vs7
+# set default COMPILER 
+# for Win vs7
+# otherwise g++
+
 if [[ "$AAFPLATFORM" == "AAFWinSDK" ]] ; then
-	COMPILER="."
+	COMPILER="vs7"
 else
 	COMPILER="g++"
 fi
