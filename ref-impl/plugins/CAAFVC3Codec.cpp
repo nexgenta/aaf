@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.3 2008/07/22 02:56:01 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.4 2008/07/23 13:54:37 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1628,8 +1628,10 @@ HRESULT STDMETHODCALLTYPE CAAFVC3Codec::ReadDescriptor(
 
 	hr = descriptorHelper.GetFrameSampleSize( &_fileBytesPerSample );
 	checkExpression( AAFRESULT_PROP_NOT_PRESENT == hr || 
+			 AAFRESULT_NO_MORE_OBJECTS == hr ||
 			 AAFRESULT_SUCCESS == hr, hr );
-	if( hr == AAFRESULT_PROP_NOT_PRESENT )
+	if( hr == AAFRESULT_PROP_NOT_PRESENT ||
+		    hr == AAFRESULT_NO_MORE_OBJECTS )
 	    _fileBytesPerSample = 0;
 
 
