@@ -1,8 +1,11 @@
 #! C:/mksnt/sh.exe
 
+echo this script is deprecated...use RunModTestAndExamples.bash under cygwin instead!
+exit 1
+
 ###############################################################################
 #
-# $Id: RunModTestAndExamples.ksh,v 1.37 2004/02/27 14:26:15 stuart_hc Exp $ $Name:  $
+# $Id: RunModTestAndExamples.ksh,v 1.38 2008/07/23 16:53:21 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
