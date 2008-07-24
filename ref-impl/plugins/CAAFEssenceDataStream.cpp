@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFEssenceDataStream.cpp,v 1.27 2008/05/22 21:26:42 terabrit Exp $ $Name:  $
+// $Id: CAAFEssenceDataStream.cpp,v 1.28 2008/07/24 08:36:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -49,6 +49,7 @@ TYPEDEF_SP( MobSlot );
 const aafUID_t NULL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 // Debugging log function which is optimised away for default builds
+#include <stdarg.h>
 inline void plugin_trace(const char *fmt, ...)
 {
 #ifdef PLUGIN_TRACE
