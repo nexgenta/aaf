@@ -1,7 +1,7 @@
 /*! \file	framebuffer.h
  *	\brief	functions to fill a buffer
  *
- *	\version $Id: framebuffer.h,v 1.2 2008/07/23 16:38:27 terabrit Exp $
+ *	\version $Id: framebuffer.h,v 1.3 2008/07/25 02:09:53 stuart_hc Exp $
  *
  */
 /*
@@ -52,6 +52,13 @@ static void malign_free ( void * pmem ) {  _aligned_free( pmem); }
 // Mac OSX: malloc() always aligned 16. no posix_memalign() or memalign()
 #include <stdlib.h>
 static byte* malign( size_t size, size_t alignment ) { return (byte*)malloc( size ); }
+static void malign_free ( void * pmem ) {  free( pmem); }
+
+#elif defined(__sun) // _WIN32
+
+// Solaris 10 doesn't have posix_memalign(), but does have memalign()
+#include <stdlib.h>
+static byte* malign( size_t size, size_t alignment ) { return (byte*)memalign( alignment, size ); }
 static void malign_free ( void * pmem ) {  free( pmem); }
 
 #else // _WIN32
