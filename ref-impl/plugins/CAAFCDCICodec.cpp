@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.29 2008/07/25 06:29:00 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.30 2008/07/28 09:57:38 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1918,8 +1918,10 @@ void CAAFCDCICodec::UpdateDescriptor (CAAFCDCIDescriptorHelper& descriptorHelper
 	else		// uncompressed clip wrapped
 		hr = pEDS2->SetEssenceElementKey( GC_EEK, 0x15, 1, 0x03, 1, 1 );
 
+	pEDS2->Release();
+
 	// EssenceDataStream2 will return AAFRESULT_CODEC_SEMANTIC_WARN when SetEssenceElementKey()
-	// not appropriate for container, so ignore the error in this case.
+	// is not appropriate for container, so ignore the error in this case.
 	if (AAFRESULT_FAILED(hr) && hr != AAFRESULT_CODEC_SEMANTIC_WARN)
 		throw HRESULT(AAFRESULT_CODEC_SEMANTIC_WARN);
 }
