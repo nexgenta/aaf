@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.30 2008/07/28 09:57:38 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.31 2008/07/29 12:00:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -352,42 +352,61 @@ HRESULT STDMETHODCALLTYPE CAAFCDCICodec::CreateLegacyPropDefs(
 
 
 	// Register legacy property definitions
-	checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_DIDResolutionID, kAAFPropName_DIDResolutionID, 
-	    p_typedef_int32, &p_propdef ) );
+	if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDResolutionID, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_DIDResolutionID, kAAFPropName_DIDResolutionID, 
+			p_typedef_int32, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
 
-	checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_DIDFrameSampleSize, kAAFPropName_DIDFrameSampleSize, 
-	    p_typedef_int32, &p_propdef ) );
+	if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameSampleSize, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_DIDFrameSampleSize, kAAFPropName_DIDFrameSampleSize, 
+			p_typedef_int32, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
 
-	checkResult( p_cdci_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_CDCIOffsetToFrameIndexes, 
-		kAAFPropName_CDCIOffsetToFrameIndexes, 
-	    p_typedef_int32, &p_propdef ) );
+	if (p_cdci_classdef->LookupPropertyDef(kAAFPropID_CDCIOffsetToFrameIndexes, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_cdci_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_CDCIOffsetToFrameIndexes, 
+			kAAFPropName_CDCIOffsetToFrameIndexes, 
+			p_typedef_int32, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
 
-	checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_DIDFrameIndexByteOrder, kAAFPropName_DIDFrameIndexByteOrder, 
-	    p_typedef_int16, &p_propdef ) );
+	if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameIndexByteOrder, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_DIDFrameIndexByteOrder, kAAFPropName_DIDFrameIndexByteOrder, 
+			p_typedef_int16, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
 
-	checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_DIDFirstFrameOffset, kAAFPropName_DIDFirstFrameOffset, 
-	    p_typedef_int32, &p_propdef ) );
+	if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFirstFrameOffset, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_DIDFirstFrameOffset, kAAFPropName_DIDFirstFrameOffset, 
+			p_typedef_int32, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
 
-	checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
-	    kAAFPropID_DIDImageSize, kAAFPropName_DIDImageSize, 
-	    p_typedef_int32, &p_propdef ) );
+	if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDImageSize, &p_propdef) != AAFRESULT_SUCCESS)
+	{
+		checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
+			kAAFPropID_DIDImageSize, kAAFPropName_DIDImageSize, 
+			p_typedef_int32, &p_propdef ) );
+	}
 	p_propdef->Release();
 	p_propdef = NULL;
+
     }
     catch( HRESULT& rhr )
     {
