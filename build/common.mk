@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: common.mk,v 1.21 2007/08/08 14:34:18 stuart_hc Exp $ $Name:  $
+# $Id: common.mk,v 1.22 2008/07/30 05:37:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -65,9 +65,9 @@ ifeq ($(wildcard $(AAFBUILDDIR)/sss-impl/libSSRW2C$(LIBEXT)),$(AAFBUILDDIR)/sss-
 endif
 
 # On Windows the layout is /sss-impl/ssrw_c.lib (for historical reasons)
-ifeq ($(wildcard $(AAFBASE)/AAF$(AAFPLATFORM)SDK/sss-impl/ssrw_c$(LIBEXT)),$(AAFBASE)/AAF$(AAFPLATFORM)SDK/sss-impl/ssrw_c$(LIBEXT))
-	STORAGE_LIBS += $(AAFBASE)/AAF$(AAFPLATFORM)SDK/sss-impl/ssrw_c$(LIBEXT)
-	LINK_STG += -L$(AAFBASE)/AAF$(AAFPLATFORM)SDK/sss-impl -lssrw_c
+ifeq ($(wildcard $(AAFBASE)/AAF$(AAFPLATFORM)SDK/$(MSVCVERSION)/sss-impl/ssrw_c$(LIBEXT)),$(AAFBASE)/AAF$(AAFPLATFORM)SDK/$(MSVCVERSION)/sss-impl/ssrw_c$(LIBEXT))
+	STORAGE_LIBS += $(AAFBASE)/AAF$(AAFPLATFORM)SDK/$(MSVCVERSION)/sss-impl/ssrw_c$(LIBEXT)
+	LINK_STG += -L$(AAFBASE)/AAF$(AAFPLATFORM)SDK/$(MSVCVERSION)/sss-impl -lssrw_c
 	ADD_CFLAGS += -DOM_USE_SCHEMASOFT_SS
 	USE_SS=1
 endif

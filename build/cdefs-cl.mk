@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-cl.mk,v 1.3 2008/05/25 17:40:23 terabrit Exp $ $Name:  $
+# $Id: cdefs-cl.mk,v 1.4 2008/07/30 05:37:56 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -54,6 +54,7 @@
 #------------------------------------------------------------------------------
 CC = cl
 CCVERSION = $(shell cl 2>&1 | head -1 | sed 's/.*Version \([^ ]*\).*/\1/')
+MSVCVERSION = $(shell echo $(CCVERSION) | sed -e 's/^12\..*/vs6/' -e 's/^13\..*/vs7/' -e 's/^14\..*/vs8/' -e 's/^15\..*/vs9/')
 
 # Header dependencies are taken care of by PDB or precompiled headers.
 # Therefore don't generate dependencies to be included by make.
