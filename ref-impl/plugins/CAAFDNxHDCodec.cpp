@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDNxHDCodec.cpp,v 1.4 2008/07/29 11:59:34 stuart_hc Exp $ $Name:  $
+// $Id: CAAFDNxHDCodec.cpp,v 1.5 2008/07/31 04:31:06 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -75,7 +75,7 @@ typedef struct {
 	const aafCharacter *name;
 } FlavourInfo;
 
-static FlavourInfo kSupportedFlavours[12];
+static FlavourInfo kSupportedFlavours[13];
 const aafUInt32 kNumSupportedFlavours = sizeof(kSupportedFlavours);
 
 const wchar_t kDisplayName[] = L"AAF DNxHD Codec";
