@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportVC3.cpp,v 1.2 2008/08/01 02:01:16 terabrit Exp $ $Name:  $
+// $Id: ExportVC3.cpp,v 1.3 2008/08/01 07:32:39 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file

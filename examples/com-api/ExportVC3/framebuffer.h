@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: framebuffer.h,v 1.4 2008/08/01 01:54:41 terabrit Exp $
+// $Id: framebuffer.h,v 1.5 2008/08/01 07:32:40 stuart_hc Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
