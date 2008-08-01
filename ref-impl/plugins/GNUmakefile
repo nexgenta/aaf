@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.21 2008/07/15 23:56:22 terabrit Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.22 2008/08/01 00:59:41 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -68,7 +68,7 @@ INCLUDES = -I. \
 		-I../src/com-api \
 		-I../src/com-api/com-dll \
 		-I../libjpeg \
-                 $(OPT_CODEC_INCS) \
+		$(OPT_CODEC_INCS) \
 		-I../include/com-api
 
 
