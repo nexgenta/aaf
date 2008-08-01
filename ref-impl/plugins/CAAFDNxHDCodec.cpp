@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDNxHDCodec.cpp,v 1.5 2008/07/31 04:31:06 stuart_hc Exp $ $Name:  $
+// $Id: CAAFDNxHDCodec.cpp,v 1.6 2008/08/01 03:18:41 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -385,7 +385,7 @@ HRESULT STDMETHODCALLTYPE CAAFDNxHDCodec::CreateLegacyPropDefs(
 		p_propdef = NULL;
 
 
-		if (p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameSampleSize, &p_propdef) != AAFRESULT_SUCCESS)
+		if ( true || p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameSampleSize, &p_propdef) != AAFRESULT_SUCCESS)
 		{
 			checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
 				kAAFPropID_DIDFrameSampleSize, kAAFPropName_DIDFrameSampleSize, 
