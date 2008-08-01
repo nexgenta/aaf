@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportVC3.cpp,v 1.1 2008/07/14 17:07:33 terabrit Exp $ $Name:  $
+// $Id: ExportVC3.cpp,v 1.2 2008/08/01 02:01:16 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -683,7 +683,7 @@ extern int main(int argc, char *argv[])
 	CAAFInitialize aafInit;
 
 	aafWChar 		pwFileName[FILENAME_MAX] = L"ExportVC3.aaf";
-	bool			compressionEnable = true;		// convert from uncomp to VC3 by default
+	bool			compressionEnable = true;		// supply synthetic component bars to codec by default
 
 	int i = 1;
 	if (argc > 1)
