@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.22 2007/04/17 17:32:47 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.23 2008/08/02 22:52:17 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -448,6 +448,14 @@ const aafUID_t kAAFPropID_EssenceData_Data =
 //{06010102-0100-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_EssenceData_SampleIndex =
 {0x06010102, 0x0100, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
+
+//{01030404-0000-0000-060e-2b3401010104}
+const aafUID_t kAAFPropID_EssenceData_EssenceStreamID =
+{0x01030404, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
+
+//{01030405-0000-0000-060e-2b3401010104}
+const aafUID_t kAAFPropID_EssenceData_IndexStreamID =
+{0x01030405, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
 
 //{06010104-0603-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_EssenceDescriptor_Locator =

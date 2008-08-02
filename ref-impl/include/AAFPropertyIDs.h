@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyIDs.h,v 1.27 2007/04/17 17:32:47 phil_tudor Exp $ $Name:  $
+// $Id: AAFPropertyIDs.h,v 1.28 2008/08/02 22:52:17 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -144,6 +144,8 @@ const int PID_Dictionary_TaggedValueDefinitions                  = 0x260B;
 const int PID_EssenceData_MobID                                  = 0x2701;
 const int PID_EssenceData_Data                                   = 0x2702;
 const int PID_EssenceData_SampleIndex                            = 0x2B01;
+const int PID_EssenceData_EssenceStreamID                        = 0x3F07;
+const int PID_EssenceData_IndexStreamID                          = 0x3F06;
 const int PID_EssenceDescriptor_Locator                          = 0x2F01;
 const int PID_EssenceDescriptor_SubDescriptors                   = 0x2F02;
 const int PID_FileDescriptor_SampleRate                          = 0x3001;
