@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.6 2008/08/01 03:17:35 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.7 2008/08/03 18:51:28 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -366,7 +366,7 @@ HRESULT STDMETHODCALLTYPE CAAFVC3Codec::CreateLegacyPropDefs(
 
 
 		// Register legacy property definitions
-		if ( true || p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameSampleSize, &p_propdef) != AAFRESULT_SUCCESS)
+		if ( p_did_classdef->LookupPropertyDef(kAAFPropID_DIDFrameSampleSize, &p_propdef) != AAFRESULT_SUCCESS)
 		{
 			checkResult( p_did_classdef->RegisterOptionalPropertyDef( 
 				kAAFPropID_DIDFrameSampleSize, kAAFPropName_DIDFrameSampleSize, 
