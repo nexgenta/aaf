@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestExampleFiles.cpp,v 1.6 2007/11/05 04:06:20 stuart_hc Exp $ $Name:  $
+// $Id: TestExampleFiles.cpp,v 1.7 2008/08/04 01:45:40 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -71,7 +71,7 @@ int testExampleFiles()
             saveCopy(exampleFiles[i], L"tmp.xml");
             if (diff(exampleFiles[i], L"tmp.xml"))
             {
-                printf("FAILED\n");
+                printf("FAILED diff(%ls,%ls)\n", exampleFiles[i], L"tmp.xml");
                 thisFilePassed = false;
             }
             else
@@ -83,7 +83,7 @@ int testExampleFiles()
             copyAndTouch(exampleFiles[i], L"tmp.xml");
             if (diff(exampleFiles[i], L"tmp.xml"))
             {
-                printf("FAILED\n");
+                printf("FAILED diff(%ls,%ls)\n", exampleFiles[i], L"tmp.xml");
                 thisFilePassed = false;
             }
             else
