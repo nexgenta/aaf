@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.7 2008/08/03 18:51:28 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.8 2008/08/15 00:31:22 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1104,8 +1104,13 @@ HRESULT STDMETHODCALLTYPE
 		hr = ReadDescriptor( _descriptorHelper );
 		checkExpression (hr == S_OK, hr);
 
-		_ComprID = GetComprID( _compression, _containerFormat );
-		_fileBytesPerSample = GetBytesPerSample();
+		// if _fileBytesPerSample was not provided by (optional) Descriptor::FrameSampleSize
+		// try to obtain it by decoding Compression and ContainerFormat
+		if( !_fileBytesPerSample )
+		{
+			if( !_ComprID ) _ComprID = GetComprID( _compression, _containerFormat );
+			_fileBytesPerSample = GetBytesPerSample();
+		}
 
 		if (_compressEnable == kAAFCompressionEnable && IsVC3(_compression))
 		{
