@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: axDump.cpp,v 1.11 2005/01/11 09:22:20 jfpanisset Exp $ $Name:  $
+// $Id: axDump.cpp,v 1.12 2008/08/18 11:27:02 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,6 +40,7 @@
 #include <iostream>
 #include <sstream>
 
+#include <stdio.h>
 #include <assert.h>
 
 namespace {

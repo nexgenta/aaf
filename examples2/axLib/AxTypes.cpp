@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AxTypes.cpp,v 1.13 2008/06/08 10:28:19 stuart_hc Exp $ $Name:  $
+// $Id: AxTypes.cpp,v 1.14 2008/08/18 11:27:03 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -36,6 +36,7 @@
 
 
 #include <cstring>
+#include <stdio.h>
 #include <assert.h>
 
 namespace {
