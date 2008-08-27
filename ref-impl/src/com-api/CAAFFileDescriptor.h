@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFFileDescriptor.h,v 1.8 2006/06/27 20:19:34 heydowns Exp $ $Name:  $
+// $Id: CAAFFileDescriptor.h,v 1.9 2008/08/27 20:35:43 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -134,6 +134,8 @@ public:
   ///
   /// Succeeds if all of the following are true:
   /// - the pCodecDef pointer is valid.
+  /// - the CodecDefinition identifying the codec is
+  ///   present in the dictionary.
   /// 
   /// If this method fails nothing will be written to *pCodecDef.
   /// 
@@ -146,6 +148,10 @@ public:
   ///
   /// AAFRESULT_NULL_PARAM
   ///   - pCodecDef arg is NULL.
+  ///
+  /// AAFRESULT_OBJECT_NOT_FOUND
+  ///   - the CodecDefinition identifying the codec is not
+  ///     in the dictionary.
   //
   STDMETHOD (GetCodecDef) (
     // Which codec was used 
@@ -230,6 +236,8 @@ public:
   ///
   /// Succeeds if all of the following are true:
   /// - the pFormat pointer is valid.
+  /// - the ContainerDefinition identifying the file format is
+  ///   present in the dictionary.
   /// 
   /// If this method fails nothing will be written to *pFormat.
   /// 
@@ -242,6 +250,10 @@ public:
   ///
   /// AAFRESULT_NULL_PARAM
   ///   - pFormat arg is NULL.
+  ///
+  /// AAFRESULT_OBJECT_NOT_FOUND
+  ///   - the ContainerDefinition identifying the file format is not
+  ///     in the dictionary.
   //
   STDMETHOD (GetContainerFormat) (
     // Optional 
