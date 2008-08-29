@@ -1,5 +1,5 @@
 //
-// $Id: aafembed.cpp,v 1.2 2008/05/23 08:16:30 stuart_hc Exp $ $Name:  $
+// $Id: aafembed.cpp,v 1.3 2008/08/29 04:03:51 stuart_hc Exp $ $Name:  $
 //
 // aafembed.cpp -	Edits AAF file in place adding essence for each FileMob
 //
@@ -542,11 +542,11 @@ static HRESULT RelinkAAFFile(aafWChar * pFileName)
 			if (*(pb+1))
 				pb++;
 			strncpy(avifile, EssenceDir, sizeof(avifile));
-			avifile[sizeof(avifile)] = '\0';
+			avifile[sizeof(avifile)-1] = '\0';
 			strncat(avifile, "/", sizeof(avifile));
-			avifile[sizeof(avifile)] = '\0';
+			avifile[sizeof(avifile)-1] = '\0';
 			strncat(avifile, pb, sizeof(avifile));
-			avifile[sizeof(avifile)] = '\0';
+			avifile[sizeof(avifile)-1] = '\0';
 		}
 		printf("  Using path=%s\n", avifile);
 
