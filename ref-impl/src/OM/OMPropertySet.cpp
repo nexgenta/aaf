@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMPropertySet.cpp,v 1.39 2008/05/05 06:22:58 stuart_hc Exp $ $Name:  $
+// $Id: OMPropertySet.cpp,v 1.40 2008/08/29 14:30:38 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2006, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -237,6 +237,7 @@ void OMPropertySet::setContainer(const OMStorable* container)
 OMStorable* OMPropertySet::container(void) const
 {
   TRACE("OMPropertySet::container");
+  POSTCONDITION("Valid container", _container != 0);
   return const_cast<OMStorable*>(_container);
 }
 
