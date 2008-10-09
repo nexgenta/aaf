@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.66 2008/10/03 15:00:37 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.67 2008/10/09 15:18:04 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -162,8 +162,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::AppendComponent (ImplAAFComponent* pComponent)
 {
-	aafUInt32 count;
-	AAFRESULT ar;
+	aafUInt32 count=0;
+	AAFRESULT ar = AAFRESULT_SUCCESS;
 	ar = CountComponents (&count);
 	if (AAFRESULT_FAILED (ar)) 
 	{
@@ -193,8 +193,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (!pComponent) 
     return AAFRESULT_NULL_PARAM;
 
-  aafUInt32 count;
-  AAFRESULT ar;
+  aafUInt32 count=0;
+  AAFRESULT ar = AAFRESULT_SUCCESS;
   ar = CountComponents (&count);
   if (AAFRESULT_FAILED (ar)) 
   {
@@ -306,9 +306,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFSequence::RemoveComponentAt (aafUInt32 index)
 {
-  AAFRESULT status;
-  aafUInt32 count;
-  AAFRESULT hr;
+  aafUInt32 count = 0;
+  AAFRESULT hr = AAFRESULT_SUCCESS;
   hr = CountComponents (&count);
   if (AAFRESULT_FAILED (hr)) return hr;
   if (index >= count)
@@ -334,7 +333,7 @@ AAFRESULT STDMETHODCALLTYPE
 				//and then a component without lenght is removed and there are no components
 				//left in the sequence, should its length be 0 or undefined?
 			}
-			else status = SetLength( 0 );
+			else hr = SetLength( 0 );
 		}
 		else
 		{
@@ -360,7 +359,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pComp->ReleaseReference ();
 	}
 
-	return status;
+	return hr;
 }
 
 
