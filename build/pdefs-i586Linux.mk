@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-i586Linux.mk,v 1.15 2008/05/02 13:12:56 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-i586Linux.mk,v 1.16 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -114,12 +114,11 @@ ifndef UUIDLIB
     UUIDLIB = -luuid
 endif
 
-# For GNU/Linux always attempt to use the libdv library.
-# If this detection fails, LIBDV_PATH can be passed on the make command line.
-ifndef LIBDV_PATH
-	TMP_LIBDV_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libdv.a && echo $$f && break; done)
-	ifneq "$(TMP_LIBDV_PATH)" ""
-		LIBDV_PATH = $(TMP_LIBDV_PATH)
+# Try to detect FFmpeg libraries if FFMPEG_PATH not set
+ifndef FFMPEG_PATH
+	TMP_FFMPEG_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libavcodec.a && test -e $$f/libavformat.a && echo $$f && break; done)
+	ifneq "$(TMP_FFMPEG_PATH)" ""
+		FFMPEG_PATH = $(TMP_FFMPEG_PATH)
 	endif
 endif
 

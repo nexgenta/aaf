@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImportDV.cpp,v 1.7 2007/08/01 15:15:25 stuart_hc Exp $ $Name:  $
+// $Id: ImportDV.cpp,v 1.8 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -132,7 +132,7 @@ static HRESULT OpenAAFFile(aafWChar * pFileName, bool comp_enable)
 
 	// Open raw video output file
 	FILE		*output;
-	const char	*output_file = comp_enable ? "raw.yuv" : "raw.dv";
+	const char	*output_file = comp_enable ? "raw.yuv" : "raw.cdci";
 
 	if ((output = fopen(output_file, "wb")) == NULL)
 	{
@@ -371,7 +371,9 @@ static HRESULT RegisterRequiredPlugins(void)
 
 void printUsage(const char *progname)
 {
-	fprintf(stderr, "Usage:\n\t%s file.aaf\n", progname);
+	printf("Usage:\n\t%s [options] file.aaf\n", progname);
+	printf("\n");
+	printf("  -d      enable decompression, rather than just unwrapping\n");
 }
 
 int main(int argc, char *argv[])
@@ -391,7 +393,7 @@ int main(int argc, char *argv[])
 				printUsage(argv[0]);
 				return 0;
 			}
-			else if (!strcmp(argv[i], "-compressionEnable"))
+			else if (!strcmp(argv[i], "-d"))
 			{
 				compressionEnable = true;
 				i++;

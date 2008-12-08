@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: pdefs-ppc64Linux.mk,v 1.6 2007/05/15 17:47:17 stuart_hc Exp $ $Name:  $
+# $Id: pdefs-ppc64Linux.mk,v 1.7 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -117,14 +117,6 @@ ifndef UUIDLIB
     UUIDLIB = -luuid
 endif
 
-# For GNU/Linux always attempt to use the libdv library.
-# If this detection fails, LIBDV_PATH can be passed on the make command line.
-ifndef LIBDV_PATH
-	TMP_LIBDV_PATH := $(shell for f in /usr/local/lib /usr/lib /lib /usr/lib64 /lib64; do test -e $$f/libdv.a && echo $$f && break; done)
-	ifneq "$(TMP_LIBDV_PATH)" ""
-		LIBDV_PATH = $(TMP_LIBDV_PATH)
-	endif
-endif
 
 #------------------------------------------------------------------------------
 # Select UNICODE or ansi API's:
