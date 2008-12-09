@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.32 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.33 2008/12/09 04:17:53 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -2141,7 +2141,7 @@ void CAAFCDCICodec::UpdateCalculatedData( void )
 	}
 	else if (EqualAUID(&NULL_UID, &_compression) || EqualAUID(&AAF_CMPR_AUNC422, &_compression))
 	{
-		aafUInt32 _bitsPerSample;
+		aafUInt32 _bitsPerSample = 0;
     	//
 	    // Calculate number of bits per pixel. 
     	// Be aware that for 4:2:2 format number of bits per pi
