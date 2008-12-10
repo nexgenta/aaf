@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: InfoDumper.cpp,v 1.36 2007/02/18 01:54:38 akharkev Exp $ $Name:  $
+// $Id: InfoDumper.cpp,v 1.37 2008/12/10 23:03:41 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -13,7 +13,7 @@
 // the License for the specific language governing rights and limitations
 // under the License.
 //
-// The Original Code of this file is Copyright 1998-2004, Licensor of the
+// The Original Code of this file is Copyright 1998-2008, Licensor of the
 // AAF Association.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -2009,7 +2009,7 @@ HRESULT dumpPropertyValue (IAAFPropertyValueSP pPVal,
 		  os << "Weak Object Reference Array";
 		else
 		  os << "Unknown-type object reference array";
-		os << " [" << numElems << "] of ";
+		os << " [" << dec << numElems << "] of ";
 		checkResult(pElemTDObjRef->GetObjectType(&pElemTDObjRefCD));
 		printAAFName( pElemTDObjRefCD, os);
 		os << endl;
