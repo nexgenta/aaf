@@ -2,7 +2,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ExportDV.cpp,v 1.21 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
+// $Id: ExportDV.cpp,v 1.22 2008/12/10 05:39:21 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -353,7 +353,7 @@ static HRESULT CreateAAFFile(aafWChar * pFileName, bool comp_enable)
 			total_bytes_written += bytesWritten;
 		}
 	}
-	printf("Wrote %d samples (size of essence=%lld)\n", total_samples, total_bytes_written);
+	printf("Wrote %d samples (size of essence=%"AAFFMT64"d)\n", total_samples, total_bytes_written);
 
 	/* Set the essence to indicate that you have finished writing the samples */
 	check(pEssenceAccess->CompleteWrite());
