@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: AAFAnalyzerMain.cpp,v 1.42 2008/05/25 02:54:19 jptrainor Exp $
+// $Id: AAFAnalyzerMain.cpp,v 1.43 2009/01/17 17:09:54 jptrainor Exp $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1153,7 +1153,7 @@ int main( int argc, char** argv )
   {
     wcerr << L"Error: " << ex.widewhat() << endl;
   }
-  catch ( const exception& ex )
+  catch ( const std::exception& ex )
   {
     cerr << "Error: " << ex.what() << endl;
   }
