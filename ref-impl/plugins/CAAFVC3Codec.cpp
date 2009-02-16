@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.8 2008/08/15 00:31:22 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.9 2009/02/16 13:27:14 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1108,7 +1108,9 @@ HRESULT STDMETHODCALLTYPE
 		// try to obtain it by decoding Compression and ContainerFormat
 		if( !_fileBytesPerSample )
 		{
-			if( !_ComprID ) _ComprID = GetComprID( _compression, _containerFormat );
+			if( _ComprID==0 || _ComprID==0xFFFFFFFF )
+				_ComprID = GetComprID( _compression, _containerFormat );
+
 			_fileBytesPerSample = GetBytesPerSample();
 		}
 
