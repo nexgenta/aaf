@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.18 2008/06/03 03:06:02 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.19 2009/02/16 13:24:57 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1606,6 +1606,10 @@ HRESULT STDMETHODCALLTYPE
 		CHECK(_snddes->GetChannelCount(&numch));
 		_bitsPerSample = (aafUInt16)bitspersample;
 		_numCh = (aafUInt16)numch;
+
+		// mkirk, 11/26/08
+		// _bytesPerFrame was never being reset from its default of 1.
+		_bytesPerFrame = ((_bitsPerSample + 7) / 8) * _numCh;
 
 		containerDef->Release();
 		defObj->Release();
