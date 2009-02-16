@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFDNxHDCodec.cpp,v 1.8 2008/08/15 00:31:19 terabrit Exp $ $Name:  $
+// $Id: CAAFDNxHDCodec.cpp,v 1.9 2009/02/16 13:28:51 terabrit Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1125,7 +1125,9 @@ HRESULT STDMETHODCALLTYPE
 		// try to obtain it by decoding Compression and ContainerFormat
 		if( !_fileBytesPerSample )
 		{
-			if( !_ComprID ) _ComprID = GetComprID( _compression, _containerFormat );
+			if( _ComprID==0 || _ComprID==0xFFFFFFFF )
+				_ComprID = GetComprID( _compression, _containerFormat );
+
 			_fileBytesPerSample = GetBytesPerSample();
 		}
 
@@ -2047,6 +2049,9 @@ void CAAFDNxHDCodec::UpdateDescriptor (CAAFCDCIDescriptorHelper& descriptorHelpe
 		_compression.Data2=byte14n15;
 	}
 
+	if(_UseLegacyAvidUIDs)
+		checkResult( descriptorHelper.SetResolutionID( _ComprID ) );
+	
 	checkResult(descriptorHelper.SetContainerFormat(_containerFormat));
 
 	checkResult(descriptorHelper.SetCompression(_compression));
