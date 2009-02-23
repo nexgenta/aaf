@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.29 2009/02/23 18:55:28 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.30 2009/02/23 21:24:09 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -460,6 +460,19 @@ static void Test_EssenceStreamWrite(
   
   CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
   CheckExpression(expectedSize == streamSize, AAFRESULT_TEST_FAILED);
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
+
+  // Test growing the stream
+  const aafUInt32  increment = 50;
+  CheckResult(pTypeDefStream->SetSize(pStreamPropertyValue, expectedSize+increment));
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  CheckExpression(expectedSize+increment == streamSize, AAFRESULT_TEST_FAILED);
+  // After growing, truncate the stream back to the original size
+  CheckResult(pTypeDefStream->SetSize(pStreamPropertyValue, expectedSize));
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  CheckExpression(expectedSize == streamSize, AAFRESULT_TEST_FAILED);
+  // Make sure the current position didn't change
   CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
   CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
 
