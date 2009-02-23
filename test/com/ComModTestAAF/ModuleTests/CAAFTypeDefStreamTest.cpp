@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.28 2008/05/01 20:15:03 vladimirg2 Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.29 2009/02/23 18:55:28 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -900,7 +900,8 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
     IEnumAAFEssenceDataSP pEnumEssenceData;
     CheckResult(pHeader->EnumEssenceData(&pEnumEssenceData));
     CheckResult(pEnumEssenceData->NextOne(&pEssenceData));
-    aafMobID_t testMobID = {0};
+    aafMobID_t testMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+                            {0,0,0,{0,0,0,0,0,0,0,0}}};
     CheckResult(pEssenceData->GetFileMobID(&testMobID));
     CheckExpression(0 == memcmp(&testMobID, &sMobID[0], sizeof(aafMobID_t)),
                     AAFRESULT_TEST_FAILED);  
