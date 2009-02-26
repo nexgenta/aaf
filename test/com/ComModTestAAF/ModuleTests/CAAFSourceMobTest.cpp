@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSourceMobTest.cpp,v 1.43 2009/02/26 17:25:21 vladimirg2 Exp $ $Name:  $
+// $Id: CAAFSourceMobTest.cpp,v 1.44 2009/02/26 19:00:26 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -61,8 +61,8 @@ inline void checkExpression(bool expression, HRESULT r)
 const int numberOfSlots = 2;
 aafFrameOffset_t storedTimeCode = 0;
 aafFrameOffset_t storedEdgeCode = 0;
-const aafInt32 edgeSlotID = 33;
-const aafInt32 timeCodeSlotID = 35;
+const aafSlotID_t edgeSlotID = 33;
+const aafSlotID_t timeCodeSlotID = 35;
 
 static HRESULT CreateAAFFile(
     aafWChar * pFileName,
@@ -119,7 +119,7 @@ static HRESULT CreateAAFFile(
 	  }
 
 	  // Append an Edgcode slot:
-	  aafInt32 slotID = edgeSlotID;
+	  aafSlotID_t slotID = edgeSlotID;
 	  aafRational_t editRate;
 	  editRate.numerator = 1; editRate.denominator = 1;
 	  aafFilmType_t filmType = kAAFFt35MM;

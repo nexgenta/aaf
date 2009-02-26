@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFTypeDefStreamTest.cpp,v 1.31 2009/02/24 23:15:21 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStreamTest.cpp,v 1.32 2009/02/26 19:00:26 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -818,8 +818,6 @@ static void Test_NearKAGBoundaryWrite(
   CAAFBuiltinDefs & defs,
   IAAFPropertyValue *pStreamPropertyValue)
 {
-  AAFRESULT hr = AAFRESULT_SUCCESS;
-
   IAAFPlainStreamDataSP pTypeDefStream;
   Test_GetTypeDefStream(pStreamPropertyValue, &pTypeDefStream);
 
