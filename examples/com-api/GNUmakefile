@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.11 2008/07/21 00:54:11 terabrit Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.12 2009/02/26 18:25:35 phil_tudor Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -27,7 +27,7 @@ all: ComCutsOnlyTest ComEssenceDataTest ComExtension ComPropDirectAccess \
 	ComPropDirectDump ExportAudioExample ExportSimpleComposition \
 	ImportAudioExample InfoDumper MetadataExample comClientTest \
 	ExportDV ImportDV ExportJPEG ImportJPEG ExportPCM ImportPCM \
-	ExportVC3 ImportVC3
+	ExportVC3 ImportVC3 ExportAS05Effects
 
 .PHONY : ComCutsOnlyTest
 ComCutsOnlyTest:
@@ -105,6 +105,10 @@ ExportVC3 :
 ImportVC3 :
 	cd ImportVC3 && $(MAKE)
 
+.PHONY : ExportAS05Effects
+ExportAS05Effects :
+	cd ExportAS05Effects && $(MAKE)
+
 # Run ComPropDirectDump, comClientTest and InfoDumper checks last since all
 # generated AAF files will be available to be read and tested
 .PHONY : check
@@ -125,6 +129,7 @@ check : all
 	cd ImportPCM && $(MAKE) $@
 	cd ExportVC3 && $(MAKE) $@
 	cd ImportVC3 && $(MAKE) $@
+	cd ExportAS05Effects && $(MAKE) $@
 	cd ComPropDirectDump && $(MAKE) $@
 	cd comClientTest && $(MAKE) $@
 	cd InfoDumper && $(MAKE) $@
@@ -150,6 +155,7 @@ clean :
 	cd ImportPCM && $(MAKE) GENDEPS=0 $@
 	cd ExportVC3 && $(MAKE) GENDEPS=0 $@
 	cd ImportVC3 && $(MAKE) GENDEPS=0 $@
+	cd ExportAS05Effects && $(MAKE) GENDEPS=0 $@
 
 .PHONY : realclean
 realclean :
@@ -172,3 +178,4 @@ realclean :
 	cd ImportPCM && $(MAKE) GENDEPS=0 $@
 	cd ExportVC3 && $(MAKE) GENDEPS=0 $@
 	cd ImportVC3 && $(MAKE) GENDEPS=0 $@
+	cd ExportAS05Effects && $(MAKE) GENDEPS=0 $@

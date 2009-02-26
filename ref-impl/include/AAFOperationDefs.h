@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFOperationDefs.h,v 1.14 2007/02/06 15:46:04 wschilp Exp $ $Name:  $
+// $Id: AAFOperationDefs.h,v 1.15 2009/02/26 18:25:35 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -166,6 +166,18 @@ const aafUID_t kAAFOperationDef_StereoAudioGain =
 //{8d896ad0-2261-11d3-8a4c-0050040ef7d2}
 const aafUID_t kAAFOperationDef_MonoAudioMixdown =
 {0x8d896ad0, 0x2261, 0x11d3, {0x8a, 0x4c, 0x00, 0x50, 0x04, 0x0e, 0xf7, 0xd2}};
+
+
+// AS-05
+const aafUID_t kAAFOperationDef_VideoOpacity =
+{0x9bb90dfd, 0x2aad, 0x49af, {0xb0, 0x9c, 0x8b, 0xa6, 0xcd, 0x52, 0x81, 0xd1}};
+
+const aafUID_t kAAFOperationDef_VideoTitle =
+{0x2c50831c, 0x572e, 0x4042, {0xb1, 0xdd, 0x55, 0xed, 0x0b, 0x7c, 0x49, 0xdf}};
+
+const aafUID_t kAAFOperationDef_VideoColor =
+{0x5aba98f8, 0xf389, 0x471f, {0x8f, 0xee, 0xdf, 0xde, 0x7e, 0xc7, 0xf9, 0xbb}};
+
 
 
 // AAF OperationDefinition legacy aliases
