@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSourceMob.cpp,v 1.69 2009/02/26 17:26:01 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFSourceMob.cpp,v 1.70 2009/03/16 20:35:04 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -373,7 +373,7 @@ AAFRESULT STDMETHODCALLTYPE
 		edge.startFrame = startPos;
 		edge.filmKind = filmKind;
 		edge.codeFormat = codeFormat;
-		strncpy((char *)&edge.header, (char *)&header, 8);
+		strncpy((char *)edge.header, (char *)header, 8);
 		
 		CHECK(pDictionary->GetBuiltinDefs()->cdEdgecode()->
 			  CreateInstance ((ImplAAFObject**) &edgecodeClip));
