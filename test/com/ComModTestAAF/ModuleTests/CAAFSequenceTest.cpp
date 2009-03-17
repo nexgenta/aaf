@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFSequenceTest.cpp,v 1.41 2009/02/26 19:00:26 phil_tudor Exp $ $Name:  $
+// $Id: CAAFSequenceTest.cpp,v 1.42 2009/03/17 15:07:15 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -77,6 +77,13 @@ void InstantiateComponent(CAAFBuiltinDefs *defs,
 		(IUnknown **)&pComponent));
 	checkResult(pComponent->SetDataDef(defs->ddkAAFSound()));
 	checkResult(pComponent->SetLength(length)); 
+}
+
+void InstantiateComponentWithoutLength(CAAFBuiltinDefs *defs, IAAFComponent*& pComponent)
+{
+	checkResult(defs->cdFiller()->CreateInstance(IID_IAAFComponent, 
+		(IUnknown **)&pComponent));
+	checkResult(pComponent->SetDataDef(defs->ddkAAFSound()));
 }
 
 void InstantiateEvent(CAAFBuiltinDefs *defs,
@@ -210,6 +217,11 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 	  IAAFComponent *pEventASpComp = NULL;
 	  aafPosition_t position;
 	  
+	  InstantiateComponentWithoutLength(defs, pComponent);
+	  //Inserting a component without length should fail:
+	  checkExpression(AAFRESULT_PROP_NOT_PRESENT==pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	  pComponent->Release();
+	  pComponent = NULL;
 
 	  int i = 0;
 	  // Append two components onto sequence

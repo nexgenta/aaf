@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFSequence.cpp,v 1.67 2008/10/09 15:18:04 vladimirg2 Exp $ $Name:  $
+// $Id: ImplAAFSequence.cpp,v 1.68 2009/03/17 15:06:49 vladimirg2 Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -1373,7 +1373,7 @@ AAFRESULT ImplAAFSequence::CheckLengthSemantics( ImplAAFComponent* pComponentNex
 	// If either the new component, or the last component in the sequence, is
 	// a transition, then verify they fully overlap.
 
-	// Length properties are not optional in this case.
+	// Length properties are not optional for components and transitions.
 
 	AAFRESULT status;
 
