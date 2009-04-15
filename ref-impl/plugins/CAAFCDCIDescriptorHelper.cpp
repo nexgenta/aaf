@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCIDescriptorHelper.cpp,v 1.10 2008/05/22 21:26:42 terabrit Exp $ $Name:  $
+// $Id: CAAFCDCIDescriptorHelper.cpp,v 1.11 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 #include "AAF.h"
 #include "AAFTypeDefUIDs.h"
 
-#include "AAFUtils.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"

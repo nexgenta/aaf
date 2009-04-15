@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.h,v 1.3 2008/07/22 02:56:01 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.h,v 1.4 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@
 // Include our base class for support of IUnknown methods.
 #include "CAAFUnknown.h"
 
-#include "AAFUtils.h" // AAFByteOrder
+#include "AAFPluginUtils.h" // AAFByteOrder
 
 #ifndef __CAAFCDCIDescriptorHelper_h__
 #include "CAAFCDCIDescriptorHelper.h"
@@ -270,7 +270,7 @@ public:
 
 private:
 
-	// EqualDegenerateAUID() could be moved to AAFUtils.cpp
+	// EqualDegenerateAUID() could be moved to AAFPluginUtils.cpp and/or AAFUtils.cpp
 	// it appears in plugins/CAAFVC3Codec.cpp and plugins/CAAFDNxHDCodec.cpp and impl/ImplAAFEssenceAccess.cpp
 	// it is kept here for 1.1.3 because it is used only by the patch to accept MXF files with no CodecID
 	static aafBool EqualDegenerateAUID(const aafUID_t *uid1, const aafUID_t *uid2)

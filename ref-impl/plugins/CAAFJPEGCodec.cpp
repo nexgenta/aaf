@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.cpp,v 1.62 2008/07/28 11:47:49 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.cpp,v 1.63 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,7 +29,6 @@
 
 #include "AAF.h"
 
-#include "AAFUtils.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"

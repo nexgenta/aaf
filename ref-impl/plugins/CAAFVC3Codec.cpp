@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.9 2009/02/16 13:27:14 terabrit Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.10 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -33,7 +33,6 @@
 
 #include "AAF.h"
 
-#include "AAFUtils.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"

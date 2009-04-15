@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.cpp,v 1.19 2009/02/16 13:24:57 terabrit Exp $ $Name:  $
+// $Id: CAAFPCMCodec.cpp,v 1.20 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -29,13 +29,13 @@
 #include <assert.h>
 #include <string.h>
 #include <stdarg.h>		// for varargs
+#include <stdio.h>		// for sprintf
 
 #include "AAFResult.h"
 
 #include "AAF.h"
 
 #include "aafErr.h"
-#include "AAFUtils.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"

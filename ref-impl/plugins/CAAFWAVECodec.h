@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFWAVECodec.h,v 1.33 2005/02/08 14:32:32 stuart_hc Exp $ $Name:  $
+// $Id: CAAFWAVECodec.h,v 1.34 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,10 +28,10 @@
 //=---------------------------------------------------------------------=
 
 
-#include "AAFUtils.h"
 #include "AAF.h"
 #include "AAFPlugin.h"
 #include "CAAFUnknown.h"
+#include "AAFPluginUtils.h"
 
 EXTERN_C const CLSID CLSID_AAFWaveCodec;
 

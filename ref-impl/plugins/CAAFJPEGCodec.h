@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFJPEGCodec.h,v 1.20 2006/03/08 14:29:53 stuart_hc Exp $ $Name:  $
+// $Id: CAAFJPEGCodec.h,v 1.21 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@
 #include "CAAFJPEGDescriptorHelper.h"
 #endif
 
-#include "AAFUtils.h" // AAFByteOrder
+#include "AAFPluginUtils.h" // AAFByteOrder
 
 #include "jpegesdata.h"
 

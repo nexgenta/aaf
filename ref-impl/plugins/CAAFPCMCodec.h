@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFPCMCodec.h,v 1.2 2008/06/02 12:16:51 stuart_hc Exp $ $Name:  $
+// $Id: CAAFPCMCodec.h,v 1.3 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -28,7 +28,7 @@
 //=---------------------------------------------------------------------=
 
 
-#include "AAFUtils.h"
+#include "AAFPluginUtils.h"
 #include "AAF.h"
 #include "AAFPlugin.h"
 #include "CAAFUnknown.h"

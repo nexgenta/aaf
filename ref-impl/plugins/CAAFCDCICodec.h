@@ -5,7 +5,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.h,v 1.7 2008/12/08 06:50:10 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.h,v 1.8 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -34,7 +34,7 @@
 // Include our base class for support of IUnknown methods.
 #include "CAAFUnknown.h"
 
-#include "AAFUtils.h" // AAFByteOrder
+#include "AAFPluginUtils.h" // AAFByteOrder
 
 #ifndef __CAAFCDCIDescriptorHelper_h__
 #include "CAAFCDCIDescriptorHelper.h"

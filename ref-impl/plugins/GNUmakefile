@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.22 2008/08/01 00:59:41 terabrit Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.23 2009/04/15 14:51:24 akharkev Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public
 # Source License Agreement (the "License"); You may not use this file
@@ -91,7 +91,7 @@ CXXFILES = AAFPluginCOM.cpp \
 		jpegesdatasrc.cpp
 
 
-SUPOBJS = $(OBJDIR)/AAFUtils$(OBJ) \
+SUPOBJS = $(OBJDIR)/AAFPluginUtils$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFClassFactory$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFServer$(OBJ) \
 		$(AAFBUILDDIR)/com-api/$(AAFTARGETDIR)/CAAFUnknown$(OBJ) \
