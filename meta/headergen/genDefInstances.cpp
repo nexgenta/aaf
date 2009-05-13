@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: genDefInstances.cpp,v 1.7 2005/06/14 20:26:29 montrowe Exp $ $Name:  $
+// $Id: genDefInstances.cpp,v 1.8 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -31,6 +31,7 @@
 #include <iostream>
 #include <assert.h>
 #include <stdlib.h>
+#include <cstring>
 
 #include "headerGenUtils.h"
 
@@ -51,10 +52,10 @@
 // additional properties of subclasses not yet supported
 
 struct inst_t {
-  char* cls;
-  char* name;
-  char* alias;
-  char* desc;
+  const char* cls;
+  const char* name;
+  const char* alias;
+  const char* desc;
   uid identification;
 };
 

@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: result.cpp,v 1.18 2006/06/07 16:24:00 tbingham Exp $ $Name:  $
+// $Id: result.cpp,v 1.19 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -30,6 +30,7 @@
 #include <string>
 using namespace std;
 #include <assert.h>
+#include <cstring>
 
 void comment(const char* s)
 {

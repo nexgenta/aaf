@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propertyDefUid.cpp,v 1.13 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: propertyDefUid.cpp,v 1.14 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -39,7 +39,7 @@ const char* prefix = "kAAFPropID_";
 #define AAF_TABLE_END()   };
 
 typedef struct {
-  char* name;
+  const char* name;
   uid identifier;
 } Property_t;
 

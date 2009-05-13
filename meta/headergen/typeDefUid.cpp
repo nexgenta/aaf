@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: typeDefUid.cpp,v 1.15 2006/06/05 22:50:55 tbingham Exp $ $Name:  $
+// $Id: typeDefUid.cpp,v 1.16 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -115,7 +115,7 @@ const char* prefix = "kAAFTypeID_";
 #define AAF_REFERENCE_TYPE_NAME(type, target) AAF_TYPE(target##type)
 
 struct typesTag {
-  char* name;
+  const char* name;
   uid identifier;
 } types [] = {
 #include "AAFMetaDictionary.h"

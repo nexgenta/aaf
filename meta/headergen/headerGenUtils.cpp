@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: headerGenUtils.cpp,v 1.18 2006/06/05 22:52:25 tbingham Exp $ $Name:  $
+// $Id: headerGenUtils.cpp,v 1.19 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -114,7 +114,7 @@ void validateArgs(int argc, char** argv, char*& moduleName, char*& prefix)
 
   moduleName = argv[1];
 
-  if( argc < 3 ) prefix = "";
+  if( argc < 3 ) prefix = const_cast<char*>("");
   else prefix = argv[2];
 }
 

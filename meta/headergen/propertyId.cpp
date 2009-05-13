@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: propertyId.cpp,v 1.11 2005/06/14 20:27:50 montrowe Exp $ $Name:  $
+// $Id: propertyId.cpp,v 1.12 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -38,7 +38,7 @@
 #define AAF_TABLE_END()   };
 
 typedef struct {
-  char* name;
+  const char* name;
   int identifier;
 } Property_t;
 

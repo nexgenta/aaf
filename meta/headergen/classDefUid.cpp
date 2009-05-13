@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: classDefUid.cpp,v 1.17 2006/06/05 22:50:55 tbingham Exp $ $Name:  $
+// $Id: classDefUid.cpp,v 1.18 2009/05/13 16:55:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -40,8 +40,8 @@ const char* prefix = "kAAFClassID_";
 #define AAF_ALIAS_TABLE_END()   };
 
 struct aliasTag {
-  char* name;
-  char* alias;
+  const char* name;
+  const char* alias;
 } aliases [] =
 #include "AAFMetaDictionary.h"
 
@@ -51,7 +51,7 @@ struct aliasTag {
 #define AAF_TABLE_END()   };
 
 struct classesTag {
-  char* name;
+  const char* name;
   uid identifier;
 } classes [] =
 #include "AAFMetaDictionary.h"
