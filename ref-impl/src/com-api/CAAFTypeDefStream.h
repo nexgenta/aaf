@@ -7,7 +7,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFTypeDefStream.h,v 1.11 2007/03/16 18:07:39 akharkev Exp $ $Name:  $
+// $Id: CAAFTypeDefStream.h,v 1.12 2009/05/14 13:21:36 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -652,6 +652,7 @@ public:
   // Succeeds if:
   // - Initialize() has already been called on this object.
   // - pPlainStreamData is a valid pointer.
+  // - reserved is 0.
   //
   // This method will return the following codes.  If more than one of
   // the listed errors is in effect, it will return the first one
@@ -665,6 +666,9 @@ public:
   //
   // AAFRESULT_NULL_PARAM
   //   - pPlainStreamData arg is NULL.
+  ///
+  /// AAFRESULT_INVALID_PARAM
+  ///   - reserved is not 0.
   // @end
   // 
   STDMETHOD (GetPlainStreamData)
