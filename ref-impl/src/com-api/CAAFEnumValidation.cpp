@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.cpp,v 1.11 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CAAFEnumValidation.cpp,v 1.12 2009/05/14 13:35:03 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -806,6 +806,18 @@ bool Is_aafTimecodeSourceType_t_Valid(aafTimecodeSourceType_t param)
   switch (param) {
     case kAAFTimecodeLTC:
     case kAAFTimecodeVITC:
+      return true;
+    default:
+      return false;
+  }
+}
+
+bool Is_aafTitleAlignmentType_t_Valid(aafTitleAlignmentType_t param)
+{
+  switch (param) {
+    case kAAFTitleAlignment_Left:
+    case kAAFTitleAlignment_Center:
+    case kAAFTitleAlignment_Right:
       return true;
     default:
       return false;

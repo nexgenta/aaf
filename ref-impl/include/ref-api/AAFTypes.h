@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypes.h,v 1.16 2006/03/24 17:54:28 jlow Exp $ $Name:  $
+// $Id: AAFTypes.h,v 1.17 2009/05/14 13:35:03 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -383,8 +383,15 @@ typedef enum _aafContentScanningType_e
 	kAAFContentScanning_Progressive = 1,
 	kAAFContentScanning_Interlace = 2,
 	kAAFContentScanning_Mixed = 3
-
 } aafContentScanningType_e;
+	
+typedef aafInt32 aafTitleAlignmentType_t;
+typedef enum _aafTitleAlignmentType_e
+{
+	kAAFTitleAlignment_Left = 0,
+	kAAFTitleAlignment_Center = 1,
+	kAAFTitleAlignment_Right = 2
+} aafTitleAlignmentType_e;
 	
 typedef aafInt32 aafColorSiting_t;
 typedef enum _aafColorSiting_e
