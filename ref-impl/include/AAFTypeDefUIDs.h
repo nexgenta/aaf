@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.28 2009/02/26 18:27:05 phil_tudor Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.29 2009/05/14 11:27:40 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -200,6 +200,10 @@ const aafUID_t kAAFTypeID_ScanningDirectionType =
 //{0201012a-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_ContentScanningType =
 {0x0201012a, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+//{0201012b-0000-0000-060e-2b3401040101}
+const aafUID_t kAAFTypeID_TitleAlignmentType =
+{0x0201012b, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 //{02020101-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_OperationCategoryType =
@@ -653,10 +657,6 @@ const aafUID_t kAAFTypeID_DescriptiveObjectStrongReferenceVector =
 const aafUID_t kAAFTypeID_SubDescriptorStrongReferenceVector =
 {0x05060e00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
-
-// AS-05
-const aafUID_t kAAFTypeID_TitleAlignmentType =
-{0x24d75790, 0x282f, 0x4fc9, {0xbc, 0x99, 0xd9, 0x6c, 0xb0, 0xb2, 0xa9, 0x12}};
 
 
 #endif // ! __AAFTypeDefUIDs_h__
