@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: CAAFEnumValidation.h,v 1.7 2006/03/24 18:18:38 jlow Exp $ $Name:  $
+// $Id: CAAFEnumValidation.h,v 1.8 2009/05/29 14:27:42 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public
 // Source License Agreement (the "License"); You may not use this file
@@ -93,6 +93,7 @@ bool Is_aafSwapNeeded_t_Valid(aafSwapNeeded_t param);
 bool Is_aafTapeCaseType_t_Valid(aafTapeCaseType_t param);
 bool Is_aafTapeFormatType_t_Valid(aafTapeFormatType_t param);
 bool Is_aafTimecodeSourceType_t_Valid(aafTimecodeSourceType_t param);
+bool Is_aafTitleAlignmentType_t_Valid(aafTitleAlignmentType_t param);
 bool Is_aafUserDataModeType_t_Valid(aafUserDataModeType_t param);
 bool Is_aafVideoSignalType_t_Valid(aafVideoSignalType_t param);
 bool Is_eAAFByteOrder_t_Valid(eAAFByteOrder_t param);
