@@ -1,7 +1,7 @@
 @echo off
 rem  --------------------------------------------------------------------------
 rem
-rem   $Id: update.cmd,v 1.2 2009/06/02 04:23:07 stuart_hc Exp $ $Name:  $
+rem   $Id: update.cmd,v 1.3 2009/06/02 07:43:22 stuart_hc Exp $ $Name:  $
 rem
 rem   The contents of this file are subject to the AAF SDK Public Source
 rem   License Agreement Version 2.0 (the "License"); You may not use this
@@ -26,7 +26,8 @@ rem   The Original Code of this file is Copyright 1998-2009, licensor of the
 rem   Advanced Media Workflow Association.  All rights reserved.
 rem
 rem   The Initial Developer of the Original Code of this file and the
-rem   licensor of the Advanced Media Workflow Association is Avid Technology.
+rem   licensor of the Advanced Media Workflow Association is
+rem   Avid Technology.
 rem   All rights reserved.
 rem
 rem  --------------------------------------------------------------------------

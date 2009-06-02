@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: win32aafsdk.mak,v 1.3 2009/06/02 04:23:06 stuart_hc Exp $ $Name:  $
+# $Id: win32aafsdk.mak,v 1.4 2009/06/02 07:43:22 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -25,7 +25,8 @@
 # Advanced Media Workflow Association.  All rights reserved.
 #
 # The Initial Developer of the Original Code of this file and the
-# licensor of the Advanced Media Workflow Association is Avid Technology.
+# licensor of the Advanced Media Workflow Association is
+# Avid Technology.
 # All rights reserved.
 #
 ###############################################################################
