@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: comcx.mac,v 1.29 2009/06/01 11:46:51 stuart_hc Exp $ $Name:  $
+#c $Id: comcx.mac,v 1.30 2009/06/10 13:14:07 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public Source
 #c License Agreement Version 2.0 (the "License"); You may not use this
@@ -76,6 +76,9 @@
 #startm AD_COM_EXT3_CLASS_BEGIN 03
 #endm
 
+#startm AD_COM_EXT4_CLASS_BEGIN 04
+#endm
+
 #startm AD_ROOT_CLASS_BEGIN 00
 #endm
 
@@ -143,6 +146,9 @@
 #endm
 
 #startm AD_COM_EXT3_CLASS_END 03
+#endm
+
+#startm AD_COM_EXT4_CLASS_END 04
 #endm
 
 #startm AD_ROOT_CLASS_END 00

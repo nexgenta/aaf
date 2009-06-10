@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: comh.mac,v 1.57 2009/06/01 11:46:51 stuart_hc Exp $ $Name:  $
+#c $Id: comh.mac,v 1.58 2009/06/10 13:14:07 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public Source
 #c License Agreement Version 2.0 (the "License"); You may not use this
@@ -247,6 +247,45 @@ class C.this-module
     %01,
     %02,
     %03,
+    public C.parent-module
+{
+protected:
+
+  //********
+  //
+  // Constructor/destructor
+  //
+  C.this-module (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
+  virtual ~C.this-module ();
+
+public:
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT4_CLASS_BEGIN 04
+#ifndef __C.parent-module_h__
+#include "C.parent-module.h"
+#endif
+
+
+//
+// Forward declaration
+//
+class Impl.this-module;
+
+
+class C.this-module
+  : public I.this-module,
+    %01,
+    %02,
+    %03,
+    %04,
     public C.parent-module
 {
 protected:
@@ -1115,12 +1154,23 @@ AD_CLASS_END\
 
 #ccccccccccccccccccccccccccc
 #c
-#c Ends a class definition for classes which support 2 more than the
+#c Ends a class definition for classes which support 3 more than the
 #c primary COM interface.
 #c
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT3_CLASS_END 03
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support 4 more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT4_CLASS_END 04
 AD_CLASS_END\
 #endm
 
