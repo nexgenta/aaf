@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: implc.mac,v 1.54 2009/06/01 11:46:51 stuart_hc Exp $ $Name:  $
+#c $Id: implc.mac,v 1.55 2009/06/10 13:42:29 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public Source
 #c License Agreement Version 2.0 (the "License"); You may not use this
@@ -252,6 +252,17 @@ AD_CLASS_BEGIN\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT3_CLASS_BEGIN 03
+AD_CLASS_BEGIN\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT4_CLASS_BEGIN 04
 AD_CLASS_BEGIN\
 #endm
 
@@ -870,6 +881,18 @@ AD_CLASS_END\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT3_CLASS_END 03
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT4_CLASS_END 04
 AD_CLASS_END\
 #endm
 
