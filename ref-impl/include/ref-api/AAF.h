@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAF.h,v 1.61 2009/06/01 11:47:00 stuart_hc Exp $ $Name:  $
+// $Id: AAF.h,v 1.62 2009/06/15 10:08:11 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -21946,7 +21946,7 @@ DECLARE_INTERFACE_(IAAFPluginManager, IUnknown)
   // EnumLoadedPlugins()
   //
   /// Returns an enumerator which enumerates over all of the loaded
-  /// pluigin choices through the *ppEnum argument.  The returned
+  /// plugin choices through the *ppEnum argument.  The returned
   /// enumerator is AddRef()ed before it is returned.
   /// 
   /// Succeeds if all of the following are true:

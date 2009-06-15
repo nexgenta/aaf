@@ -1,6 +1,6 @@
 #c *********************************************************************
 #c
-#c $Id: AAFPluginManager.dod,v 1.13 2009/06/01 11:46:50 stuart_hc Exp $ $Name:  $
+#c $Id: AAFPluginManager.dod,v 1.14 2009/06/15 10:08:11 stuart_hc Exp $ $Name:  $
 #c
 #c The contents of this file are subject to the AAF SDK Public Source
 #c License Agreement Version 2.0 (the "License"); You may not use this
@@ -99,7 +99,7 @@ AD_XMETHOD2(EnumLoadedPlugins,
 			  ppEnum,
 			  Loaded Plugin Enumeration,
      Returns an enumerator which enumerates over all of the loaded
-  /// pluigin choices through the *ppEnum argument.  The returned
+  /// plugin choices through the *ppEnum argument.  The returned
   /// enumerator is AddRef\(\)ed before it is returned.
   /// 
   /// Succeeds if all of the following are true:
