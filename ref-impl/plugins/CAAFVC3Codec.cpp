@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFVC3Codec.cpp,v 1.11 2009/06/01 11:47:00 stuart_hc Exp $ $Name:  $
+// $Id: CAAFVC3Codec.cpp,v 1.12 2009/06/16 06:11:04 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -94,7 +94,7 @@ typedef struct {
 } FlavourInfo;
 
 static FlavourInfo kSupportedFlavours[11];
-const aafUInt32 kNumSupportedFlavours = sizeof(kSupportedFlavours);
+const aafUInt32 kNumSupportedFlavours = sizeof(kSupportedFlavours) / sizeof(FlavourInfo);
 
 const wchar_t kDisplayName[] = L"AAF VC3 Codec";
 const wchar_t kDescription[] = L"Handles uncompressed CbYCrY and (compressed) VC3 streams";
