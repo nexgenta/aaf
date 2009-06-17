@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMXMLUtilities.h,v 1.7 2009/06/01 11:47:02 stuart_hc Exp $ $Name:  $
+// $Id: OMXMLUtilities.h,v 1.8 2009/06/17 18:13:25 phil_tudor Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -38,10 +38,10 @@
 #include "OMByteArray.h"
 
 
-#define XML_MAX_AUID_URI_SIZE                   46
-#define XML_MAX_MOBID_URI_SIZE                  79
+#define XML_MAX_AUID_URI_SIZE                   49
+#define XML_MAX_MOBID_URI_SIZE                  87
 // XML_MAX_URI_SIZE = max(XML_MAX_AUID_URI_SIZE, XML_MAX_MOBID_URI_SIZE)
-#define XML_MAX_URI_SIZE                        79 
+#define XML_MAX_URI_SIZE                        87 
 #define XML_MAX_INTEGER_STRING_SIZE             21
 #define XML_MAX_BYTE_ORDER_STRING_SIZE          13
 #define XML_MAX_TIMESTAMP_STRING_SIZE           32
