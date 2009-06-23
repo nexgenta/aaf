@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: nightly_cvs_build.pl,v 1.2 2009/06/19 09:33:18 stuart_hc Exp $
+# $Id: nightly_cvs_build.pl,v 1.3 2009/06/23 02:31:30 stuart_hc Exp $
 use strict;
 use Getopt::Long;
 use File::Basename;
@@ -194,6 +194,18 @@ E.g.
        # A special case is needed for MS Visual C++ using 'devenv'
        aafopts => q{. $HOME/vc71_vars.sh; devenv AAFWinSDK\\\\AAFWinSDK.sln /build Debug /project "Everything" /out devenv.log; cat devenv.log},
    },
+
+
+=head1 BUILD STATE
+
+The build state file stores the results of all previous builds in Data::Dumper format.
+It is stored at $config{scp_web_dest}/build_state_$config{cvs_module}.dumper on the
+remote host.  Before each build, unless it is a local build with the -l option, the 
+previous build state is read so that new build results can be merged into the
+previous results and an updated table of results can be generated.
+
+The first time nightly_cvs.build.pl is run, an initial build state file can be
+a plain text file consisting of one character, the digit 1.
 
 
 =head1 INTERNAL DESIGN DETAILS
