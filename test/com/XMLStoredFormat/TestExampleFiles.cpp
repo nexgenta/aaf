@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: TestExampleFiles.cpp,v 1.8 2009/06/01 11:47:15 stuart_hc Exp $ $Name:  $
+// $Id: TestExampleFiles.cpp,v 1.9 2009/06/24 08:06:45 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -77,10 +77,15 @@ int testExampleFiles()
             bool thisFilePassed = true;
             
             printf("a) Roundtrip\n");
-            saveCopy(exampleFiles[i], L"tmp.xml");
-            if (diff(exampleFiles[i], L"tmp.xml"))
+
+			wchar_t tmpFile[100];
+			wcscpy(tmpFile, exampleFiles[i]);
+			wcscat(tmpFile, L"_roundtrip_tmp.xml");
+
+            saveCopy(exampleFiles[i], tmpFile);
+            if (diff(exampleFiles[i], tmpFile))
             {
-                printf("FAILED diff(%ls,%ls)\n", exampleFiles[i], L"tmp.xml");
+                printf("FAILED diff(%ls, %ls)\n", exampleFiles[i], tmpFile);
                 thisFilePassed = false;
             }
             else
@@ -89,10 +94,14 @@ int testExampleFiles()
             }
     
             printf("b) Modify\n");
-            copyAndTouch(exampleFiles[i], L"tmp.xml");
-            if (diff(exampleFiles[i], L"tmp.xml"))
+
+			wcscpy(tmpFile, exampleFiles[i]);
+			wcscat(tmpFile, L"_modify_tmp.xml");
+
+            copyAndTouch(exampleFiles[i], tmpFile);
+            if (diff(exampleFiles[i], tmpFile))
             {
-                printf("FAILED diff(%ls,%ls)\n", exampleFiles[i], L"tmp.xml");
+                printf("FAILED diff(%ls, %ls)\n", exampleFiles[i], tmpFile);
                 thisFilePassed = false;
             }
             else
