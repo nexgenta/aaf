@@ -3,7 +3,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImportDV.cpp,v 1.9 2009/06/01 11:46:52 stuart_hc Exp $ $Name:  $
+// $Id: ImportDV.cpp,v 1.10 2009/07/22 02:29:35 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -334,6 +334,19 @@ static HRESULT OpenAAFFile(aafWChar * pFileName, bool comp_enable)
 
 	pMobIter->Release();
 	pMobIter = NULL;
+
+	pPictureDef->Release();
+	pPictureDef = NULL;
+
+	pDictionary->Release();
+	pDictionary = NULL;
+
+	pHeader->Release();
+	pHeader = NULL;
+
+	pFile->Close();
+	pFile->Release();
+	pFile = NULL;
 
 	return moduleErrorTmp;
 }
