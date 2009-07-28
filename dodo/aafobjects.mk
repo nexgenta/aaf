@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.174 2009/06/01 11:46:51 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.175 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -51,7 +51,6 @@ AAFCOMINTERFACESONLY="\
 	AAFEndian \
 	AAFEssenceDataEx \
 	AAFEssenceData2 \
-	AAFEssenceDescriptor2 \
 	AAFEssenceMultiAccess \
 	AAFEventMobSlot2 \
 	AAFFileDescriptor2 \
@@ -162,7 +161,6 @@ HUMAN_TYPED_IMPL="\
 	AAFSourceMob \
 	AAFSourceReference \
 	AAFStaticMobSlot \
-	AAFSubDescriptor \
 	AAFTIFFDescriptor \
 	AAFTaggedValue \
 	AAFTaggedValueDefinition \
@@ -220,7 +218,6 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFPropertyValues \
 	EnumAAFRIFFChunks \
 	EnumAAFSegments \
-	EnumAAFSubDescriptors \
 	EnumAAFTaggedValueDefs \
 	EnumAAFTaggedValues \
 	EnumAAFTypeDefs "

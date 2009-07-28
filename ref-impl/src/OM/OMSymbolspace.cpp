@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMSymbolspace.cpp,v 1.5 2009/06/17 17:37:02 phil_tudor Exp $ $Name:  $
+// $Id: OMSymbolspace.cpp,v 1.6 2009/07/28 05:49:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -3615,9 +3615,6 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
         LITERAL_AUID(0x0D010101, 0x0101, 0x5100, 0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
         L"MPEGVideoDescriptor");
     ADD_METADEF_SYMBOL(
-        LITERAL_AUID(0x0D010101, 0x0101, 0x5900, 0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
-        L"SubDescriptor");
-    ADD_METADEF_SYMBOL(
         LITERAL_AUID(0x0D010101, 0x0201, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01),
         L"ClassDefinition");
     ADD_METADEF_SYMBOL(
@@ -4109,10 +4106,6 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
         LITERAL_AUID(0x06010104, 0x0603, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x02),
         0x2f01,
         L"Locators");
-    ADD_PROPERTYDEF_SYMBOL(
-        LITERAL_AUID(0x06010104, 0x0610, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x09),
-        0x2f02,
-        L"SubDescriptors");
     ADD_PROPERTYDEF_SYMBOL(
         LITERAL_AUID(0x04060101, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01),
         0x3001,
@@ -5349,9 +5342,6 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
         LITERAL_AUID(0x05022200, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01),
         L"DescriptiveObjectStrongReference");
     ADD_METADEF_SYMBOL(
-        LITERAL_AUID(0x05022600, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01),
-        L"SubDescriptorStrongReference");
-    ADD_METADEF_SYMBOL(
         LITERAL_AUID(0x05030D00, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01),
         L"DataDefinitionWeakReferenceSet");
     ADD_METADEF_SYMBOL(
@@ -5456,9 +5446,6 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
     ADD_METADEF_SYMBOL(
         LITERAL_AUID(0x05060D00, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01),
         L"DescriptiveObjectStrongReferenceVector");
-    ADD_METADEF_SYMBOL(
-        LITERAL_AUID(0x05060E00, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01),
-        L"SubDescriptorStrongReferenceVector");
     
     
     //

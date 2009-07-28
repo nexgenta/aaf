@@ -2,7 +2,7 @@ cpp_quote("//=------------------------------------------------------------------
 cpp_quote("//")
 cpp_quote("// This file was GENERATED for the AAF SDK")
 cpp_quote("//")
-cpp_quote("// $Id: AAFPrivate.idl,v 1.19 2009/06/01 11:46:59 stuart_hc Exp $ $Name:  $")
+cpp_quote("// $Id: AAFPrivate.idl,v 1.20 2009/07/28 05:49:08 stuart_hc Exp $ $Name:  $")
 cpp_quote("//")
 cpp_quote("// The contents of this file are subject to the AAF SDK Public Source")
 cpp_quote("// License Agreement Version 2.0 (the \"License\"); You may not use this")
@@ -354,7 +354,6 @@ interface IAAFHTMLClip : IUnknown
 ///  - IAAFFileDescriptor
 ///  - IAAFFileDescriptor2
 ///  - IAAFEssenceDescriptor
-///  - IAAFEssenceDescriptor2
 ///  - IAAFObject
 [
     object,

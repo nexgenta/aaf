@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable.h,v 1.21 2009/06/01 11:47:02 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectTable.h,v 1.22 2009/07/28 05:49:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -163,7 +163,6 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(AAFSourceMob)
 	AAF_OBJECT_ENTRY(AAFSourceReference)
 	AAF_OBJECT_ENTRY(AAFStaticMobSlot)
-	AAF_OBJECT_ENTRY(AAFSubDescriptor)
 	AAF_OBJECT_ENTRY(AAFTIFFDescriptor)
 	AAF_OBJECT_ENTRY(AAFTaggedValue)
 	AAF_OBJECT_ENTRY(AAFTaggedValueDefinition)
@@ -221,7 +220,6 @@ AAF_BEGIN_OBJECT_MAP(AAFObjectMap)
 	AAF_OBJECT_ENTRY(EnumAAFPropertyValues)
 	AAF_OBJECT_ENTRY(EnumAAFRIFFChunks)
 	AAF_OBJECT_ENTRY(EnumAAFSegments)
-	AAF_OBJECT_ENTRY(EnumAAFSubDescriptors)
 	AAF_OBJECT_ENTRY(EnumAAFTaggedValueDefs)
 	AAF_OBJECT_ENTRY(EnumAAFTaggedValues)
 	AAF_OBJECT_ENTRY(EnumAAFTypeDefs)

@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPrivate_i.c,v 1.19 2009/06/01 11:47:00 stuart_hc Exp $ $Name:  $
+// $Id: AAFPrivate_i.c,v 1.20 2009/07/28 05:49:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -45,6 +45,7 @@
 #ifdef __cplusplus
 extern "C"{
 #endif
+
 
 const IID IID_IAAFRoot = {0x7C3712C2,0x390D,0x11D2,{0x84,0x1B,0x00,0x60,0x08,0x32,0xAC,0xB8}};
 

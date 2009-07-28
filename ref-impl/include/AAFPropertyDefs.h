@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPropertyDefs.h,v 1.25 2009/06/01 11:46:58 stuart_hc Exp $ $Name:  $
+// $Id: AAFPropertyDefs.h,v 1.26 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -461,10 +461,6 @@ const aafUID_t kAAFPropID_EssenceData_SampleIndex =
 //{06010104-0603-0000-060e-2b3401010102}
 const aafUID_t kAAFPropID_EssenceDescriptor_Locator =
 {0x06010104, 0x0603, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02}};
-
-//{06010104-0610-0000-060e-2b3401010109}
-const aafUID_t kAAFPropID_EssenceDescriptor_SubDescriptors =
-{0x06010104, 0x0610, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x09}};
 
 //{04060101-0000-0000-060e-2b3401010101}
 const aafUID_t kAAFPropID_FileDescriptor_SampleRate =

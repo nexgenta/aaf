@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFTypeDefUIDs.h,v 1.30 2009/06/01 11:46:58 stuart_hc Exp $ $Name:  $
+// $Id: AAFTypeDefUIDs.h,v 1.31 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -518,10 +518,6 @@ const aafUID_t kAAFTypeID_TaggedValueDefinitionStrongReference =
 const aafUID_t kAAFTypeID_DescriptiveObjectStrongReference =
 {0x05022200, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
-//{05022600-0000-0000-060e-2b3401040101}
-const aafUID_t kAAFTypeID_SubDescriptorStrongReference =
-{0x05022600, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
-
 //{05030d00-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_DataDefinitionWeakReferenceSet =
 {0x05030d00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
@@ -661,10 +657,6 @@ const aafUID_t kAAFTypeID_RIFFChunkStrongReferenceVector =
 //{05060d00-0000-0000-060e-2b3401040101}
 const aafUID_t kAAFTypeID_DescriptiveObjectStrongReferenceVector =
 {0x05060d00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
-
-//{05060e00-0000-0000-060e-2b3401040101}
-const aafUID_t kAAFTypeID_SubDescriptorStrongReferenceVector =
-{0x05060e00, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 
 

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: maketargets_gnu.mak,v 1.10 2009/06/01 11:46:51 stuart_hc Exp $ $Name:  $
+# $Id: maketargets_gnu.mak,v 1.11 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -412,7 +412,8 @@ $(INCLUDE_DIR)/ref-api/%.h : %.dod macros/refh.mac macros/base.mac
 .dod.comc :
 	$(RM) $*.comc
 	$(DODO) -f macros/comc.mac < $*.dod > $*.tmp
-	$(MV) $*.tmp $*.comc
+	$(PERL) tool/fix_compiler_warnings.pl $*.tmp > $*.comc
+	$(RM) $*.tmp
 	$(CHMOD) -w $*.comc
 
 .dod.comcx :

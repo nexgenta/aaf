@@ -5,7 +5,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFClassDefUIDs.h,v 1.24 2009/06/01 11:46:57 stuart_hc Exp $ $Name:  $
+// $Id: AAFClassDefUIDs.h,v 1.25 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -393,10 +393,6 @@ const aafUID_t kAAFClassID_BWFImportDescriptor =
 //{0d010101-0101-5100-060e-2b3402060101}
 const aafUID_t kAAFClassID_MPEGVideoDescriptor =
 {0x0d010101, 0x0101, 0x5100, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
-
-//{0d010101-0101-5900-060e-2b3402060101}
-const aafUID_t kAAFClassID_SubDescriptor =
-{0x0d010101, 0x0101, 0x5900, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
 
 //{0d010101-0201-0000-060e-2b3402060101}
 const aafUID_t kAAFClassID_ClassDefinition =

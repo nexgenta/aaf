@@ -2,7 +2,7 @@
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFObjectTable_i.cpp,v 1.21 2009/06/01 11:47:02 stuart_hc Exp $ $Name:  $
+// $Id: AAFObjectTable_i.cpp,v 1.22 2009/07/28 05:49:08 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -141,7 +141,6 @@
 #include "CAAFSourceMob.h"
 #include "CAAFSourceReference.h"
 #include "CAAFStaticMobSlot.h"
-#include "CAAFSubDescriptor.h"
 #include "CAAFTIFFDescriptor.h"
 #include "CAAFTaggedValue.h"
 #include "CAAFTaggedValueDefinition.h"
@@ -199,7 +198,6 @@
 #include "CEnumAAFPropertyValues.h"
 #include "CEnumAAFRIFFChunks.h"
 #include "CEnumAAFSegments.h"
-#include "CEnumAAFSubDescriptors.h"
 #include "CEnumAAFTaggedValueDefs.h"
 #include "CEnumAAFTaggedValues.h"
 #include "CEnumAAFTypeDefs.h"
