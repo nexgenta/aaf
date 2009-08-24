@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.175 2009/07/28 05:49:05 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.176 2009/08/24 13:31:59 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -58,6 +58,7 @@ AAFCOMINTERFACESONLY="\
 	AAFKLVEssenceDataParameters \
 	AAFKLVStreamParameters \
 	AAFMasterMob2 \
+	AAFMasterMob3 \
 	AAFMasterMobEx \
 	AAFMob2 \
 	AAFProgress \

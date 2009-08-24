@@ -6,7 +6,7 @@
 
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFMasterMob.h,v 1.32 2009/06/01 11:47:06 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFMasterMob.h,v 1.33 2009/08/24 13:32:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -78,6 +78,28 @@ public:
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     AddMasterSlot
+        (// @parm [in] Data kind of new Master Mob slot
+		 ImplAAFDataDef * pDataDef,
+
+		 // @parm [in] Slot ID of the Source Mob slot to be added to the Master Mob
+         aafSlotID_t  sourceSlotID,
+
+		 // @parm [in] Source Mob containing the slot to be added to the Master Mob
+         ImplAAFSourceMob * pSourceMob,
+
+		 // @parm [in] SlotID assigned to the new Master Mob slot
+		 aafSlotID_t  masterSlotID,
+
+		 // @parm [in, string] Name to assign to new slot in Master Mob
+		 const aafWChar *  pSlotName);
+
+
+
+  //****************
+  // AddMasterSlotWithSequence()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddMasterSlotWithSequence
         (// @parm [in] Data kind of new Master Mob slot
 		 ImplAAFDataDef * pDataDef,
 

@@ -3,10 +3,10 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
- /* File created by MIDL compiler version 6.00.0361 */
-/* at Fri Mar 24 17:09:03 2006
+/* File created by MIDL compiler version 6.00.0361 */
+/* at TIMESTAMP REMOVED
  */
-/* Compiler settings for C:\cygwin\home\jesse\SDK\AAF\ref-impl\include\com-api\AAFPluginTypes.idl:
+/* Compiler settings for ../ref-impl/include/com-api/AAFPluginTypes.idl:
     Oicf, W1, Zp8, env=Win32 (32b run)
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
@@ -59,7 +59,7 @@ void __RPC_USER MIDL_user_free( void * );
 //
 // This file was GENERATED for the AAF SDK
 //
-// $Id: AAFPluginTypes.h,v 1.10 2009/06/01 11:46:59 stuart_hc Exp $ $Name:  $
+// $Id: AAFPluginTypes.h,v 1.11 2009/08/24 13:32:13 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
