@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.54 2009/06/01 11:47:08 stuart_hc Exp $ $Name:  $
+// $Id: ImplAAFTypeDefFixedArray.cpp,v 1.55 2009/09/01 16:46:58 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -343,9 +343,10 @@ OMUInt32 ImplAAFTypeDefFixedArray::internalSize(const OMByte* /*externalBytes*/,
 
 OMUInt32 ImplAAFTypeDefFixedArray::internalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+  ImplAAFTypeDef* ptd = NonRefCountedBaseType ();
+  ASSERTU (ptd->IsFixedSize ());
+  OMUInt32 result = _ElementCount * ptd->ActualSize ();
+  return result;
 }
 
 
