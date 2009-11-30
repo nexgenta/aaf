@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: aafobjects.mk,v 1.176 2009/08/24 13:31:59 stuart_hc Exp $ $Name:  $
+# $Id: aafobjects.mk,v 1.177 2009/11/30 13:10:16 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -270,6 +270,7 @@ PLUGIN_OBJECTS="\
 	AAFClassExtension \
 	AAFEssenceCodec \
 	AAFEssenceCodec2 \
+	AAFEssenceCodec3 \
 	AAFEssenceContainer \
 	AAFEssenceDataStream \
 	AAFEssenceDataStream2 \

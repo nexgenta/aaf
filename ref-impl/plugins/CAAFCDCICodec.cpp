@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: CAAFCDCICodec.cpp,v 1.37 2009/06/16 10:48:28 stuart_hc Exp $ $Name:  $
+// $Id: CAAFCDCICodec.cpp,v 1.38 2009/11/30 13:10:16 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -936,6 +936,26 @@ HRESULT STDMETHODCALLTYPE
 	_storedFrameSampleSize = p_params->storedSize;
 
 	SetCodecState();
+
+	return AAFRESULT_SUCCESS;
+}
+
+// IsCompressionSupported is used by the toolkit to test whether this plugin
+// is capable of opening and reading essence for the given compression ID.
+HRESULT STDMETHODCALLTYPE
+	CAAFCDCICodec::IsCompressionSupported(
+		aafUID_constref compression,
+		aafBool* pIsSupported)
+{
+	plugin_trace("CAAFCDCICodec::IsCompressionSupported()\n");
+
+	if (NULL == pIsSupported)
+		return AAFRESULT_NULL_PARAM;
+
+	if (IsSupportedCompressionID(compression))
+		*pIsSupported = kAAFTrue;
+	else
+		*pIsSupported = kAAFFalse;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -3202,9 +3222,16 @@ HRESULT CAAFCDCICodec::InternalQueryInterface
         return S_OK;
     }
     // and the IAAFEssenceCodec2 interface 
-    if( aafIsEqualIID( riid, IID_IAAFEssenceCodec2 ) )
+    else if( aafIsEqualIID( riid, IID_IAAFEssenceCodec2 ) )
     { 
         *ppvObj = (IAAFEssenceCodec2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+    // and the IAAFEssenceCodec3 interface 
+    else if( aafIsEqualIID( riid, IID_IAAFEssenceCodec3 ) )
+    { 
+        *ppvObj = (IAAFEssenceCodec3 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
