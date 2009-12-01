@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.5 2009/06/01 11:46:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.6 2009/12/01 08:00:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -39,3 +39,4 @@ include ../comexamplerules.mk
 .PHONY : check
 check : $(AAFSDKBINDIR)/ImportAudioExample$(EXE)
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportAudioExample$(EXE) ../ExportAudioExample/ExportAudioExample.aaf
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportAudioExample$(EXE) ../ExportAudioExample/ExportAudioExample_NoCodecDef.aaf

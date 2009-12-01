@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.7 2009/06/01 11:46:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.8 2009/12/01 08:00:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -81,6 +81,7 @@ endif
 	SMPTE_D10_525x5994I_40Mbps \
 	SMPTE_D10_625x50I_30Mbps \
 	SMPTE_D10_525x5994I_30Mbps \
-	NoCompression ; do \
+	NoCompression \
+	NoCodecDef ; do \
 	  rm -f raw.cdci; if [ ! -r ../ExportDV/ExportDV_$$f.aaf ] ; then continue; fi; echo $(TEST_CMD) ../ExportDV/ExportDV_$$f.aaf; $(TEST_CMD) ../ExportDV/ExportDV_$$f.aaf || exit 1; \
 	done

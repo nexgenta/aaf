@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: GNUmakefile,v 1.3 2009/06/01 11:46:52 stuart_hc Exp $ $Name:  $
+# $Id: GNUmakefile,v 1.4 2009/12/01 08:00:19 stuart_hc Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -40,3 +40,4 @@ include ../comexamplerules.mk
 check : $(AAFSDKBINDIR)/ImportPCM$(EXE)
 	@rm -f raw.pcm
 	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportPCM$(EXE) ../ExportPCM/ExportPCM.aaf && test -f raw.pcm
+	$(APP_RUN_ENV) $(AAFSDKBINDIR)/ImportPCM$(EXE) ../ExportPCM/ExportPCM_NoCodecDef.aaf && test -f raw.pcm
