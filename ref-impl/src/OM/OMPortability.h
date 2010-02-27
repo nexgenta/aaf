@@ -42,7 +42,7 @@
 // Figure out the compiler and define symbols of the form
 // OM_COMPILER_<compiler name>_<processor>_<operating system>
 // OM_OS_<operating system>
-//
+
 #if defined (_MSC_VER) && defined(_M_IX86) && defined(_WIN32)
 #define OM_COMPILER_MSC_INTEL_WINDOWS
 #define OM_OS_WINDOWS
@@ -91,6 +91,12 @@
 #define OM_OS_UNIX
 #elif defined(__GNUC__) && defined(__sparc__) && defined(__sun__)
 #define OM_COMPILER_GCC_SPARC_SUNOS
+#define OM_OS_UNIX
+#elif defined(__GNUC__) && defined(__i386__) && defined(__sun__)
+#define OM_COMPILER_GCC_INTEL_SUNOS
+#define OM_OS_UNIX
+#elif defined(__GNUC__) && defined(__x86_64__) && defined(__sun__)
+#define OM_COMPILER_GCC_X86_64_SUNOS
 #define OM_OS_UNIX
 #else
 #error "Unknown compiler"
