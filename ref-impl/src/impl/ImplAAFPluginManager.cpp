@@ -31,6 +31,11 @@
 //
 //=---------------------------------------------------------------------=
 
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <wchar.h>
+
 #ifndef __AAFTypes_h__
 #include "AAFTypes.h"
 #endif
@@ -54,10 +59,6 @@
 #include "ImplAAFSourceMob.h"
 
 #include "OMAssertions.h"
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <wchar.h>
 
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
