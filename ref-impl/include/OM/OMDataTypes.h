@@ -46,30 +46,15 @@
 // types below.
 // This allows new platforms to be added without disturbing the code
 // for existing platforms.
-//
-#if defined(OM_COMPILER_MSC_INTEL_WINDOWS) || \
-    defined(OM_COMPILER_MSC_X64_WINDOWS)
-typedef signed char            OMInt8;
-typedef short int              OMInt16;
-typedef long int               OMInt32;
-typedef __int64                OMInt64;
 
-typedef unsigned char          OMUInt8;
-typedef unsigned short int     OMUInt16;
-typedef unsigned long int      OMUInt32;
-typedef unsigned __int64       OMUInt64;
+#if defined(HAVE_STDINT_H) || defined(HAVE_INTTYPES_H)
 
-#define INT64_C(c)	c
-#define UINT64_C(c)	c
-
-#elif defined(OM_COMPILER_GCC_INTEL_LINUX) || defined(OM_COMPILER_GCC_X86_64_LINUX) \
-   || defined(OM_COMPILER_GCC_PPC_LINUX) \
-   || defined(OM_COMPILER_GCC_PPC64_LINUX) \
-   || defined(OM_COMPILER_GCC_PPC_MACOSX) || defined(OM_COMPILER_GCC_INTEL_MACOSX) || defined(OM_COMPILER_MWERKS_PPC_MACOSX) \
-   || defined(OM_COMPILER_SGICC_MIPS_SGI) || defined(OM_COMPILER_GCC_MIPS_SGI) \
-   || defined(OM_COMPILER_GCC_SPARC_SUNOS) \
-   || defined(OM_COMPILER_GCC_INTEL_FREEBSD) || defined(OM_COMPILER_GCC_INTEL_OPENBSD) \
-   || defined(OM_COMPILER_GCC_INTEL_WINDOWS) || defined(OM_COMPILER_GCC_INTEL_CYGWIN)
+#ifdef HAVE_STDINT_H
+#  include <stdint.h>
+# endif
+# ifdef HAVE_INTTYPES_H
+#  include <inttypes.h>
+# endif
 
 // Use ISO C99 (also ANSI and POSIX) fixed size integers
 
@@ -84,6 +69,22 @@ typedef uint8_t                OMUInt8;
 typedef uint16_t               OMUInt16;
 typedef uint32_t               OMUInt32;
 typedef uint64_t               OMUInt64;
+
+//
+#elif defined(OM_COMPILER_MSC_INTEL_WINDOWS) || \
+    defined(OM_COMPILER_MSC_X64_WINDOWS)
+typedef signed char            OMInt8;
+typedef short int              OMInt16;
+typedef long int               OMInt32;
+typedef __int64                OMInt64;
+
+typedef unsigned char          OMUInt8;
+typedef unsigned short int     OMUInt16;
+typedef unsigned long int      OMUInt32;
+typedef unsigned __int64       OMUInt64;
+
+#define INT64_C(c)	c
+#define UINT64_C(c)	c
 
 #else
 #error "Unknown compiler"
