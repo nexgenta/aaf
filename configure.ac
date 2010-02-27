@@ -50,6 +50,7 @@ ref-impl/aafiid/Makefile
 ref-impl/src/Makefile
 ref-impl/src/OM/Makefile
 ref-impl/src/impl/Makefile
+ref-impl/src/com-api/Makefile
 ref-impl/plugins/Makefile
 ])
 
