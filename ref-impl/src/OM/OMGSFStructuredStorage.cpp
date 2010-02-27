@@ -51,6 +51,15 @@ extern "C" {
 }
 #endif
 
+#ifdef HAVE_GSF_OUTFILE_MSOLE_NEW_FULL
+extern "C" GsfOutfileMSOle *gsf_outfile_msole_new_full (GsfOutput *sink, guint bb_size, guint sb_size);
+#else
+GsfOutfileMSOle *
+gsf_outfile_msole_new_full (GsfOutput *sink, guint bb_size, guint sb_size)
+{
+	return gsf_outfile_msole_new(sink);
+}	
+#endif
 
 typedef struct tag_GSF_GUID
 {
