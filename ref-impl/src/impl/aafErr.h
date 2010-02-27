@@ -162,12 +162,14 @@ AAF_EXPORT void aafPrintStackTrace(AAFFile * file);
 
 #define CHECK(a) { if((zzOmfEcode = (a)) != AAFRESULT_SUCCESS) goto zzOmfCleanup; }
 
+#undef REG_ERR
+#undef REREG_ERR
 #if defined(AAF_ERROR_TRACE)
 #define REG_ERR(ecode)	   aafRegErrDebug(ecode, __FILE__, __LINE__)
 #define REREG_ERR(ecode)  aafReregErrDebug(ecode, __FILE__, __LINE__)
 #else 
-#define REG_ERR(ecode)
-#define REREG_ERR(ecode)
+#define REG_ERR(ecode)    /* REG_ERR(ecode) */
+#define REREG_ERR(ecode)  /* REREG_ERR(ecode) */
 #endif
 
 #ifdef AAF_NO_ASSERTS
