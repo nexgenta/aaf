@@ -38,6 +38,9 @@ fi
 
 AM_CONDITIONAL([OM_USE_GSF_SS],[test x"$ss_impl" = x"gsf"])
 
+AC_CHECK_LIB([uuid],[uuid_generate])
+AC_CHECK_FUNC([uuid_generate],,[AC_MSG_ERROR([an implementation of uuid_generate() is required to build the AAF SDK])])
+
 INCLUDES="$INCLUDES -I\${top_srcdir}/ref-impl/include"
 INCLUDES="$INCLUDES -I\${top_srcdir}/ref-impl/include/ref-api"
 AC_SUBST([INCLUDES])
