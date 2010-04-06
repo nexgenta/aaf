@@ -48,6 +48,8 @@ AC_SUBST([INCLUDES])
 AC_CONFIG_FILES([
 Makefile
 ref-impl/Makefile
+ref-impl/include/Makefile
+ref-impl/include/ref-api/Makefile
 ref-impl/aaflib/Makefile
 ref-impl/aafiid/Makefile
 ref-impl/src/Makefile

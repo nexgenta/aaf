@@ -1,1 +1,1 @@
-SUBDIRS = aaflib aafiid src plugins
+SUBDIRS = include aaflib aafiid src plugins
