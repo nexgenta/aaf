@@ -1,4 +1,4 @@
-AC_INIT([libMXF],[1.1.4])
+AC_INIT([aaf],[1.1.4])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_MAINTAINER_MODE
 
