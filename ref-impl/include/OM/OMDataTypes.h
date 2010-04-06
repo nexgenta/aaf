@@ -49,7 +49,7 @@
 
 #if defined(HAVE_STDINT_H) || defined(HAVE_INTTYPES_H)
 
-#ifdef HAVE_STDINT_H
+# ifdef HAVE_STDINT_H
 #  include <stdint.h>
 # endif
 # ifdef HAVE_INTTYPES_H
@@ -59,7 +59,7 @@
 // Use ISO C99 (also ANSI and POSIX) fixed size integers
 
 #define __STDC_CONSTANT_MACROS	// needed in C++ to define INT64_C, UINT64_C
-#include <inttypes.h>
+
 typedef int8_t                 OMInt8;
 typedef int16_t                OMInt16;
 typedef int32_t                OMInt32;
@@ -69,6 +69,9 @@ typedef uint8_t                OMUInt8;
 typedef uint16_t               OMUInt16;
 typedef uint32_t               OMUInt32;
 typedef uint64_t               OMUInt64;
+
+#define INT64_C(c)	c
+#define UINT64_C(c)	c
 
 //
 #elif defined(OM_COMPILER_MSC_INTEL_WINDOWS) || \
