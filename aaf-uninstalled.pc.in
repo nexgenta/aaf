@@ -1,0 +1,17 @@
+# AAF pkg-config source file
+
+prefix=
+exec_prefix=
+aaflibdir=${pcfiledir}/ref-impl/aaflib
+comapilibdir=${pcfiledir}/ref-impl/src/com-api
+aafidlibdir=${pcfiledir}/ref-impl/aafid
+includedir=${pcfiledir}/ref-impl/include
+
+Name: @PACKAGE@
+Description: Advanced Authoring Format SDK
+Version: @VERSION@
+Requires: @pkg_requires@
+Conflicts: @pkg_conflicts@
+Libs: -L${aaflibdir} -Wl,-rpath,${aaflibdir} -L${comapilibdir} -Wl,-rpath,${comapilibdir} -L${aafidlibdir} -Wl,-rpath,${aafidlibdir} -lcom-api @LIBS@
+Cflags: -I${includedir} -I${includedir}/ref-impl
+

@@ -19,3 +19,5 @@ Makefile.in
 *.loT
 .deps
 .libs
+/aaf.pc
+/aaf-uninstalled.pc

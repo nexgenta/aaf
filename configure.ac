@@ -16,7 +16,7 @@ if test x"$ss_impl" = x"no" ; then
 	AC_CHECK_LIB([ole32],[StgOpenStorageOnILockBytes],[ss_impl=win32])
 fi
 if test x"$ss_impl" = x"no" ; then
-	PKG_CHECK_MODULES([GSF],[libgsf-1 >= 1.9.0],[ss_impl=gsf])
+	PKG_CHECK_MODULES([GSF],[libgsf-1 >= 1.9.0],[ss_impl=gsf;pkg_requires="$pkg_requires libgsf-1 >= 1.90"])
 fi
 
 AC_MSG_CHECKING([which structured storage implementation to use])
@@ -45,6 +45,9 @@ INCLUDES="$INCLUDES -I\${top_srcdir}/ref-impl/include"
 INCLUDES="$INCLUDES -I\${top_srcdir}/ref-impl/include/ref-api"
 AC_SUBST([INCLUDES])
 
+AC_SUBST([pkg_requires])
+AC_SUBST([pkg_conflicts])
+
 AC_CONFIG_FILES([
 Makefile
 ref-impl/Makefile
@@ -57,6 +60,8 @@ ref-impl/src/OM/Makefile
 ref-impl/src/impl/Makefile
 ref-impl/src/com-api/Makefile
 ref-impl/plugins/Makefile
+aaf.pc
+aaf-uninstalled.pc
 ])
 
 AC_OUTPUT

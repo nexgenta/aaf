@@ -1,0 +1,14 @@
+# AAF pkg-config source file
+
+prefix=@prefix@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: @PACKAGE@
+Description: Advanced Authoring Format SDK
+Version: @VERSION@
+Requires: @pkg_requires@
+Conflicts: @pkg_conflicts@
+Libs: -L${libdir} -Wl,-rpath,${libdir} -lcom-api @LIBS@
+Cflags: -I${includedir}/aaf
