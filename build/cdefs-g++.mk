@@ -1,6 +1,6 @@
 ###############################################################################
 #
-# $Id: cdefs-g++.mk,v 1.16 2009/06/01 11:46:49 stuart_hc Exp $ $Name:  $
+# $Id: cdefs-g++.mk,v 1.17 2010/09/17 23:12:45 terabrit Exp $ $Name:  $
 #
 # The contents of this file are subject to the AAF SDK Public Source
 # License Agreement Version 2.0 (the "License"); You may not use this
@@ -77,12 +77,12 @@ CCVERSION = $(shell g++ -dumpversion)
 #------------------------------------------------------------------------------
 # Debug info generation
 #------------------------------------------------------------------------------
-DBG_FLAGS = -g -Wall -Wundef -Wno-non-virtual-dtor -Werror
+DBG_FLAGS = -g -Wall -Wundef -Wno-non-virtual-dtor -Werror -Wno-reorder -Wno-unused
 
 #------------------------------------------------------------------------------
 # Optimisation flags when building a Release
 #------------------------------------------------------------------------------
-REL_FLAGS = -O2 -Wall -Wundef -Wno-non-virtual-dtor -Werror
+REL_FLAGS = -O2 -Wall -Wundef -Wno-non-virtual-dtor -Werror -Wno-reorder -Wno-unused
 
 # Turn off no-strict-aliasing warning as a workaround for g++ 4.1.x and above
 # "dereferencing type-punned pointer will break strict-aliasing rules" warnings.
