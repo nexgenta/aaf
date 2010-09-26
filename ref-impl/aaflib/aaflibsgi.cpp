@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: aaflibsgi.cpp,v 1.13 2009/06/01 11:46:57 stuart_hc Exp $ $Name:  $
+// $Id: aaflibsgi.cpp,v 1.14 2010/09/26 06:49:57 stuart_hc Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -68,7 +68,7 @@ static bool AAFIsValidFile(const char *name)
    if (name == NULL)
       return false;
 
-   char *pExt = strrchr(name, '.');
+   const char *pExt = strrchr(name, '.');
 
    return (pExt && strcmp(++pExt, pluginExt) == 0);
 }
