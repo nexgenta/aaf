@@ -1,6 +1,6 @@
 //=---------------------------------------------------------------------=
 //
-// $Id: OMWeakRefPropertyT.h,v 1.74 2009/06/01 11:47:02 stuart_hc Exp $ $Name:  $
+// $Id: OMWeakRefPropertyT.h,v 1.75 2010/10/13 10:19:09 philipn Exp $ $Name:  $
 //
 // The contents of this file are subject to the AAF SDK Public Source
 // License Agreement Version 2.0 (the "License"); You may not use this
@@ -647,7 +647,10 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::shallowCopyTo(
   ASSERT("Valid destination", dest != this);
   ASSERT("Valid source", (_targetName != 0) || (_targetPropertyPath != 0));
 
+  Key id = identification();
+
   dest->_reference = _reference;
+  dest->_reference.setValue(&id, 0); // set reference unresolved
   dest->_targetTag = nullOMPropertyTag;
   dest->_targetName = _targetName;
   delete [] dest->_targetPropertyPath;
